@@ -1,0 +1,152 @@
+module Basic where
+
+import Prelude
+
+import Data.Foldable (any)
+import Data.Tuple (Tuple(..))
+import Effect (Effect)
+import Nemo (nemo)
+import Nemo.Class.Game (class Game)
+import Nemo.Constants (scene)
+import Nemo.Data.Audio (Tone(..))
+import Nemo.Data.Color (Color(..))
+import Nemo.Data.Emoji (Emoji(..))
+import Nemo.Data.Input (Input(..))
+import Nemo.Draw (cls, emap, emo, emo')
+import Nemo.Sound (play)
+import Nemo.Types (RawMap(..), RawSound(..), Size, X, Y)
+import Nemo.Utils (isMapCollide, isMonitorCollide, mkAsset)
+
+
+emoSize :: Size
+emoSize = 64
+
+mapSize :: Size
+mapSize = 64
+
+gravity :: Int
+gravity = 2
+
+data State = State
+  { x :: Int
+  , y :: Int
+  , dy :: Int
+  , isJump :: Boolean
+  , appear :: Appear
+  , frame :: Int
+  }
+
+data Appear = LeftWalk | RightWalk | LeftRun | RightRun
+
+instance gameState :: Game State where
+  update (Input input) (State state) asset =
+    State $ state
+      { x = nnx
+      , y = nny
+      , dy = nndy
+      , isJump = isJump
+      , appear = appear
+      , frame = state.frame + 1
+      }
+      where
+        isCollide :: X -> Y -> Boolean
+        isCollide x y =
+            any
+              (\f -> f emoSize x y)
+              [ isMapCollide asset 0 mapSize walls
+              , isMonitorCollide
+              ]
+        
+        -- next x
+        nx = case Tuple input.isLeft input.isRight of
+              Tuple true false -> state.x - 10
+              Tuple false true-> state.x + 10
+              _ -> state.x
+
+        -- next y, dy
+        canJump = isCollide state.x (state.y - gravity)
+        isJump = canJump && input.isUp
+        ddy = if isJump then 40 else 0
+        ndy = state.dy - gravity + ddy
+        ny = state.y + ndy
+
+        -- final x, y, dy
+        -- FIXME: rough adjust
+        isCollX = isCollide nx state.y
+        isCollY = isCollide state.x ny
+        nnx = if isCollX then state.x else nx
+        nny = if isCollY then state.y else ny
+        nndy = if isCollY then gravity else ndy
+
+        -- next appearance
+        appear =
+          case Tuple input.isLeft input.isRight of
+            Tuple true false -> if isAppearRun then LeftRun else LeftWalk 
+            Tuple false true -> if isAppearRun then RightRun else RightWalk
+            _ -> case state.appear of
+                  LeftRun -> LeftWalk
+                  RightRun -> RightWalk
+                  _ -> state.appear
+          where
+            isAppearRun = mod state.frame 8 < 4
+            
+  draw (State state) =
+    [ cls Silver
+    , emap 0 emoSize 0 0
+    , emoF emoSize state.x state.y
+    ]
+    where
+      emoF = case state.appear of
+        LeftWalk -> emo PersonWalking
+        RightWalk -> emo' PersonWalking
+        LeftRun -> emo PersonRunning
+        RightRun -> emo' PersonRunning
+
+  sound (State state) =
+    [ if state.isJump then play 0 Saw 4096 else const $ pure unit
+    ]
+
+main :: Effect Unit
+main = do
+  asset <- mkAsset [map0] [sound0]
+  nemo initialState asset
+
+initialState :: State 
+initialState = State
+  { x: scene.width / 2
+  , y: mapSize
+  , dy: 0
+  , isJump: false
+  , appear: LeftWalk
+  , frame: 0
+  }
+
+walls :: Array Emoji
+walls = [JapaneseNoVacancyButton] -- 🈵
+
+map0 :: RawMap
+map0 = RawMap """
+🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+🈳🈳🈳🈳🈳🈳🈳🈚🈚🈳🈳🈳🈳🈳🈳🈳
+🈳🈳🈳🈳🈳🈳🈳🈚🈚🈳🈳🈳🈳🈳🈳🈳
+🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+🈵🈵🈵🈵🈳🈳🈳🈳🈳🈳🈳🈳🈵🈵🈵🈵
+🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+🈳🈳🈳🈳🈵🈵🈵🈵🈵🈵🈵🈵🈳🈳🈳🈳
+🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+🈵🈵🈵🈵🈵🈵🈵🈵🈵🈵🈵🈵🈵🈵🈵🈵
+"""
+
+sound0 :: RawSound
+sound0 = RawSound """
+🎼🎼🎼🎼🎼🎼🎛🎛🎛🎛🎛🎛
+🕕🕡🕖🕢🕗🕣🕘🕤🕙🕥🕚🕦
+🔈🔈🔈🔈🔈🔈🔈🔈🔈🔈🔈🔈
+"""

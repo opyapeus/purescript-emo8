@@ -1,0 +1,28 @@
+{
+  "name": "purescript-nemo",
+  "license": "MIT",
+  "description": "Simple 2D game engine based on emoji.",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/opyapeus/purescript-nemo.git"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-prelude": "^4.1.0",
+    "purescript-console": "^4.1.0",
+    "purescript-effect": "^2.0.0",
+    "purescript-canvas": "^4.0.0",
+    "purescript-signal": "^10.1.0",
+    "purescript-stringutils": "^0.0.8",
+    "purescript-webaudio": "^0.1.2",
+    "purescript-tuples": "^5.0.0"
+  },
+  "devDependencies": {
+    "purescript-psci-support": "^4.0.0"
+  }
+}
