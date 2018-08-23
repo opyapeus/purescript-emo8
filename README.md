@@ -115,7 +115,7 @@ open html (public folder) on browser
 npm run open
 ```
 
-access with tag
+access with tag (it may need reload)
 
 ```url
 public/index.html#hello
@@ -160,7 +160,7 @@ Since it is beta version, wait for a while.
 If you find an improvement point, please give me an issue.
 Thank you.
 
-## LICENSE
+## License
 
 [MIT](LICENSE)
 

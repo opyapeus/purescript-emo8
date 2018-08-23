@@ -115,7 +115,7 @@ npm run build:examples
 npm run open
 ```
 
-タグを指定してアクセス
+タグを指定してアクセス（リロードが必要かもしれません）
 
 ```url
 public/index.html#hello
