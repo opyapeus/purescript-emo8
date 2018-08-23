@@ -1,5 +1,7 @@
 # NEMO
 
+[ [日本語](README.ja.md) ]
+
 ※ it's beta for now
 
 A unique game engine for creating visual symbolic games using emoticons and powerful functional language.
@@ -27,7 +29,7 @@ But type classes are not supported.
 And it is recommended to follow Elm architecture.
 
 PureScript ->
-It has a powerful type class like Haskell.
+It has a type class like Haskell.
 And it is compiled into Javascript.
 So it can be easy to run on any devices with browser!
 
