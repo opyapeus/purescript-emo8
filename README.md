@@ -51,6 +51,12 @@ You can also add games you made with NEMO here.
 
 If you want, please make issue or PR at Github Pages [Repository](https://github.com/opyapeus/nemo)
 
+## Installation
+
+```sh
+bower i purescript-nemo
+```
+
 ## Getting Started
 
 - [Usage](docs/usage.md)
@@ -119,18 +125,6 @@ public/index.html#emodius
 
 - [Supported Emojis](docs/emoji.md)
 
-## Installation
-
-Preparing...
-
-## Documentation
-
-Preparing...
-
-## Contribution
-
-Preparing...
-
 ## Under Developing List
 
 ### high
@@ -153,6 +147,16 @@ Preparing...
 
 - emoji rotate (45°, 135°, 225°, 315°) problem on canvas
 - default emoji presentation [CSS Fonts Module Level 4 - Editor’s Draft, 17 August 2018](https://drafts.csswg.org/css-fonts-4/#font-variant-emoji-prop)
+
+## Documentation
+
+- [Module documentation on Pursuit](https://pursuit.purescript.org/packages/purescript-nemo/)
+
+## Contribution
+
+Since it is beta version, wait for a while.
+If you find an improvement point, please give me an issue.
+Thank you.
 
 ## LICENSE
 
