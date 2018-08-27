@@ -4,6 +4,8 @@ For concrete implementation, see [examples](../examples).
 
 ## Startup
 
+### Production
+
 ```PureScript
 nemo :: forall s. Game s => s -> Asset -> Effect Unit
 ```
@@ -13,6 +15,26 @@ main game loop function.
 To run this function, you need to define game state s which is instance of Game class.
 
 And give asset.
+
+### Development
+
+```PureScript
+nemoDev :: forall s. Show s => Game s => s -> Asset -> DebugConfig -> Effect Unit
+```
+
+main game loop function for development.
+
+state s should be instance of Show class for saving state.
+
+give DebugConfig. (ex: `defaultDebugConfig`)
+
+for convenience, special key signal below.
+
+- Alt + 1: Resume game cycle
+- Alt + 2: Suspend game cycle
+- Alt + 3: Forward one frame
+- Alt + 4: Load game state (default is initial state)
+- Alt + 5: Save game state (output current state in browser console and update state which will be loaded)
 
 ## Game Class
 

@@ -131,19 +131,19 @@ public/index.html#emodius
 
 ### high
 
-- add debug mode
-- more sound effect support (ex. noise)
-- improve touch screen operation
+- [x] add debug mode
+- [ ] more sound effect support (ex. noise)
+- [ ] improve touch screen operation
 
 ### middle
 
-- interpreter which executes code on the web
-- performance tuning
-- iOS sound support
+- [ ] interpreter which executes code on the web
+- [ ] performance tuning
+- [ ] iOS sound support
 
 ### low
 
-- emoji parser (adapt to all emoticons)
+- [ ] emoji parser (adapt to all emoticons)
   
 ### wait and see
 
