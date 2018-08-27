@@ -3,9 +3,11 @@ module Basic where
 import Prelude
 
 import Data.Foldable (any)
+import Data.Generic.Rep (class Generic)
+import Data.Generic.Rep.Show (genericShow)
 import Data.Tuple (Tuple(..))
 import Effect (Effect)
-import Nemo (nemo)
+import Nemo (nemoDev)
 import Nemo.Class.Game (class Game)
 import Nemo.Constants (scene)
 import Nemo.Data.Audio (Tone(..))
@@ -15,7 +17,7 @@ import Nemo.Data.Input (Input(..))
 import Nemo.Draw (cls, emap, emo, emo')
 import Nemo.Sound (play)
 import Nemo.Types (RawMap(..), RawSound(..), Size, X, Y)
-import Nemo.Utils (isMapCollide, isMonitorCollide, mkAsset)
+import Nemo.Utils (defaultDebugConfig, isMapCollide, isMonitorCollide, mkAsset)
 
 
 emoSize :: Size
@@ -35,8 +37,14 @@ data State = State
   , appear :: Appear
   , frame :: Int
   }
+derive instance genericState :: Generic State _
+instance showState :: Show State where
+  show = genericShow
 
 data Appear = LeftWalk | RightWalk | LeftRun | RightRun
+derive instance genericAppear :: Generic Appear _
+instance showAppear :: Show Appear where
+  show = genericShow
 
 instance gameState :: Game State where
   update (Input input) (State state) asset =
@@ -109,7 +117,7 @@ instance gameState :: Game State where
 main :: Effect Unit
 main = do
   asset <- mkAsset [map0] [sound0]
-  nemo initialState asset
+  nemoDev initialState asset defaultDebugConfig
 
 initialState :: State 
 initialState = State
