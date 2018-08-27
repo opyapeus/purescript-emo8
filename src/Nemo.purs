@@ -4,18 +4,22 @@ module Nemo
   ) where
 
 import Prelude
+
 import Audio.WebAudio.BaseAudioContext (newAudioContext)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Traversable (sequence_)
 import Effect (Effect)
+import Effect.Class.Console (log)
 import Effect.Timer (setTimeout)
 import Graphics.Canvas (getCanvasElementById, getContext2D)
 import Nemo.Class.Game (class Game, draw, sound, update)
 import Nemo.Constants (canvasId)
 import Nemo.Data.Input (pollInputs)
+import Nemo.Data.SpecialInput (pollSpecialInputs)
 import Nemo.Data.Touch (initTS, margeToInput, pollTouches, upd)
-import Nemo.Types (Asset(..), DrawContext(..), SoundContext(..))
+import Nemo.Debug (initialDebugState, providedSave, providedUpdate, updateD, withDebugInput)
 import Nemo.Startup (startupView, showStartupViewTime)
+import Nemo.Types (Asset(..), DrawContext(..), SoundContext(..))
 import Signal (foldp, map2, runSignal, sampleOn)
 import Signal.DOM (animationFrame)
 
@@ -48,10 +52,11 @@ nemo state ass@(Asset asset) = do
     auds ctx stt = sequence_ $ (sound stt) <*> [ctx] 
 
 
+
 -- | Run game function for developing. (temporary)
 -- | It short cuts startup view.
 -- TODO: have more feature with arg like DefConfig.
-nemoDev :: forall s. Game s => s -> Asset -> Effect Unit
+nemoDev :: forall s. Show s => Game s => s -> Asset -> Effect Unit
 nemoDev state ass@(Asset asset) = do
   mcanvas <- getCanvasElementById canvasId
   case mcanvas of
@@ -64,13 +69,18 @@ nemoDev state ass@(Asset asset) = do
       frames <- animationFrame
       inputs <- pollInputs
       touches <- pollTouches
+      specialInputs <- pollSpecialInputs
       let touchState = foldp upd initTS touches
-      let margedInputs = map2 margeToInput touchState inputs
-      let game = foldp (\i s -> update i s ass) state (sampleOn frames margedInputs)
+      let mergedInputs = margeToInput <$> touchState <*> inputs
+      let debugInput = withDebugInput <$> mergedInputs <*> specialInputs
+      let debugState = initialDebugState state
+      let game = foldp (\i s -> updateD i s ass) debugState (sampleOn frames debugInput)
+      runSignal $ catLog <$> game
       runSignal $ rens drawCtx <$> game
       runSignal $ auds soundCtx <$> game
     Nothing -> do
       pure unit
   where
-    rens ctx stt = sequence_ $ (draw stt) <*> [ctx] 
-    auds ctx stt = sequence_ $ (sound stt) <*> [ctx] 
+    catLog ds = providedSave ds $ log $ show ds.state
+    rens ctx ds = providedUpdate ds $ sequence_ $ (draw ds.state) <*> [ctx]
+    auds ctx ds = providedUpdate ds $ sequence_ $ (sound ds.state) <*> [ctx]
