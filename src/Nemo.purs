@@ -7,9 +7,11 @@ import Prelude
 
 import Audio.WebAudio.BaseAudioContext (newAudioContext)
 import Data.Maybe (Maybe(Just, Nothing))
+import Data.String (joinWith)
 import Data.Traversable (sequence_)
 import Effect (Effect)
 import Effect.Class.Console (log)
+import Effect.Exception (throw)
 import Effect.Timer (setTimeout)
 import Graphics.Canvas (getCanvasElementById, getContext2D)
 import Nemo.Class.Game (class Game, draw, sound, update)
@@ -45,8 +47,7 @@ nemo state ass@(Asset asset) = do
         runSignal $ rens drawCtx <$> game
         runSignal $ auds soundCtx <$> game
       pure unit
-    Nothing -> do
-      pure unit
+    Nothing -> throw $ joinWith " " ["canvas id:", canvasId, "was not found."]
   where
     rens ctx stt = sequence_ $ (draw stt) <*> [ctx] 
     auds ctx stt = sequence_ $ (sound stt) <*> [ctx] 
@@ -77,8 +78,7 @@ nemoDev state ass@(Asset asset) dc = do
       runSignal $ catLog <$> game
       runSignal $ rens drawCtx <$> game
       runSignal $ auds soundCtx <$> game
-    Nothing -> do
-      pure unit
+    Nothing -> throw $ joinWith " " ["canvas id:", canvasId, "was not found."]
   where
     catLog ds = providedSave ds $ log $ show ds.state
     rens ctx ds = providedUpdate ds $ sequence_ $ (draw ds.state <> [debugDraw dc ds]) <*> [ctx]
