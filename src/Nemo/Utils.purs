@@ -1,6 +1,7 @@
 module Nemo.Utils
     ( mkAsset
     , emptyAsset
+    , defaultDebugConfig
     , isMapCollide
     , getMapEmoji
     , isMonitorCollide
@@ -18,9 +19,10 @@ import Data.Traversable (traverse)
 import Effect (Effect)
 import Effect.Exception (throw)
 import Nemo.Constants (scene)
+import Nemo.Data.Color (Color(..))
 import Nemo.Data.Emoji (Emoji)
 import Nemo.Parse (parseEmojiMap, parseSound)
-import Nemo.Types (Asset(..), IdX, IdY, MapId, RawMap, RawSound, Size, X, Y)
+import Nemo.Types (Asset(..), DebugConfig, DebugDisplay(..), IdX, IdY, MapId, RawMap, RawSound, Size, X, Y)
 
 
 -- | Map collision detection.
@@ -58,7 +60,7 @@ isMonitorCollide size x y
     || y < 0
     || y + size - 1 > scene.height
 
--- | Collision detection if an object completely protrudes out of monitor
+-- | Collision detection if an object completely protrudes out of monitor
 isOutOfMonitor :: Size -> X -> Y -> Boolean
 isOutOfMonitor size x y
     = x + size - 1 < 0
@@ -99,3 +101,7 @@ orErrMsg = case _ of
 -- | Empty asset for convenience. 
 emptyAsset :: Asset
 emptyAsset = Asset { mapData: [], soundData: [] }
+
+-- | Default debug config for convenience. 
+defaultDebugConfig :: DebugConfig
+defaultDebugConfig = { debugDisplay: LeftTop, color: White }

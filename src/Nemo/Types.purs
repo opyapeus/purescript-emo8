@@ -1,11 +1,13 @@
 module Nemo.Types where
 
 import Prelude
+
 import Audio.WebAudio.Types (AudioContext)
 import Effect (Effect)
 import Graphics.Canvas (Context2D)
-import Nemo.Data.Emoji (Emoji)
 import Nemo.Data.Audio (Efct, Note, Vol)
+import Nemo.Data.Color (Color)
+import Nemo.Data.Emoji (Emoji)
 
 
 newtype RawMap = RawMap String
@@ -42,6 +44,13 @@ type Sound = Array Tick
 type RenderOp = DrawContext -> Effect Unit
 
 type AudioOp = SoundContext -> Effect Unit
+
+data DebugDisplay = None | LeftBottom | LeftTop
+
+type DebugConfig =
+  { debugDisplay :: DebugDisplay
+  , color :: Color
+  }
 
 type X = Int
 type Y = Int

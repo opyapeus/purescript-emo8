@@ -17,9 +17,9 @@ import Nemo.Constants (canvasId)
 import Nemo.Data.Input (pollInputs)
 import Nemo.Data.SpecialInput (pollSpecialInputs)
 import Nemo.Data.Touch (initTS, margeToInput, pollTouches, upd)
-import Nemo.Debug (initialDebugState, providedSave, providedUpdate, updateD, withDebugInput)
+import Nemo.Debug (debugDraw, initialDebugState, providedSave, providedUpdate, updateD, withDebugInput)
 import Nemo.Startup (startupView, showStartupViewTime)
-import Nemo.Types (Asset(..), DrawContext(..), SoundContext(..))
+import Nemo.Types (Asset(..), DrawContext(..), SoundContext(..), DebugConfig)
 import Signal (foldp, map2, runSignal, sampleOn)
 import Signal.DOM (animationFrame)
 
@@ -53,11 +53,10 @@ nemo state ass@(Asset asset) = do
 
 
 
--- | Run game function for developing. (temporary)
+-- | Run game function for developing.
 -- | It short cuts startup view.
--- TODO: have more feature with arg like DefConfig.
-nemoDev :: forall s. Show s => Game s => s -> Asset -> Effect Unit
-nemoDev state ass@(Asset asset) = do
+nemoDev :: forall s. Show s => Game s => s -> Asset -> DebugConfig -> Effect Unit
+nemoDev state ass@(Asset asset) dc = do
   mcanvas <- getCanvasElementById canvasId
   case mcanvas of
     Just canvas -> do
@@ -82,5 +81,5 @@ nemoDev state ass@(Asset asset) = do
       pure unit
   where
     catLog ds = providedSave ds $ log $ show ds.state
-    rens ctx ds = providedUpdate ds $ sequence_ $ (draw ds.state) <*> [ctx]
+    rens ctx ds = providedUpdate ds $ sequence_ $ (draw ds.state <> [debugDraw dc ds]) <*> [ctx]
     auds ctx ds = providedUpdate ds $ sequence_ $ (sound ds.state) <*> [ctx]
