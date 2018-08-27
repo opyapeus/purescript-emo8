@@ -32,8 +32,8 @@ type DebugState s =
 
 data LoopState = Resume | Suspend | JustSuspend
 
-updateD :: forall s. Game s => DebugInput -> DebugState s -> (Asset -> DebugState s)
-updateD i s ass = nnns
+updateDebugState :: forall s. Game s => DebugInput -> DebugState s -> (Asset -> DebugState s)
+updateDebugState i s ass = nnns
   where
     updatedState = update i.input s.state ass
     updatedSaveAction = updatePressState i.specialInput.isSave s.saveAction
@@ -63,8 +63,8 @@ updateD i s ass = nnns
 withDebugInput :: Input -> SpecialInput -> DebugInput
 withDebugInput i si = { input: i, specialInput: si }
 
-initialDebugState :: forall s. Game s => s -> DebugState s
-initialDebugState s =
+initDebugState :: forall s. Game s => s -> DebugState s
+initDebugState s =
   { state: s
   , savedState : s
   , loopState: Resume

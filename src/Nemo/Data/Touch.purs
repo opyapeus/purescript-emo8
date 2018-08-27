@@ -3,9 +3,9 @@ module Nemo.Data.Touch
   ( TouchData
   , TouchState
   , pollTouches
-  , initTS
+  , initialTouchState
   , margeToInput
-  , upd
+  , updateTouchState
   ) where
   
 import Prelude
@@ -18,7 +18,7 @@ import Nemo.Data.Input (Input(..))
 import Signal (Signal)
 import Signal.DOM (Touch, DimensionPair, touch, windowDimensions)
 
-data TouchData = TouchData
+type TouchData =
   { touches :: Array Touch
   , window :: DimensionPair    
   }
@@ -27,15 +27,15 @@ pollTouches :: Effect (Signal TouchData)
 pollTouches = do
     t <- touch
     win <- windowDimensions
-    -- TODO: refactor
+    -- TODO: refactor?
     pure $
-        map TouchData $
-          { touches: _
-          , window: _
-          } <$> 
-            t <*> win
+      { touches: _
+      , window: _
+      }
+      <$> t
+      <*> win
 
-data TouchState = TouchState
+type TouchState =
   { lx :: Int
   , ly :: Int
   , rx :: Int
@@ -59,8 +59,8 @@ yDef = scene.height / 2
 btnDef :: Boolean
 btnDef = false
 
-initTS :: TouchState
-initTS = TouchState
+initialTouchState :: TouchState
+initialTouchState =
   { lx: lxDef
   , ly: yDef
   , rx: rxDef
@@ -75,8 +75,8 @@ initTS = TouchState
   , isD: btnDef
   }
 
-upd :: TouchData -> TouchState -> TouchState
-upd (TouchData d) (TouchState s) = TouchState
+updateTouchState :: TouchData -> TouchState -> TouchState
+updateTouchState d s =
     { lx: withDefault lxDef $ map _.screenX lt
     , ly: withDefault yDef $ map _.screenY lt
     , rx: withDefault rxDef $ map _.screenX rt
@@ -101,7 +101,7 @@ upd (TouchData d) (TouchState s) = TouchState
       Nothing -> de
 
 margeToInput :: TouchState -> Input -> Input
-margeToInput (TouchState s) (Input i) = Input
+margeToInput s (Input i) = Input
   { isLeft : i.isLeft || s.isLeft
   , isRight : i.isRight || s.isRight
   , isUp : i.isUp || s.isUp

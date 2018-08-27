@@ -33,15 +33,15 @@ keyToCodeNum D = 68
 
 pollInputs :: Effect (Signal Input)
 pollInputs = do
-    leftInput <- keyPressed $ keyToCodeNum Left
-    rightInput <- keyPressed $ keyToCodeNum Right
-    upInput <- keyPressed $ keyToCodeNum Up
-    downInput <- keyPressed $ keyToCodeNum Down
-    wInput <- keyPressed $ keyToCodeNum W
-    aInput <- keyPressed $ keyToCodeNum A
-    sInput <- keyPressed $ keyToCodeNum S
-    dInput <- keyPressed $ keyToCodeNum D
-    -- TODO: refactor
+    leftInput <- f Left
+    rightInput <- f Right
+    upInput <- f Up
+    downInput <- f Down
+    wInput <- f W
+    aInput <- f A
+    sInput <- f S
+    dInput <- f D
+    -- TODO: refactor?
     pure $
         map Input$
           { isLeft: _
@@ -61,4 +61,6 @@ pollInputs = do
             <*> aInput
             <*> sInput
             <*> dInput
+    where
+      f = keyPressed <<< keyToCodeNum
 
