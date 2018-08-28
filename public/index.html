@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <!-- to prevent y bounce for mobile -->
+    <script src="patch/inobounce.js"></script>
     <style>
         html {
             height: 100%;
@@ -17,7 +19,6 @@
             margin: 0;
             background-color: #000000;
             overflow: hidden;
-            overscroll-behavior: contain;
         }
 
         .wrap {
