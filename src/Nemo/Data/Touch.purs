@@ -1,19 +1,23 @@
--- | Experimental
 module Nemo.Data.Touch
   ( TouchData
   , TouchState
+  , Position
   , pollTouches
   , initialTouchState
-  , margeToInput
+  , mergeToInput
   , updateTouchState
   ) where
   
 import Prelude
 
-import Data.Array (filter, head)
-import Data.Maybe (Maybe(..))
+import Data.Array (elem, filter, head)
+import Data.Generic.Rep (class Generic)
+import Data.Generic.Rep.Eq (genericEq)
+import Data.Int (toNumber)
+import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Tuple (Tuple(..))
 import Effect (Effect)
-import Nemo.Constants (scene)
+import Math (atan2, pi)
 import Nemo.Data.Input (Input(..))
 import Signal (Signal)
 import Signal.DOM (Touch, DimensionPair, touch, windowDimensions)
@@ -26,20 +30,31 @@ type TouchData =
 pollTouches :: Effect (Signal TouchData)
 pollTouches = do
     t <- touch
-    win <- windowDimensions
+    w <- windowDimensions
     -- TODO: refactor?
     pure $
       { touches: _
       , window: _
       }
       <$> t
-      <*> win
+      <*> w
+
+data Direction
+  = Northwest | North | Northeast
+  | West | NoDirection | East
+  | Southwest | South | Southeast
+derive instance genericDirection :: Generic Direction _
+instance showDirection :: Eq Direction where
+  eq = genericEq
+
+type Position =
+  { x :: Int
+  , y :: Int
+  }
 
 type TouchState =
-  { lx :: Int
-  , ly :: Int
-  , rx :: Int
-  , ry :: Int
+  { leftBasePos :: Maybe Position
+  , rightBasePos :: Maybe Position
   , isLeft :: Boolean
   , isRight :: Boolean
   , isUp :: Boolean
@@ -50,58 +65,79 @@ type TouchState =
   , isD :: Boolean
   }
 
-lxDef :: Int
-lxDef = scene.width / 4
-rxDef :: Int
-rxDef = 3 * scene.width / 4
-yDef :: Int
-yDef = scene.height / 2
-btnDef :: Boolean
-btnDef = false
-
 initialTouchState :: TouchState
 initialTouchState =
-  { lx: lxDef
-  , ly: yDef
-  , rx: rxDef
-  , ry: yDef
-  , isLeft: btnDef
-  , isRight: btnDef
-  , isUp: btnDef
-  , isDown: btnDef
-  , isW: btnDef
-  , isA: btnDef
-  , isS: btnDef
-  , isD: btnDef
+  { leftBasePos: Nothing
+  , rightBasePos: Nothing
+  , isLeft: false
+  , isRight: false
+  , isUp: false
+  , isDown: false
+  , isW: false
+  , isA: false
+  , isS: false
+  , isD: false
   }
 
 updateTouchState :: TouchData -> TouchState -> TouchState
 updateTouchState d s =
-    { lx: withDefault lxDef $ map _.screenX lt
-    , ly: withDefault yDef $ map _.screenY lt
-    , rx: withDefault rxDef $ map _.screenX rt
-    , ry: withDefault yDef $ map _.screenY rt
-    , isLeft: withDefault btnDef $ map (\t -> t.screenX < s.rx) rt
-    , isRight: withDefault btnDef $ map (\t -> t.screenX > s.rx) rt
-    , isUp: withDefault btnDef $ map (\t -> t.screenY < s.ry) rt
-    , isDown: withDefault btnDef $ map (\t -> t.screenY > s.ry) rt
-    , isW: withDefault btnDef $ map (\t -> t.screenY < s.ly) lt
-    , isA: withDefault btnDef $ map (\t -> t.screenX < s.lx) lt
-    , isS: withDefault btnDef $ map (\t -> t.screenY > s.ly) lt
-    , isD: withDefault btnDef $ map (\t -> t.screenX > s.lx) lt
+    -- TODO: use pattern match for performance?
+    { leftBasePos: nextLeftBasePos
+    , rightBasePos: nextRightBasePos
+    , isLeft: elem rightDir [Northwest, West, Southwest]
+    , isRight: elem rightDir [Southeast, East, Northeast]
+    , isUp: elem rightDir [Northwest, North, Northeast]
+    , isDown: elem rightDir [Southwest, South, Southeast]
+    , isW: elem leftDir [Northwest, North, Northeast]
+    , isA: elem leftDir [Northwest, West, Southwest]
+    , isS: elem leftDir [Southwest, South, Southeast]
+    , isD: elem leftDir [Southeast, East, Northeast]
     }
   where
-    ts = d.touches
-    w = d.window.w
-    lt = filter (\t -> t.screenX < w / 2) ts
-    rt = filter (\t -> t.screenX > w / 2) ts
-    withDefault :: forall a. a -> Array a -> a
-    withDefault de xs = case head xs of
-      Just x -> x
-      Nothing -> de
+    touches = d.touches
+    width = d.window.w
+    mLeftPos = head $ touchToPos <$> filter (\t -> t.screenX < width / 2) touches
+    mRightPos = head $ touchToPos <$> filter (\t -> t.screenX > width / 2) touches
+    nextLeftBasePos = updateBasePos s.leftBasePos mLeftPos
+    nextRightBasePos = updateBasePos s.rightBasePos mRightPos
+    mLeftVec = diffVector <$> mLeftPos <*> s.leftBasePos
+    mRightVec = diffVector <$> mRightPos <*> s.rightBasePos
+    leftDir = fromMaybe NoDirection $ vectorToDirection <$> mLeftVec
+    rightDir = fromMaybe NoDirection $ vectorToDirection <$> mRightVec
 
-margeToInput :: TouchState -> Input -> Input
-margeToInput s (Input i) = Input
+updateBasePos :: Maybe Position -> Maybe Position -> Maybe Position
+updateBasePos bp tp = case Tuple bp tp of
+  Tuple (Just p) (Just _) -> Just p
+  Tuple (Just _) Nothing -> Nothing
+  Tuple Nothing mp -> mp
+
+touchToPos :: Touch -> Position
+touchToPos t = { x: t.screenX, y: t.screenY }
+
+diffVector :: Position -> Position -> Position
+diffVector { x: xa, y: ya } { x: xb, y: yb } = { x: xa - xb, y: ya - yb } 
+
+-- https://github.com/purescript/purescript/issues/888
+-- top level guard where
+-- TODO: refactor
+vectorToDirection :: Position -> Direction
+vectorToDirection { x, y } = f arg
+  where
+    y' = -y -- NOTE: left top -> left bottom base
+    arg = atan2 (toNumber y') (toNumber x)
+    f rad
+      | rad < pi * -7.0 / 8.0 || rad >= pi * 7.0 / 8.0 = West
+      | rad < pi * -5.0 / 8.0 = Southwest
+      | rad < pi * -3.0 / 8.0 = South
+      | rad < pi * -1.0 / 8.0 = Southeast
+      | rad < pi * 1.0 / 8.0 = East
+      | rad < pi * 3.0 / 8.0 = Northeast
+      | rad < pi * 5.0 / 8.0 = North
+      | rad < pi * 7.0 / 8.0 = Northwest
+      | otherwise  = NoDirection
+  
+mergeToInput :: TouchState -> Input -> Input
+mergeToInput s (Input i) = Input
   { isLeft : i.isLeft || s.isLeft
   , isRight : i.isRight || s.isRight
   , isUp : i.isUp || s.isUp
