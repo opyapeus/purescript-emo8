@@ -4,34 +4,35 @@
 
 ※ it's beta for now
 
-A unique game engine for creating visual symbolic games using emoticons and powerful functional language.
+A functional game engine that can create emoji games.
 
 ![nemo](nemo.png)
 ![emodius](https://opyapeus.github.io/nemo/img/emodius-half.gif)
 
 ## Major Features
 
-- Easy to create games with powerful functional language (PureScript)
-- Only emoticons can be used. On the contrary it stimulates your creativity
-- Games can be distribute to any device on which web browser runs
+- Easy to create games with powerful functional languages ​​(PureScript).
+- Only emojis can be used as materials. Instead, there is room for creativity.
+- JavaScript knowledge is basically unnecessary. You can concentrate on implementing game logic with functional languages.
+- You can play on any device on which the browser runs.
 
 ### Why PureScript
 
-First, I want to create simple games with functional language.
+When making games in functional language, there were the following options.
 
 Haskell ->
-It was awesome if I could do everything.
-However, it is difficult to run on any devices.
+If everything could be done with this, it was the best.
+However, it is difficult to play on any device.
 
 Elm ->
-It is good one for easy distribution.
-But type classes are not supported.
-And it is recommended to follow Elm architecture.
+It was one of the good options when thinking about device independence.
+But there is no type class support.
+It is also recommended that you follow the Elm architecture.
 
 PureScript ->
-It has a type class like Haskell.
-And it is compiled into Javascript.
-So it can be easy to run on any devices with browser!
+There is type class support like Haskell.
+It will also be compiled into Javascript.
+Therefore, you can play on any device browser!
 
 ### Why Only Emoticons
 
@@ -39,11 +40,11 @@ Something restricted stimulates creativity.
 
 I was very inspired by fantasy consoles represented by [PICO-8](https://www.lexaloffle.com/pico-8.php).
 
-They have great limitations on available sprites, sound and some capacities.
+There are severe restrictions on sprites, sounds, capacity, etc. that can be used.
 
-On the contrary, these restrictions stimulates creativity and makes game making fun.
+On the contrary, These constraints inspire creativity and making the game more fun.
 
-Just like this, I think it is interesting to have restrictions that only emoticons can be used against the web platform.
+Just like this, I think that it is very interesting to have constraints that only emojis can be used in the Web platform.
 
 ## Play Online
 
@@ -87,9 +88,11 @@ bower i purescript-nemo
  \___/¯\___/
  ```
 
-### Touch Screen ※Experimental
+### Touch Screen
 
 For mobile, it is equivalent to keyboard inputs that swiping on the right or left side of the screen.
+
+※ The swipe origin is the touch position which started.
 
 ## Examples
 
@@ -123,7 +126,7 @@ public/index.html#basic
 public/index.html#emodius
 ```
 
-## Emoticons
+## Emojis
 
 - [Supported Emojis](docs/emoji.md)
 
@@ -133,7 +136,7 @@ public/index.html#emodius
 
 - [x] add debug mode
 - [ ] more sound effect support (ex. noise)
-- [ ] improve touch screen operation
+- [x] improve touch screen operation
 
 ### middle
 
@@ -143,14 +146,14 @@ public/index.html#emodius
 
 ### low
 
-- [ ] emoji parser (adapt to all emoticons)
+- [ ] emoji parser (adapt to all emojis)
   
 ### wait and see
 
 - emoji rotate (45°, 135°, 225°, 315°) problem on canvas
 - default emoji presentation [CSS Fonts Module Level 4 - Editor’s Draft, 17 August 2018](https://drafts.csswg.org/css-fonts-4/#font-variant-emoji-prop)
 
-## Documentation
+## Module Documentation
 
 - [Module documentation on Pursuit](https://pursuit.purescript.org/packages/purescript-nemo/)
 
@@ -164,4 +167,4 @@ Thank you.
 
 [MIT](LICENSE)
 
-※ About license of emoticons' graphics are owned by each vendor.
+※ About license of emojis' graphics are owned by each vendor.

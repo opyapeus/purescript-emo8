@@ -1,6 +1,6 @@
 # Usage
 
-For concrete implementation, see [examples](../examples).
+For concrete implementation, see [examples](../examples) and [public folder](../public)
 
 ## Startup
 
@@ -77,7 +77,7 @@ emo :: Emoji -> Size -> X -> Y -> RenderOp
 Arguments
 
 - Emoji: specify one of supported emoji.
-- Size: emoticon size (length of one side of square)
+- Size: emoji size (length of one side of square)
 - X: square's left position
 - Y: square's bottom position
 
@@ -95,7 +95,7 @@ emap :: MapId -> Size -> X -> Y -> RenderOp
 Arguments
 
 - MapId: index of map data which you edit.
-- Size: map element (emoticon) size. (not whole map size)
+- Size: map element (emoji) size. (not whole map size)
 - X: map's left position
 - Y: map's bottom position
 
