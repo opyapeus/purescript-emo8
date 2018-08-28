@@ -47,6 +47,7 @@ type AudioOp = SoundContext -> Effect Unit
 
 data DebugDisplay = None | LeftBottom | LeftTop
 
+-- | Debug config.
 type DebugConfig =
   { debugDisplay :: DebugDisplay
   , color :: Color

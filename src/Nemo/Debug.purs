@@ -1,4 +1,12 @@
-module Nemo.Debug where
+module Nemo.Debug
+  ( LoopState
+  , debugDraw
+  , initDebugState
+  , providedSave
+  , providedUpdate
+  , updateDebugState
+  , withDebugInput
+  ) where
 
 import Prelude
 
