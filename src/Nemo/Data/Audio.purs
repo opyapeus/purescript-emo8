@@ -1,7 +1,6 @@
 module Nemo.Data.Audio where
 
 import Prelude
-import Audio.WebAudio.Oscillator (OscillatorType(..))
 import Nemo.Class.Read (class Read, defaultRead, Patterns)
 
 
@@ -118,17 +117,5 @@ efcts = [ None, Detune ]
 
 efctToDetune :: Efct -> Number
 efctToDetune None = 0.0
-efctToDetune Detune = 50.0
-
-
-data Tone = Sin | Seq | Tri | Saw
-
-toneToType :: Tone -> OscillatorType
-toneToType Sin = Sine
-toneToType Seq = Square
-toneToType Tri= Triangle
-toneToType Saw = Sawtooth
-
-
-
+efctToDetune Detune = 50.0 -- 50 cent (quarter tone)
 

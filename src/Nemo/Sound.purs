@@ -8,7 +8,7 @@ import Prelude
 import Audio.WebAudio.AudioParam (setValueAtTime)
 import Audio.WebAudio.BaseAudioContext (createGain, createOscillator, currentTime, destination, resume, suspend)
 import Audio.WebAudio.GainNode (gain)
-import Audio.WebAudio.Oscillator (detune, frequency, setOscillatorType, startOscillator, stopOscillator)
+import Audio.WebAudio.Oscillator (detune, frequency, startOscillator, stopOscillator)
 import Audio.WebAudio.Types (GainNode, OscillatorNode, Seconds, connect)
 import Data.Array (length, range, zip, (!!))
 import Data.Int (toNumber)
@@ -16,7 +16,8 @@ import Data.Maybe (Maybe(..))
 import Data.Traversable (for_)
 import Data.Tuple (Tuple(..))
 import Effect (Effect)
-import Nemo.Data.Audio (Tone, efctToDetune, noteToFreq, toneToType, volToGain)
+import Nemo.Data.Audio (efctToDetune, noteToFreq, volToGain)
+import Nemo.Data.Tone (Tone, setTone)
 import Nemo.Types (AudioOp, Bpm, SoundContext(..), Tick(..), SoundId)
 
 -- ENHANCE: more detail control.
@@ -33,7 +34,7 @@ play sId tone tempo (SoundContext sctx) =
             gainNode <- createGain sctx.ctx
             now <- currentTime sctx.ctx
 
-            setOscillatorType typ osclNode
+            setTone tone osclNode sctx.ctx
 
             let len = length ticks
             let ts = range 0 $ len - 1
@@ -49,7 +50,6 @@ play sId tone tempo (SoundContext sctx) =
             let endTime = now + interval * toNumber len
             stopOscillator endTime osclNode
             where
-                typ = toneToType tone
                 interval = 60.0 / toNumber tempo
 
 prepSound :: Seconds -> OscillatorNode -> GainNode -> Tick -> Effect Unit
