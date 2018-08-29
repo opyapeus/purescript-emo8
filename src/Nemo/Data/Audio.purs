@@ -5,81 +5,77 @@ import Nemo.Class.Read (class Read, defaultRead, Patterns)
 
 
 data Note
-  = C4 | CS4 | D4 | DS4
-  | E4 | F4 | FS4 | G4
-  | GS4 | A4 | AS4 | B4
-  | C5 | CS5 | D5 | DS5
-  | E5 | F5 | FS5 | G5
-  | GS5 | A5 | AS5 | B5
-  | Rest
+  = C | CS | D | DS
+  | E | F | FS | G
+  | GS | A | AS | B
 
 instance showNote :: Show Note where
-  show C4 = "🕛"
-  show CS4 = "🕧"
-  show D4 = "🕐"
-  show DS4 = "🕜"
-  show E4 = "🕑"
-  show F4 = "🕝"
-  show FS4 = "🕒"
-  show G4 = "🕞"
-  show GS4 = "🕓"
-  show A4 = "🕟"
-  show AS4 = "🕔"
-  show B4 = "🕠"
-  show C5 = "🕕"
-  show CS5 = "🕡"
-  show D5 = "🕖"
-  show DS5 = "🕢"
-  show E5 = "🕗"
-  show F5 = "🕣"
-  show FS5 = "🕘"
-  show G5 = "🕤"
-  show GS5 = "🕙"
-  show A5 = "🕥"
-  show AS5 = "🕚"
-  show B5 = "🕦"
-  show Rest = "🈳"
+  show C = "🕛"
+  show CS = "🕐"
+  show D = "🕑"
+  show DS = "🕒"
+  show E = "🕓"
+  show F = "🕔"
+  show FS = "🕕"
+  show G = "🕖"
+  show GS = "🕗"
+  show A = "🕘"
+  show AS = "🕙"
+  show B = "🕚"
 
 instance readNote :: Read Note where
   read = defaultRead notes
    
 notes :: Patterns Note
 notes = 
-    [ C4, CS4, D4, DS4
-    , E4, F4, FS4, G4
-    , GS4, A4, AS4, B4
-    , C5, CS5, D5, DS5
-    , E5, F5, FS5, G5
-    , GS5, A5, AS5, B5
-    , Rest
+    [ C, CS, D, DS
+    , E, F, FS, G
+    , GS, A, AS, B
     ]
 
+-- NOTE: C1 base tone
 noteToFreq :: Note -> Number
-noteToFreq C4 = 261.6
-noteToFreq CS4 = 277.2
-noteToFreq D4 = 293.7
-noteToFreq DS4 = 311.1
-noteToFreq E4 = 329.6
-noteToFreq F4 = 349.2
-noteToFreq FS4 = 370.0
-noteToFreq G4 = 392.0
-noteToFreq GS4 = 415.3
-noteToFreq A4 = 440.0
-noteToFreq AS4 = 466.2
-noteToFreq B4 = 493.9
-noteToFreq C5 = 523.3
-noteToFreq CS5 = 554.4
-noteToFreq D5 = 587.3
-noteToFreq DS5 = 622.3
-noteToFreq E5 = 659.3
-noteToFreq F5 = 698.5
-noteToFreq FS5 = 740.0
-noteToFreq G5 = 784.0
-noteToFreq GS5 = 830.6
-noteToFreq A5 = 880.0
-noteToFreq AS5 = 932.3
-noteToFreq B5 = 987.8
-noteToFreq Rest = 0.0
+noteToFreq C = 32.7031956626
+noteToFreq CS = 34.6478288721
+noteToFreq D = 36.7080959897
+noteToFreq DS = 38.8908729653
+noteToFreq E = 41.2034446141
+noteToFreq F = 43.6535289291
+noteToFreq FS = 46.249302839
+noteToFreq G = 48.9994294977
+noteToFreq GS = 51.9130871975
+noteToFreq A = 55.0
+noteToFreq AS = 58.2704701898
+noteToFreq B = 61.735412657
+
+
+-- NOTE: A4 (A Fourth) is 440 Hz
+data Octave = First | Second | Third | Fourth | Fifth | Sixth | Seventh
+
+-- TODO: number emoji (parse multi code)
+instance showOctave :: Show Octave where
+  show First = "🐁"
+  show Second = "🐄"
+  show Third = "🐅"
+  show Fourth = "🐓"
+  show Fifth  = "🐉"
+  show Sixth  = "🐍"
+  show Seventh = "🐑"
+
+instance readOctave :: Read Octave where
+  read = defaultRead octaves
+   
+octaves :: Patterns Octave
+octaves = [ First, Second, Third, Fourth, Fifth, Sixth, Seventh ]
+
+octaveToMult :: Octave -> Number
+octaveToMult First = 1.0
+octaveToMult Second = 2.0
+octaveToMult Third = 4.0
+octaveToMult Fourth = 8.0
+octaveToMult Fifth = 16.0
+octaveToMult Sixth = 32.0
+octaveToMult Seventh = 64.0
 
 
 data Vol = Mute | Low | Med | High

@@ -4,6 +4,7 @@ module Nemo.Parse
   ) where
 
 import Prelude
+
 import Data.Array (slice, zip, (!!))
 import Data.Either (Either(..), note)
 import Data.Foldable (length)
@@ -11,7 +12,7 @@ import Data.String (singleton, toCodePointArray)
 import Data.String.Utils (lines)
 import Data.Traversable (traverse)
 import Data.Tuple (Tuple(..))
-import Data.Tuple.Nested (tuple3)
+import Data.Tuple.Nested (tuple4)
 import Nemo.Class.Read (read)
 import Nemo.Types (RawMap(..), RawSound(..), EmojiMap, Sound, Tick(..))
 
@@ -33,22 +34,24 @@ parseSound = singletonArrayToSound <<< rawSoundToSingletonArray
 -- TODO: refactor
 singletonArrayToSound :: Array (Array String) -> Either String Sound
 singletonArrayToSound ls =
-  case tuple3 eEfct' eNote' eVol' of
-    -- NOTE: Tuple3 _ _ _ -> [PureScript] Unknown data constructor Tuple3
-    Tuple (Right efct') (Tuple (Right note') (Tuple (Right vol') _)) ->
+  case tuple4 eOctave' eEfct' eNote' eVol' of
+    -- FIXME: Tuple4 _ _ _ _ -> [PureScript] Unknown data constructor Tuple4
+    Tuple (Right octave') (Tuple (Right efct') (Tuple (Right note') (Tuple (Right vol') _))) ->
       -- zip3?
-      let zipped = zip note' $ zip vol' efct'
+      let zipped = zip octave' $ zip note' $ zip vol' efct'
       in Right $
         flip map zipped $
-          \(Tuple n (Tuple v e)) -> 
-            Tick { note: n, vol: v, efct: e}
-    Tuple (Left msg) (Tuple _ (Tuple _ _)) -> Left msg
-    Tuple _ (Tuple (Left msg) (Tuple _ _)) -> Left msg
-    Tuple _ (Tuple _ (Tuple (Left msg) _)) -> Left msg
+          \(Tuple o (Tuple n (Tuple v e))) -> 
+            Tick { octave: o, note: n, vol: v, efct: e}
+    Tuple (Left msg) (Tuple _ (Tuple _ (Tuple _ _))) -> Left msg
+    Tuple _ (Tuple (Left msg) (Tuple _ (Tuple _ _))) -> Left msg
+    Tuple _ (Tuple _ (Tuple (Left msg) (Tuple _ _))) -> Left msg
+    Tuple _ (Tuple _ (Tuple _ (Tuple (Left msg) _))) -> Left msg
   where
     eEfct' = traverse read =<< note "efct line not found." (ls !! 0)
-    eNote' = traverse read =<< note "note line not found." (ls !! 1)
-    eVol' = traverse read =<< note "vol line not found." (ls !! 2)
+    eOctave' = traverse read =<< note "octave line not found." (ls !! 1)
+    eNote' = traverse read =<< note "note line not found." (ls !! 2)
+    eVol' = traverse read =<< note "vol line not found." (ls !! 3)
 
 rawSoundToSingletonArray :: RawSound -> Array (Array String)
 rawSoundToSingletonArray (RawSound s) = rawStringToSingletonArray s

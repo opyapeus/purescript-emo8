@@ -16,7 +16,7 @@ import Data.Maybe (Maybe(..))
 import Data.Traversable (for_)
 import Data.Tuple (Tuple(..))
 import Effect (Effect)
-import Nemo.Data.Audio (efctToDetune, noteToFreq, volToGain)
+import Nemo.Data.Audio (efctToDetune, noteToFreq, octaveToMult, volToGain)
 import Nemo.Data.Tone (Tone, setTone)
 import Nemo.Types (AudioOp, Bpm, SoundContext(..), Tick(..), SoundId)
 
@@ -55,7 +55,7 @@ play sId tone tempo (SoundContext sctx) =
 prepSound :: Seconds -> OscillatorNode -> GainNode -> Tick -> Effect Unit
 prepSound t on gn (Tick tick) = do
     let det = efctToDetune tick.efct
-    let freq = noteToFreq tick.note
+    let freq = noteToFreq tick.note * octaveToMult tick.octave
     let vol = volToGain tick.vol
     detParam <-  detune on
     freqParam <- frequency on

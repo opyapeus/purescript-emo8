@@ -5,7 +5,7 @@ import Prelude
 import Audio.WebAudio.Types (AudioContext)
 import Effect (Effect)
 import Graphics.Canvas (Context2D)
-import Nemo.Data.Audio (Efct, Note, Vol)
+import Nemo.Data.Audio (Efct, Note, Octave, Vol)
 import Nemo.Data.Color (Color)
 import Nemo.Data.Emoji (Emoji)
 
@@ -32,7 +32,8 @@ data SoundContext = SoundContext
   }
 
 data Tick = Tick
-  { note :: Note
+  { octave :: Octave
+  , note :: Note
   , vol :: Vol
   , efct :: Efct
   }
