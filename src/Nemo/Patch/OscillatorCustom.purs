@@ -1,4 +1,9 @@
-module Nemo.Patch.OscillatorCustom where
+module Nemo.Patch.OscillatorCustom
+    ( PeriodicWave
+    , FFTComponent
+    , createPeriodicWave
+    , setPeriodicWave
+    ) where
 
 import Prelude
 
