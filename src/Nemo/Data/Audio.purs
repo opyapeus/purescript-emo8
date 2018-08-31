@@ -54,13 +54,13 @@ data Octave = First | Second | Third | Fourth | Fifth | Sixth | Seventh
 
 -- TODO: number emoji (parse multi code)
 instance showOctave :: Show Octave where
-  show First = "🐁"
-  show Second = "🐄"
-  show Third = "🐅"
-  show Fourth = "🐓"
-  show Fifth  = "🐉"
-  show Sixth  = "🐍"
-  show Seventh = "🐑"
+  show First = "1️⃣"
+  show Second = "2️⃣"
+  show Third = "3️⃣"
+  show Fourth = "4️⃣"
+  show Fifth  = "5️⃣"
+  show Sixth  = "6️⃣"
+  show Seventh = "7️⃣"
 
 instance readOctave :: Read Octave where
   read = defaultRead octaves
