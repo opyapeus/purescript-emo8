@@ -110,9 +110,8 @@ play :: SoundId -> Tone -> Bpm -> AudioOp
 Arguments
 
 - SoundId: index of sound data which you edit.
-- Tone: Oscillation type (correspond to web audio)
+- Tone: oscillation type (select one of [Sin, Sq, Tri, Saw, Noise])
 - Bpm: tempo (beat per minute)
-
 
 ## Map Edit
 
@@ -143,8 +142,6 @@ map0 = RawMap """
 You can use [Supported Emojis](emoji.md).
 
 ## Sound Edit
-
-※ It may need more development
 
 ```PureScript
 sound0 :: RawSound
