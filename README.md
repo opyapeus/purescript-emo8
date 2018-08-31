@@ -34,7 +34,7 @@ There is type class support like Haskell.
 It will also be compiled into Javascript.
 Therefore, you can play on any device browser!
 
-### Why Only Emoticons
+### Why Only Emojis
 
 Something restricted stimulates creativity.
 
@@ -68,7 +68,7 @@ bower i purescript-nemo
 
 - Language: PureScript
 - Monitor Size: 1024x1024
-- Emoticon: 1207 unicode emojis
+- Emoji: 1388 unicode emojis
 - Color: 16 html base colors
 - Map Editor: Raw text (emoji) editing
 - Sound Editor: Raw text (emoji) editing
@@ -107,6 +107,8 @@ bower i
 
 build
 
+※ if you can not build with warning, please ```pulp build``` once.
+
 ```sh
 npm run build
 npm run build:examples
@@ -135,7 +137,7 @@ public/index.html#emodius
 ### high
 
 - [x] add debug mode
-- [ ] more sound effect support (ex. noise)
+- [x] more sound effect support (ex. noise)
 - [x] improve touch screen operation
 
 ### middle
@@ -146,7 +148,7 @@ public/index.html#emodius
 
 ### low
 
-- [ ] emoji parser (adapt to all emojis)
+- [x] emoji parser ([purescript-emoji-splitter](https://github.com/opyapeus/purescript-emoji-splitter))
   
 ### wait and see
 

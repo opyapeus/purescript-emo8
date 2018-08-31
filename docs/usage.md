@@ -150,11 +150,23 @@ You can use [Supported Emojis](emoji.md).
 sound0 :: RawSound
 sound0 = RawSound """
 🎼🎼🎼🎼🎼🎼🎛🎛🎛🎛🎛🎛
-🕕🕡🕖🕢🕗🕣🕘🕤🕙🕥🕚🕦
+5️⃣5️⃣5️⃣5️⃣5️⃣5️⃣5️⃣5️⃣5️⃣5️⃣5️⃣5️⃣
+🕛🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚
 🔈🔈🔈🔈🔈🔈🔈🔈🔈🔈🔈🔈
 """
 ```
 
 - First line: effect (🎼: None, 🎛: Detune)
-- Second line: scale (🕧: Code C4 ~ 🕦: Code B5)
-- Third line: Volume (🔇: Mute ~ 🔊: High)
+- Second line: octave (1️⃣: Octave 1 ~ 7️⃣: Octave 7)
+- Third line: code (🕛: Code C ~ 🕚: Code B)
+- Fourth line: Volume (🔇: Mute ~ 🔊: High)
+
+code frequency examples
+
+```plain
+🕘3️⃣: means A3 (220 Hz)
+🕛4️⃣: means C4 (261.626xxx Hz)
+🕘4️⃣: means A4 (440 Hz)
+🕛5️⃣: means C5 (523.251xxx Hz)
+🕘5️⃣: means A5 (880 Hz)
+```
