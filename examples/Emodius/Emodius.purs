@@ -22,44 +22,51 @@ import Nemo.Data.Emoji (Emoji(..))
 import Nemo.Draw (cls, emo, emor, emor')
 import Nemo.Utils (mkAsset)
 
-
-data View = Title | Play | Over | Clear
-
-data State = State
-    { view :: View
-    , isButtonPressed :: Boolean
-    , distance :: Int
-    , player :: Player
-    , bullets :: Array Bullet
-    , enemies :: Array Enemy
-    , particles :: Array Particle
-    , enemyBullets :: Array EnemyBullet
-    -- , debug :: String
-    }
+data State
+    = TitleState
+        { isButtonPressed :: Boolean }
+    | OverState
+        { isButtonPressed :: Boolean }
+    | ClearState
+        { isButtonPressed :: Boolean }
+    | PlayState
+        { distance :: Int
+        , player :: Player
+        , bullets :: Array Bullet
+        , enemies :: Array Enemy
+        , particles :: Array Particle
+        , enemyBullets :: Array EnemyBullet
+        }
 
 instance gameState :: Game State where
-    update input stt@(State s) asset = case s.view of
-        Over -> if isFirstPressed then initialState else State $ s { isButtonPressed = isPressed }
-        Clear -> if isFirstPressed then initialState else State $ s { isButtonPressed = isPressed }
-        Title -> if isFirstPressed then State $ s { view = Play } else State $ s { isButtonPressed = isPressed }
-        Play -> case Tuple isGameClear isGameOver of
-            Tuple true _ -> State $ s { view = Clear }
-            Tuple false true -> State $ s { view = Over }
-            Tuple false false -> State $ s 
-                { isButtonPressed = isPressed
-                , distance = s.distance + speed
+    update input (TitleState s) _ =
+        if isPressed && not s.isButtonPressed
+            then initialPlayState
+            else TitleState { isButtonPressed: isPressed }
+        where isPressed = isInputAny input
+    update input (OverState s) _ =
+        if isPressed && not s.isButtonPressed
+            then initialState
+            else OverState { isButtonPressed: isPressed }
+        where isPressed = isInputAny input
+    update input (ClearState s) _ =
+        if isPressed && not s.isButtonPressed
+            then initialState
+            else ClearState { isButtonPressed: isPressed }
+        where isPressed = isInputAny input
+    update input (PlayState s) asset =
+        case Tuple isGameClear isGameOver of
+            Tuple true _ -> ClearState { isButtonPressed: true }
+            Tuple false true -> OverState { isButtonPressed: true }
+            Tuple false false -> PlayState $ s 
+                { distance = s.distance + speed
                 , player = nnp
                 , bullets = nnbullets <> newBullets
                 , enemies = nnenemies <> newEnemies
                 , particles = nnparticles <> newParticles
                 , enemyBullets = nnenemyBullets <> newEnemyBullets
-                -- , debug = show s.distance
                 }
             where
-                -- util
-                isPressed = isInputAny input
-                isFirstPressed = isPressed && not s.isButtonPressed
-
                 -- update pos
                 np = updatePlayer input s.player
                 nbullets = map updateBullet s.bullets
@@ -97,53 +104,53 @@ instance gameState :: Game State where
                 isCatchOct _ = false  
                 isGameClear = any isCatchOct collidedEnemies
 
-    draw (State s) = case s.view of
-        Over ->
-            [ cls Maroon
-            , emo Hole 512 250 300
-            , emor 160 Helicopter 256 350 400
-            , emo RecyclingSymbol 256 375 700
-            ]
-        Clear ->
-            [ cls Lime
-            , emor 15 Helicopter 128 700 800
-            , emor (-15) Octopus 256 350 350
-            , emo GlobeWithMeridians 512 150 150
-            , emo ThumbsUp 128 200 800
-            ]
-        Title ->
-            [ cls Aqua
-            , emor' 30 Helicopter 384 100 100
-            , emo SpiderWeb 512 400 400
-            , emor (-15) Octopus 256 600 600
-            , emo Pill 128 250 800
-            , emor 75 Pill 128 200 600
-            , emo FastForwardButton 128 700 200
-            ]
-        Play ->
-            [ cls Aqua
-            , drawScrollMap s.distance
-            , draw s.player
-            -- , const $ log (show s.debug)
-            ] <> map draw s.bullets
-            <> map draw s.enemies
-            <> map draw s.particles
-            <> map draw s.enemyBullets
+    draw (TitleState _) =
+        [ cls Aqua
+        , emor' 30 Helicopter 384 100 100
+        , emo SpiderWeb 512 400 400
+        , emor (-15) Octopus 256 600 600
+        , emo Pill 128 250 800
+        , emor 75 Pill 128 200 600
+        , emo FastForwardButton 128 700 200
+        ]
+    draw (OverState _) =
+        [ cls Maroon
+        , emo Hole 512 250 300
+        , emor 160 Helicopter 256 350 400
+        , emo RecyclingSymbol 256 375 700
+        ]
+    draw (ClearState _) =
+        [ cls Lime
+        , emor 15 Helicopter 128 700 800
+        , emor (-15) Octopus 256 350 350
+        , emo GlobeWithMeridians 512 150 150
+        , emo ThumbsUp 128 200 800
+        ]
+    draw (PlayState s) =
+        [ cls Aqua
+        , drawScrollMap s.distance
+        , draw s.player
+        ]
+        <> map draw s.bullets
+        <> map draw s.enemies
+        <> map draw s.particles
+        <> map draw s.enemyBullets
 
     sound _ = []
 
-initialState :: State
-initialState = State
-    { view: Title
-    , isButtonPressed: true
-    , distance: 0
+initialPlayState :: State
+initialPlayState = PlayState
+    { distance: 0
     , player: initialPlayer
     , bullets: []
     , enemies: []
     , particles: []
     , enemyBullets : []
-    -- , debug: ""
     }
+
+initialState :: State
+initialState = TitleState
+    { isButtonPressed: true }
 
 main :: Effect Unit
 main = do
