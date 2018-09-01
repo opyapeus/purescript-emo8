@@ -25,7 +25,6 @@ import Nemo.Data.Emoji (Emoji(..))
 import Nemo.Patch.TextBaseline (TextBaseline(..), setTextBaseline)
 import Nemo.Types (Deg, IdX, IdY, MapId, RenderOp, Size, X, Y)
 
-
 -- | Clear screen with given color.
 cls :: Color -> RenderOp
 cls c dctx = do
@@ -39,11 +38,12 @@ withLocalDraw op dctx = do
     restore dctx.ctx
 
 fillTextWithT :: Emoji -> Size -> X -> Y -> (Context2D -> Effect Unit) -> RenderOp
-fillTextWithT e size x y' op dctx = do
+fillTextWithT e size x y op dctx = do
     translate dctx.ctx { translateX: toNumber x + halfSize, translateY: toNumber y' - halfSize }
     op dctx.ctx
     fillTextConsVoid e size (- halfSize) halfSize dctx.ctx
     where
+        y' = toBaseY y
         halfSize = toNumber size / 2.0
 
 fillTextConsVoid :: Emoji -> Size -> Number -> Number -> Context2D -> Effect Unit
@@ -69,30 +69,24 @@ emo e size x y =
 emor :: Deg -> Emoji -> Size -> X -> Y -> RenderOp
 emor rot e size x y =
     withLocalDraw $ \dctx -> do
-        flip (fillTextWithT e size x y') dctx $ \ctx2d -> do
+        flip (fillTextWithT e size x y) dctx $ \ctx2d -> do
             rotate ctx2d (- degToRad rot)
-    where
-        y' = toBaseY y
 
 -- | Draw mirrored emoji.
 emo' :: Emoji -> Size -> X -> Y -> RenderOp
 emo' e size x y =
     withLocalDraw $ \dctx -> do
-        flip (fillTextWithT e size x y') dctx $ \ctx2d -> do
+        flip (fillTextWithT e size x y) dctx $ \ctx2d -> do
             scale ctx2d { scaleX: -1.0, scaleY: 1.0 }
-    where
-        y' = toBaseY y
   
 -- | Draw mirrored rotated emoji.
 -- | CAUTION: It does not display correctly (Deg = 45, 135, 225, 315).
 emor' :: Deg -> Emoji -> Size -> X -> Y -> RenderOp
 emor' rot e size x y =
     withLocalDraw $ \dctx -> do
-        flip (fillTextWithT e size x y') dctx $ \ctx2d -> do
+        flip (fillTextWithT e size x y) dctx $ \ctx2d -> do
             rotate ctx2d (- degToRad rot)
             scale ctx2d { scaleX: -1.0, scaleY: 1.0 }
-    where
-        y' = toBaseY y
 
 -- | Draw emoji map.
 emap :: MapId -> Size -> X -> Y -> RenderOp
@@ -149,4 +143,3 @@ degToRad d = 2.0 * pi * toNumber d / 360.0
 sizeToFont :: Size -> String
 sizeToFont px = joinWith " " [fontSize, fontFamily]
     where fontSize = show px <> "px"
-
