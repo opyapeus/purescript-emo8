@@ -52,7 +52,7 @@ each methods are called in order update, draw, sound at every frame.
 ## Asset
 
 ```PureScript
-data Asset = Asset
+type Asset =
   { mapData :: Array EmojiMap
   , soundData :: Array Sound
   }

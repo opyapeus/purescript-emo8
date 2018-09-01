@@ -21,7 +21,7 @@ import Nemo.Data.Input (Input)
 import Nemo.Data.SpecialInput (SpecialInput)
 import Nemo.KeyPress (PressState(..), updatePressState)
 import Nemo.Patch.TextBaseline (TextBaseline(..), setTextBaseline)
-import Nemo.Types (Asset, DebugConfig, DebugDisplay(..), DrawContext(..), RenderOp)
+import Nemo.Types (Asset, DebugConfig, DebugDisplay(..), RenderOp)
 
 
 type DebugInput =
@@ -97,7 +97,7 @@ providedUpdate { loopState: JustSuspend } op = op
 providedUpdate _ op = pure unit
 
 debugDraw :: forall s. Game s => DebugConfig -> DebugState s -> RenderOp
-debugDraw dc ds (DrawContext dctx) = do
+debugDraw dc ds dctx = do
   save dctx.ctx
   setFillStyle dctx.ctx (colorToCode dc.color)
   setFont dctx.ctx "bold 64px sans-serif"

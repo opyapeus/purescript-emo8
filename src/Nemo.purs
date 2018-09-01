@@ -21,20 +21,20 @@ import Nemo.Data.SpecialInput (pollSpecialInputs)
 import Nemo.Data.Touch (initialTouchState, mergeToInput, pollTouches, updateTouchState)
 import Nemo.Debug (debugDraw, initDebugState, providedSave, providedUpdate, updateDebugState, withDebugInput)
 import Nemo.Startup (startupView, showStartupViewTime)
-import Nemo.Types (Asset(..), DrawContext(..), SoundContext(..), DebugConfig)
+import Nemo.Types (Asset, DebugConfig)
 import Signal (foldp, map2, runSignal, sampleOn)
 import Signal.DOM (animationFrame)
 
 -- | Run game function.
 nemo :: forall s. Game s => s -> Asset -> Effect Unit
-nemo state ass@(Asset asset) = do
+nemo state asset = do
   mcanvas <- getCanvasElementById canvasId
   case mcanvas of
     Just canvas -> do
       context <- getContext2D canvas
       audCtx <- newAudioContext
-      let drawCtx = DrawContext { ctx: context, mapData: asset.mapData }
-      let soundCtx = SoundContext { ctx: audCtx, soundData: asset.soundData }
+      let drawCtx = { ctx: context, mapData: asset.mapData }
+      let soundCtx = { ctx: audCtx, soundData: asset.soundData }
 
       startupView context
       _ <- setTimeout showStartupViewTime $ do
@@ -43,7 +43,7 @@ nemo state ass@(Asset asset) = do
         toucheSig <- pollTouches
         let touchStateSig = foldp updateTouchState initialTouchState toucheSig
         let mergedInputSig = map2 mergeToInput touchStateSig inputSig
-        let stateSig = foldp (\i s -> update i s ass) state (sampleOn frameSig mergedInputSig)
+        let stateSig = foldp (\i s -> update i s asset) state (sampleOn frameSig mergedInputSig)
         runSignal $ rens drawCtx <$> stateSig
         runSignal $ auds soundCtx <$> stateSig
       pure unit
@@ -57,14 +57,14 @@ nemo state ass@(Asset asset) = do
 -- | Run game function for developing.
 -- | It short cuts startup view.
 nemoDev :: forall s. Show s => Game s => s -> Asset -> DebugConfig -> Effect Unit
-nemoDev state ass@(Asset asset) dc = do
+nemoDev state asset dc = do
   mcanvas <- getCanvasElementById canvasId
   case mcanvas of
     Just canvas -> do
       context <- getContext2D canvas
       audCtx <- newAudioContext
-      let drawCtx = DrawContext { ctx: context, mapData: asset.mapData }
-      let soundCtx = SoundContext { ctx: audCtx, soundData: asset.soundData }
+      let drawCtx = { ctx: context, mapData: asset.mapData }
+      let soundCtx = { ctx: audCtx, soundData: asset.soundData }
 
       frameSigs <- animationFrame
       inputSig <- pollInputs
@@ -74,7 +74,7 @@ nemoDev state ass@(Asset asset) dc = do
       let mergedInputSig = mergeToInput <$> touchStateSig <*> inputSig
       let debugInputSig = withDebugInput <$> mergedInputSig <*> specialInputSig
       let initialDebugState = initDebugState state
-      let debugStateSig = foldp (\i s -> updateDebugState i s ass) initialDebugState (sampleOn frameSigs debugInputSig)
+      let debugStateSig = foldp (\i s -> updateDebugState i s asset) initialDebugState (sampleOn frameSigs debugInputSig)
       runSignal $ catLog <$> debugStateSig
       runSignal $ rens drawCtx <$> debugStateSig
       runSignal $ auds soundCtx <$> debugStateSig

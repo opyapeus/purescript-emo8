@@ -8,7 +8,7 @@ import Data.Bullet (Bullet(..))
 import Data.Tuple (Tuple(..))
 import Nemo.Constants (scene)
 import Nemo.Data.Emoji (Emoji(..))
-import Nemo.Data.Input (Input(..))
+import Nemo.Data.Input (Input)
 import Nemo.Draw (emo', emor')
 import Types (Pos)
 
@@ -34,14 +34,14 @@ instance objectDrawPlayer :: ObjectDraw Player where
                 Backword -> emor' 30
 
 updatePlayer :: Input -> Player -> Player
-updatePlayer input@(Input i) (Player s) =
+updatePlayer i (Player s) =
     Player $ s
         { pos = newPos
         , energy = newEnergy
         , appear = newAppear
         }
     where
-        newPos = updatePos input s.pos
+        newPos = updatePos i s.pos
         newEnergy = case Tuple (canEmit s.energy) (i.isW || i.isS || i.isD) of
             Tuple true true -> 0
             Tuple true false -> s.energy
@@ -53,7 +53,7 @@ updatePlayer input@(Input i) (Player s) =
                 _ -> Stable 
 
 updatePos :: Input -> Pos -> Pos
-updatePos (Input i) p = { x: nx, y: ny }
+updatePos i p = { x: nx, y: ny }
     where
         nx = case
             { l: i.isLeft, r: i.isRight } of
@@ -67,7 +67,7 @@ updatePos (Input i) p = { x: nx, y: ny }
                 _ -> p.y
 
 addBullet :: Input -> Player -> Array Bullet
-addBullet (Input i) (Player p) =
+addBullet i (Player p) =
     case canEmit p.energy of
         true | i.isW -> [ Upper { pos: p.pos } ]
         true | i.isS -> [ Downer { pos: p.pos } ]

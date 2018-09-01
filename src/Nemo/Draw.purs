@@ -23,23 +23,23 @@ import Nemo.Constants (fontFamily, scene)
 import Nemo.Data.Color (Color(..), colorToCode)
 import Nemo.Data.Emoji (Emoji(..))
 import Nemo.Patch.TextBaseline (TextBaseline(..), setTextBaseline)
-import Nemo.Types (Deg, DrawContext(..), IdX, MapId, RenderOp, Size, X, Y, IdY)
+import Nemo.Types (Deg, IdX, IdY, MapId, RenderOp, Size, X, Y)
 
 
 -- | Clear screen with given color.
 cls :: Color -> RenderOp
-cls c (DrawContext dctx) = do
+cls c dctx = do
     setFillStyle dctx.ctx (colorToCode c)
     fillRect dctx.ctx { x: 0.0, y: 0.0, width: toNumber $ scene.width, height: toNumber $ scene.height }
 
 withLocalDraw :: RenderOp -> RenderOp
-withLocalDraw op ctx@(DrawContext dctx) = do
+withLocalDraw op dctx = do
     save dctx.ctx
-    op ctx
+    op dctx
     restore dctx.ctx
 
 fillTextWithT :: Emoji -> Size -> X -> Y -> (Context2D -> Effect Unit) -> RenderOp
-fillTextWithT e size x y' op (DrawContext dctx) = do
+fillTextWithT e size x y' op dctx = do
     translate dctx.ctx { translateX: toNumber x + halfSize, translateY: toNumber y' - halfSize }
     op dctx.ctx
     fillTextConsVoid e size (- halfSize) halfSize dctx.ctx
@@ -59,7 +59,7 @@ fillTextConsVoid e size x y ctx = do
 -- | Draw emoji.
 emo :: Emoji -> Size -> X -> Y -> RenderOp
 emo e size x y =
-    withLocalDraw $ \(DrawContext dctx) -> do
+    withLocalDraw $ \dctx -> do
         fillTextConsVoid e size (toNumber x) (toNumber y') dctx.ctx
     where
         y' = toBaseY y
@@ -68,8 +68,8 @@ emo e size x y =
 -- | CAUTION: It does not display correctly (Deg = 45, 135, 225, 315).
 emor :: Deg -> Emoji -> Size -> X -> Y -> RenderOp
 emor rot e size x y =
-    withLocalDraw $ \ctx@(DrawContext dctx) -> do
-        flip (fillTextWithT e size x y') ctx $ \ctx2d -> do
+    withLocalDraw $ \dctx -> do
+        flip (fillTextWithT e size x y') dctx $ \ctx2d -> do
             rotate ctx2d (- degToRad rot)
     where
         y' = toBaseY y
@@ -77,8 +77,8 @@ emor rot e size x y =
 -- | Draw mirrored emoji.
 emo' :: Emoji -> Size -> X -> Y -> RenderOp
 emo' e size x y =
-    withLocalDraw $ \ctx@(DrawContext dctx) -> do
-        flip (fillTextWithT e size x y') ctx $ \ctx2d -> do
+    withLocalDraw $ \dctx -> do
+        flip (fillTextWithT e size x y') dctx $ \ctx2d -> do
             scale ctx2d { scaleX: -1.0, scaleY: 1.0 }
     where
         y' = toBaseY y
@@ -87,8 +87,8 @@ emo' e size x y =
 -- | CAUTION: It does not display correctly (Deg = 45, 135, 225, 315).
 emor' :: Deg -> Emoji -> Size -> X -> Y -> RenderOp
 emor' rot e size x y =
-    withLocalDraw $ \ctx@(DrawContext dctx) -> do
-        flip (fillTextWithT e size x y') ctx $ \ctx2d -> do
+    withLocalDraw $ \dctx -> do
+        flip (fillTextWithT e size x y') dctx $ \ctx2d -> do
             rotate ctx2d (- degToRad rot)
             scale ctx2d { scaleX: -1.0, scaleY: 1.0 }
     where
@@ -104,7 +104,7 @@ emap' = emapF emo'
 
 emapF :: (Emoji -> Size -> X -> Y -> RenderOp) -> MapId -> Size -> X -> Y -> RenderOp
 emapF f mId size x y =
-    withLocalDraw $ \ctx@(DrawContext dctx) ->
+    withLocalDraw $ \dctx ->
         case dctx.mapData !! mId of
             Nothing -> pure unit -- NOTE: Prioritize simplicity
             Just em ->
@@ -114,7 +114,7 @@ emapF f mId size x y =
                             when (isVisible horiId vertId)
                                 let xx = x + size * horiId
                                     yy = y + size * vertId 
-                                in f e size xx yy ctx
+                                in f e size xx yy dctx
     where
         withIndex :: forall a. Array a -> Array (Tuple Int a)
         withIndex arr = zip (0..((length arr) - 1)) arr

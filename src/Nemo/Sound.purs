@@ -18,13 +18,13 @@ import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Nemo.Data.Audio (efctToDetune, noteToFreq, octaveToMult, volToGain)
 import Nemo.Data.Tone (Tone, setTone)
-import Nemo.Types (AudioOp, Bpm, SoundContext(..), Tick(..), SoundId)
+import Nemo.Types (AudioOp, Bpm, SoundId, Tick)
 
 -- ENHANCE: more detail control.
 
 -- | Play sound with given tone and bpm.
 play :: SoundId -> Tone -> Bpm -> AudioOp
-play sId tone tempo (SoundContext sctx) =
+play sId tone tempo sctx =
     case sctx.soundData !! sId of
         Nothing -> pure unit -- NOTE: Prioritize simplicity
         Just ticks -> do
@@ -53,7 +53,7 @@ play sId tone tempo (SoundContext sctx) =
                 interval = 60.0 / toNumber tempo
 
 prepSound :: Seconds -> OscillatorNode -> GainNode -> Tick -> Effect Unit
-prepSound t on gn (Tick tick) = do
+prepSound t on gn tick = do
     let det = efctToDetune tick.efct
     let freq = noteToFreq tick.note * octaveToMult tick.octave
     let vol = volToGain tick.vol
@@ -66,5 +66,5 @@ prepSound t on gn (Tick tick) = do
 
 -- | Halt all sound.
 haltall :: AudioOp
-haltall (SoundContext sctx) =
+haltall sctx =
     suspend sctx.ctx

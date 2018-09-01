@@ -14,24 +14,24 @@ newtype RawMap = RawMap String
 
 newtype RawSound = RawSound String
 
--- | Asset data.
+-- | Asset type.
 -- | It contains map data and sound data.
-data Asset = Asset
+type Asset =
   { mapData :: Array EmojiMap
   , soundData :: Array Sound
   }
 
-data DrawContext = DrawContext
+type DrawContext =
   { ctx :: Context2D
   , mapData :: Array EmojiMap
   }
 
-data SoundContext = SoundContext
+type SoundContext =
   { ctx :: AudioContext
   , soundData :: Array Sound
   }
 
-data Tick = Tick
+type Tick =
   { octave :: Octave
   , note :: Note
   , vol :: Vol

@@ -12,7 +12,6 @@ import Nemo.Class.Game (class Game)
 import Nemo.Constants (scene)
 import Nemo.Data.Color (Color(..))
 import Nemo.Data.Emoji (Emoji(..))
-import Nemo.Data.Input (Input(..))
 import Nemo.Data.Tone (Tone(..))
 import Nemo.Draw (cls, emap, emo, emo')
 import Nemo.Sound (play)
@@ -47,7 +46,7 @@ instance showAppear :: Show Appear where
   show = genericShow
 
 instance gameState :: Game State where
-  update (Input input) (State state) asset =
+  update input (State state) asset =
     State $ state
       { x = nnx
       , y = nny

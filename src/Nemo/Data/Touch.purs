@@ -18,7 +18,7 @@ import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Math (atan2, pi)
-import Nemo.Data.Input (Input(..))
+import Nemo.Data.Input (Input)
 import Signal (Signal)
 import Signal.DOM (Touch, DimensionPair, touch, windowDimensions)
 
@@ -137,7 +137,7 @@ vectorToDirection { x, y } = f arg
       | otherwise  = NoDirection
   
 mergeToInput :: TouchState -> Input -> Input
-mergeToInput s (Input i) = Input
+mergeToInput s i =
   { isLeft : i.isLeft || s.isLeft
   , isRight : i.isRight || s.isRight
   , isUp : i.isUp || s.isUp

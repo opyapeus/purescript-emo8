@@ -14,7 +14,7 @@ import Data.Traversable (traverse)
 import Data.Tuple (Tuple(..))
 import Data.Tuple.Nested (tuple4)
 import Nemo.Class.Read (read)
-import Nemo.Types (RawMap(..), RawSound(..), EmojiMap, Sound, Tick(..))
+import Nemo.Types (EmojiMap, RawMap(..), RawSound(..), Sound)
 
 
 -- | Convert raw map string to emoji map
@@ -42,7 +42,7 @@ singletonArrayToSound ls =
       in Right $
         flip map zipped $
           \(Tuple o (Tuple n (Tuple v e))) -> 
-            Tick { octave: o, note: n, vol: v, efct: e}
+            { octave: o, note: n, vol: v, efct: e}
     Tuple (Left msg) (Tuple _ (Tuple _ (Tuple _ _))) -> Left msg
     Tuple _ (Tuple (Left msg) (Tuple _ (Tuple _ _))) -> Left msg
     Tuple _ (Tuple _ (Tuple (Left msg) (Tuple _ _))) -> Left msg

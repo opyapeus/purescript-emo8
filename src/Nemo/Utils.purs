@@ -22,7 +22,7 @@ import Nemo.Constants (scene)
 import Nemo.Data.Color (Color(..))
 import Nemo.Data.Emoji (Emoji)
 import Nemo.Parse (parseEmojiMap, parseSound)
-import Nemo.Types (Asset(..), DebugConfig, DebugDisplay(..), IdX, IdY, MapId, RawMap, RawSound, Size, X, Y)
+import Nemo.Types (Asset, DebugConfig, DebugDisplay(..), IdX, IdY, MapId, RawMap, RawSound, Size, X, Y)
 
 
 -- | Map collision detection.
@@ -47,7 +47,7 @@ isMapCollide asset mId mSize walls size x y = foldr f false [lbE, rbE, ltE, rtE]
 -- | Get map emoji with given indices.
 -- | Return Nothing there is not emoji.
 getMapEmoji :: Asset -> MapId -> IdX -> IdY -> Maybe Emoji
-getMapEmoji (Asset ass) mId xId yId =
+getMapEmoji ass mId xId yId =
     case ass.mapData !! mId of
         Nothing -> Nothing -- NOTE: Prioritize simplicity
         Just em -> reverse em !! yId >>= flip (!!) xId
@@ -91,7 +91,7 @@ mkAsset :: Array RawMap -> Array RawSound -> Effect Asset
 mkAsset rms rss = do
     ms <- orErrMsg $ traverse parseEmojiMap rms
     ss <- orErrMsg $ traverse parseSound rss
-    pure $ Asset { mapData: ms, soundData: ss }
+    pure { mapData: ms, soundData: ss }
 
 orErrMsg :: forall a. Either String a -> Effect a
 orErrMsg = case _ of
@@ -100,7 +100,7 @@ orErrMsg = case _ of
 
 -- | Empty asset for convenience. 
 emptyAsset :: Asset
-emptyAsset = Asset { mapData: [], soundData: [] }
+emptyAsset = { mapData: [], soundData: [] }
 
 -- | Default debug config for convenience. 
 defaultDebugConfig :: DebugConfig

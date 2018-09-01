@@ -1,5 +1,5 @@
 module Nemo.Data.Input
-  ( Input(..)
+  ( Input
   , pollInputs
   ) where
 
@@ -8,7 +8,7 @@ import Effect (Effect)
 import Signal (Signal)
 import Signal.DOM (keyPressed)
 
-data Input = Input
+type Input =
   { isLeft :: Boolean
   , isRight :: Boolean
   , isUp :: Boolean
@@ -33,34 +33,33 @@ keyToCodeNum D = 68
 
 pollInputs :: Effect (Signal Input)
 pollInputs = do
-    leftInput <- f Left
-    rightInput <- f Right
-    upInput <- f Up
-    downInput <- f Down
-    wInput <- f W
-    aInput <- f A
-    sInput <- f S
-    dInput <- f D
-    -- TODO: refactor?
-    pure $
-        map Input$
-          { isLeft: _
-          , isRight: _
-          , isUp: _
-          , isDown: _
-          , isW: _
-          , isA: _
-          , isS: _
-          , isD: _
-          } 
-            <$> leftInput
-            <*> rightInput
-            <*> upInput
-            <*> downInput
-            <*> wInput
-            <*> aInput
-            <*> sInput
-            <*> dInput
-    where
-      f = keyPressed <<< keyToCodeNum
+  leftInput <- f Left
+  rightInput <- f Right
+  upInput <- f Up
+  downInput <- f Down
+  wInput <- f W
+  aInput <- f A
+  sInput <- f S
+  dInput <- f D
+  -- TODO: refactor?
+  pure $
+    { isLeft: _
+    , isRight: _
+    , isUp: _
+    , isDown: _
+    , isW: _
+    , isA: _
+    , isS: _
+    , isD: _
+    } 
+      <$> leftInput
+      <*> rightInput
+      <*> upInput
+      <*> downInput
+      <*> wInput
+      <*> aInput
+      <*> sInput
+      <*> dInput
+  where
+    f = keyPressed <<< keyToCodeNum
 

@@ -10,7 +10,7 @@ import Data.Foldable (foldr)
 import Data.Player (Player(..))
 import Data.Tuple (Tuple(..))
 import Nemo.Constants (scene)
-import Nemo.Data.Input (Input(..))
+import Nemo.Data.Input (Input)
 import Nemo.Draw (emap)
 import Nemo.Types (Asset, MapId, RenderOp, X)
 
@@ -82,6 +82,6 @@ isCollideScrollMap ass distance o
                 base = num * mapWidth
 
 isInputAny :: Input -> Boolean
-isInputAny (Input i)
+isInputAny i
     = i.isW || i.isS || i.isA || i.isD
     || i.isUp || i.isDown || i.isLeft || i.isRight 
