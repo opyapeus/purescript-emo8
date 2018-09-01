@@ -23,7 +23,7 @@ import Nemo.Constants (fontFamily, scene)
 import Nemo.Data.Color (Color(..), colorToCode)
 import Nemo.Data.Emoji (Emoji(..))
 import Nemo.Patch.TextBaseline (TextBaseline(..), setTextBaseline)
-import Nemo.Types (Deg, DrawContext(..), RenderOp, Size, X, Y, MapId)
+import Nemo.Types (Deg, DrawContext(..), IdX, MapId, RenderOp, Size, X, Y, IdY)
 
 
 -- | Clear screen with given color.
@@ -109,15 +109,36 @@ emapF f mId size x y =
             Nothing -> pure unit -- NOTE: Prioritize simplicity
             Just em ->
                 for_ (emapWithIndex em) $
-                    \(Tuple vrId iarr) -> for_ iarr $
-                        \(Tuple hrId e) ->
-                            let xx = x + size * hrId
-                                yy = y + size * vrId 
-                            in f e size xx yy ctx
-                where
-                    withIndex arr = zip (0..((length arr) - 1)) arr
-                    withIndexRev arr = zip (((length arr) - 1)..0) arr
-                    emapWithIndex = withIndexRev <<< (map withIndex)
+                    \(Tuple vertId withIdRow) -> for_ withIdRow $
+                        \(Tuple horiId e) ->
+                            when (isVisible horiId vertId)
+                                let xx = x + size * horiId
+                                    yy = y + size * vertId 
+                                in f e size xx yy ctx
+    where
+        withIndex :: forall a. Array a -> Array (Tuple Int a)
+        withIndex arr = zip (0..((length arr) - 1)) arr
+        -- NOTE: reverse for y axis
+        withIndexRev :: forall a. Array a -> Array (Tuple Int a)
+        withIndexRev arr = zip (((length arr) - 1)..0) arr
+        emapWithIndex = withIndexRev <<< (map withIndex)
+
+        isVisible :: IdX -> IdY -> Boolean
+        isVisible xId yId =
+            ( xId >= xlBoundId
+            && xId <= xrBoundId
+            && yId >= ybBoundId
+            && yId <= ytBoundId
+            )
+        maxMapElemX = scene.width / size
+        maxMapElemY = scene.height / size
+        xMapId = x / size
+        yMapId = y / size
+        xlBoundId = - (xMapId + 1)
+        xrBoundId = xlBoundId + maxMapElemX 
+        ybBoundId = - (yMapId + 1)
+        ytBoundId = ybBoundId + maxMapElemY
+
 
 toBaseY :: Y -> Y
 toBaseY y = scene.height - y
