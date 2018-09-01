@@ -49,10 +49,9 @@ noteToFreq AS = 58.2704701898
 noteToFreq B = 61.735412657
 
 
--- NOTE: A4 (A Fourth) is 440 Hz
+-- NOTE: A4 (A Fourth) means 440 Hz
 data Octave = First | Second | Third | Fourth | Fifth | Sixth | Seventh
 
--- TODO: number emoji (parse multi code)
 instance showOctave :: Show Octave where
   show First = "1️⃣"
   show Second = "2️⃣"
