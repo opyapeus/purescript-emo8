@@ -5,61 +5,80 @@ module Nemo.Parse
 
 import Prelude
 
-import Data.Array (slice, zip, (!!))
-import Data.Either (Either(..), note)
+import Data.Array (concat, slice, zip)
+import Data.Either (Either(..))
 import Data.Foldable (length)
 import Data.String.EmojiSplitter (splitEmoji)
 import Data.String.Utils (lines)
 import Data.Traversable (traverse)
-import Data.Tuple (Tuple(..))
-import Data.Tuple.Nested (tuple4)
+import Data.Tuple (Tuple(..), uncurry)
 import Nemo.Class.Read (read)
-import Nemo.Types (EmojiMap, RawMap(..), RawSound(..), Sound)
+import Nemo.Constants (maxNoteSize)
+import Nemo.Data.Audio (Note, Octave, nextOctave, notes)
+import Nemo.Types (EmojiMap, RawMap(..), RawSound(..), Sound, Tick, Scale)
 
+type EmojiString = String
+type EmojiStringArray = Array EmojiString
+type EmojiStringMatrix = Array EmojiStringArray
+type NoteArray = Array Note
 
 -- | Convert raw map string to emoji map
 parseEmojiMap :: RawMap -> Either String EmojiMap
-parseEmojiMap = singletonArrayToMap <=< rawMapToSingletonArray
+parseEmojiMap (RawMap s) = stringMatrixToEmojiMap =<< rawStringToSingletonArray s
 
-singletonArrayToMap :: Array (Array String) -> Either String EmojiMap
-singletonArrayToMap = traverse (traverse read)
+stringMatrixToEmojiMap :: EmojiStringMatrix -> Either String EmojiMap
+stringMatrixToEmojiMap = traverse (traverse read)
 
-rawMapToSingletonArray :: RawMap -> Either String (Array (Array String))
-rawMapToSingletonArray (RawMap s) = rawStringToSingletonArray s
 
 -- | Convert raw sound string to sound
 parseSound :: RawSound -> Either String Sound
-parseSound = singletonArrayToSound <=< rawSoundToSingletonArray
+parseSound (RawSound s) = stringMatrixToSound =<< rawStringToSingletonArray s
 
--- TODO: refactor
-singletonArrayToSound :: Array (Array String) -> Either String Sound
-singletonArrayToSound ls =
-  case tuple4 eOctave' eEfct' eNote' eVol' of
-    -- FIXME: Tuple4 _ _ _ _ -> [PureScript] Unknown data constructor Tuple4
-    Tuple (Right octave') (Tuple (Right efct') (Tuple (Right note') (Tuple (Right vol') _))) ->
-      -- zip3?
-      let zipped = zip octave' $ zip note' $ zip vol' efct'
-      in Right $
-        flip map zipped $
-          \(Tuple o (Tuple n (Tuple v e))) -> 
-            { octave: o, note: n, vol: v, efct: e}
-    Tuple (Left msg) (Tuple _ (Tuple _ (Tuple _ _))) -> Left msg
-    Tuple _ (Tuple (Left msg) (Tuple _ (Tuple _ _))) -> Left msg
-    Tuple _ (Tuple _ (Tuple (Left msg) (Tuple _ _))) -> Left msg
-    Tuple _ (Tuple _ (Tuple _ (Tuple (Left msg) _))) -> Left msg
-  where
-    eEfct' = traverse read =<< note "efct line not found." (ls !! 0)
-    eOctave' = traverse read =<< note "octave line not found." (ls !! 1)
-    eNote' = traverse read =<< note "note line not found." (ls !! 2)
-    eVol' = traverse read =<< note "vol line not found." (ls !! 3)
+stringMatrixToSound :: EmojiStringMatrix -> Either String Sound
+stringMatrixToSound = traverse stringArrayToTick
 
-rawSoundToSingletonArray :: RawSound -> Either String (Array (Array String))
-rawSoundToSingletonArray (RawSound s) = rawStringToSingletonArray s
+stringArrayToTick :: EmojiStringArray -> Either String Tick
+stringArrayToTick
+  [ efct, vol, oct
+  , c, cs, d, ds, e, f, fs, g, gs, a, as, b
+  , c', cs', d', ds', e', f', fs', g', gs', a', as', b'
+  ] = do
+    effect <- read efct
+    volume <- read vol
+    octave <- read oct
+    notes <- parseNotes [c, cs, d, ds, e, f, fs, g, gs, a, as, b]
+    notes' <- parseNotes [c', cs', d', ds', e', f', fs', g', gs', a', as', b']
+    Tuple validNotes validNotes' <- satisfyNoteLen notes notes'
+    let scales = mkScale octave <$> validNotes
+    let scales' = mkScale (nextOctave octave) <$> validNotes'
+    pure
+      { scales: scales <> scales'
+      , vol: volume
+      , efct: effect
+      }
+stringArrayToTick _ = Left "invalid format."
 
-rawStringToSingletonArray :: String -> Either String (Array (Array String))
+parseNotes :: EmojiStringArray -> Either String NoteArray
+parseNotes = map concat <<< traverse (uncurry matchNote) <<< zip notes        
+
+matchNote :: Note -> EmojiString -> Either String NoteArray
+matchNote n "🎹" = Right [n]
+matchNote _ "🈳" = Right []
+matchNote _ s = Left $ s <> " can not be parsed."
+
+satisfyNoteLen :: Array Note -> Array Note -> Either String (Tuple NoteArray NoteArray)
+satisfyNoteLen xs ys = if length (xs <> ys) <= maxNoteSize
+  then Right $ Tuple xs ys
+  else Left $ "exceeded max note count " <> show maxNoteSize <> "."
+
+mkScale :: Octave -> Note -> Scale
+mkScale o n = { octave: o, note: n }
+
+
+rawStringToSingletonArray :: String -> Either String EmojiStringMatrix
 rawStringToSingletonArray s = eEmojis
   where
     rows = lines s
-    -- NOTE: remove top and bottom
+    -- NOTE: remove "\n" top and bottom
     rows' = slice 1 (length rows - 1) rows
     eEmojis = traverse splitEmoji rows'

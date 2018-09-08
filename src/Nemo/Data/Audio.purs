@@ -9,29 +9,28 @@ data Note
   | E | F | FS | G
   | GS | A | AS | B
 
-instance showNote :: Show Note where
-  show C = "🕛"
-  show CS = "🕐"
-  show D = "🕑"
-  show DS = "🕒"
-  show E = "🕓"
-  show F = "🕔"
-  show FS = "🕕"
-  show G = "🕖"
-  show GS = "🕗"
-  show A = "🕘"
-  show AS = "🕙"
-  show B = "🕚"
+derive instance eqNote :: Eq Note
 
-instance readNote :: Read Note where
-  read = defaultRead notes
-   
-notes :: Patterns Note
-notes = 
-    [ C, CS, D, DS
-    , E, F, FS, G
-    , GS, A, AS, B
-    ]
+instance showNote :: Show Note where
+  show C  = "🎹🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳"
+  show CS = "🈳🎹🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳"
+  show D  = "🈳🈳🎹🈳🈳🈳🈳🈳🈳🈳🈳🈳"
+  show DS = "🈳🈳🈳🎹🈳🈳🈳🈳🈳🈳🈳🈳"
+  show E  = "🈳🈳🈳🈳🎹🈳🈳🈳🈳🈳🈳🈳"
+  show F  = "🈳🈳🈳🈳🈳🎹🈳🈳🈳🈳🈳🈳"
+  show FS = "🈳🈳🈳🈳🈳🈳🎹🈳🈳🈳🈳🈳"
+  show G  = "🈳🈳🈳🈳🈳🈳🈳🎹🈳🈳🈳🈳"
+  show GS = "🈳🈳🈳🈳🈳🈳🈳🈳🎹🈳🈳🈳"
+  show A  = "🈳🈳🈳🈳🈳🈳🈳🈳🈳🎹🈳🈳"
+  show AS = "🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🎹🈳"
+  show B  = "🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🎹"
+
+notes :: Array Note
+notes =
+  [ C, CS, D, DS
+  , E, F, FS, G
+  , GS, A, AS, B
+  ]
 
 -- NOTE: C1 base tone
 noteToFreq :: Note -> Number
@@ -52,6 +51,8 @@ noteToFreq B = 61.735412657
 -- NOTE: A4 (A Fourth) means 440 Hz
 data Octave = First | Second | Third | Fourth | Fifth | Sixth | Seventh
 
+derive instance eqOctave :: Eq Octave
+
 instance showOctave :: Show Octave where
   show First = "1️⃣"
   show Second = "2️⃣"
@@ -63,9 +64,18 @@ instance showOctave :: Show Octave where
 
 instance readOctave :: Read Octave where
   read = defaultRead octaves
-   
+
 octaves :: Patterns Octave
 octaves = [ First, Second, Third, Fourth, Fifth, Sixth, Seventh ]
+
+nextOctave :: Octave -> Octave
+nextOctave First = Second
+nextOctave Second = Third
+nextOctave Third = Fourth
+nextOctave Fourth = Fifth
+nextOctave Fifth = Sixth
+nextOctave Sixth = Seventh
+nextOctave Seventh = First -- NOTE: loop
 
 octaveToMult :: Octave -> Number
 octaveToMult First = 1.0
@@ -78,6 +88,8 @@ octaveToMult Seventh = 64.0
 
 
 data Vol = Mute | Low | Med | High
+
+derive instance eqVol :: Eq Vol
 
 instance showVol :: Show Vol where
   show Mute = "🔇"
@@ -99,6 +111,8 @@ volToGain High = 1.0
 
 
 data Efct = None | Detune
+
+derive instance eqEfct :: Eq Efct
 
 instance showEfct :: Show Efct where
   show None = "🎼"

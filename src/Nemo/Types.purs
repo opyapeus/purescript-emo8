@@ -3,6 +3,7 @@ module Nemo.Types where
 import Prelude
 
 import Audio.WebAudio.Types (AudioContext)
+import Data.String (Pattern(..), Replacement(..), replace)
 import Effect (Effect)
 import Graphics.Canvas (Context2D)
 import Nemo.Data.Audio (Efct, Note, Octave, Vol)
@@ -13,6 +14,10 @@ import Nemo.Data.Emoji (Emoji)
 newtype RawMap = RawMap String
 
 newtype RawSound = RawSound String
+
+instance semigroupRawSound :: Semigroup RawSound where
+  append (RawSound a) (RawSound b) = RawSound (a <> removeTopLF b)
+    where removeTopLF = replace (Pattern "\n") (Replacement "")
 
 -- | Asset type.
 -- | It contains map data and sound data.
@@ -31,16 +36,20 @@ type SoundContext =
   , soundData :: Array Sound
   }
 
+type EmojiMap = Array (Array Emoji)
+
+type Sound = Array Tick
+
 type Tick =
-  { octave :: Octave
-  , note :: Note
+  { scales :: Array Scale
   , vol :: Vol
   , efct :: Efct
   }
 
-type EmojiMap = Array (Array Emoji)
-
-type Sound = Array Tick
+type Scale =
+  { octave :: Octave
+  , note :: Note
+  }
 
 type RenderOp = DrawContext -> Effect Unit
 
