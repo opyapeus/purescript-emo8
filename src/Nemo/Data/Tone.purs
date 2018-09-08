@@ -7,10 +7,11 @@ import Prelude
 
 import Audio.WebAudio.Oscillator (OscillatorType(..), setOscillatorType)
 import Audio.WebAudio.Types (AudioContext, OscillatorNode)
-import Data.Array (concatMap, range, (:))
-import Data.Int (pow)
-import Data.Unfoldable (replicate)
+import Data.Array ((:))
+import Data.Unfoldable (replicateA)
 import Effect (Effect)
+import Effect.Random (randomRange)
+import Math (cos, pi, sin)
 import Nemo.Patch.OscillatorCustom (FFTComponent, createPeriodicWave, setPeriodicWave)
 
 data Tone
@@ -20,14 +21,14 @@ data Tone
   | Saw
   | Noise
 
-whiteNoise :: Array FFTComponent
-whiteNoise =
-  map extendToComplex $
-    -- NOTE: generate [0,1,1,0,1,0,0,0,1,0,0,0,0,0,0,0,1,...], 4096 elements
-    0.0 : concatMap (\i -> 1.0 : replicate (pow 2 i - 1) 0.0) (range 0 11)
+type Radian = Number
 
-extendToComplex :: Number -> FFTComponent
-extendToComplex r = { real: r, imag: 0.0 }
+-- FIXME: can not express noise with createPeriodicWave?
+whiteNoise :: Array Radian -> Array FFTComponent
+whiteNoise rads = { real: 0.0, imag: 0.0 } : map extendToComplex rads
+
+extendToComplex :: Radian -> FFTComponent
+extendToComplex rad = { real: cos rad, imag: sin rad }
 
 setTone :: Tone -> OscillatorNode -> AudioContext -> Effect Unit
 setTone Sin on _ = setOscillatorType Sine on
@@ -35,5 +36,6 @@ setTone Sq on _ = setOscillatorType Square on
 setTone Tri on _ = setOscillatorType Triangle on
 setTone Saw on _ = setOscillatorType Sawtooth on
 setTone Noise on ctx = do
-  wave <- createPeriodicWave whiteNoise ctx
+  rads <- replicateA 31 $ randomRange 0.0 (2.0 * pi)
+  wave <- createPeriodicWave (whiteNoise rads) ctx
   setPeriodicWave wave on
