@@ -18,11 +18,11 @@ import Nemo.Class.Game (class Game, draw, sound, update)
 import Nemo.Constants (canvasId)
 import Nemo.Data.Input (pollInputs)
 import Nemo.Data.SpecialInput (pollSpecialInputs)
-import Nemo.Data.Touch (initialTouchState, mergeToInput, pollTouches, updateTouchState)
+import Nemo.Data.TouchInput (mergeToInput, pollTouchInput)
 import Nemo.Debug (debugDraw, initDebugState, providedSave, providedUpdate, updateDebugState, withDebugInput)
 import Nemo.Startup (startupView, showStartupViewTime)
 import Nemo.Types (Asset, DebugConfig)
-import Signal (foldp, map2, runSignal, sampleOn)
+import Signal (foldp, runSignal, sampleOn)
 import Signal.DOM (animationFrame)
 
 -- | Run game function.
@@ -40,9 +40,8 @@ nemo state asset = do
       _ <- setTimeout showStartupViewTime $ do
         frameSig <- animationFrame
         inputSig <- pollInputs
-        toucheSig <- pollTouches
-        let touchStateSig = foldp updateTouchState initialTouchState toucheSig
-        let mergedInputSig = map2 mergeToInput touchStateSig inputSig
+        toucheSig <- pollTouchInput
+        let mergedInputSig = mergeToInput <$> toucheSig <*> inputSig
         let stateSig = foldp (\i s -> update i s asset) state (sampleOn frameSig mergedInputSig)
         runSignal $ rens drawCtx <$> stateSig
         runSignal $ auds soundCtx <$> stateSig
@@ -68,10 +67,9 @@ nemoDev state asset dc = do
 
       frameSigs <- animationFrame
       inputSig <- pollInputs
-      toucheSig <- pollTouches
+      toucheSig <- pollTouchInput
       specialInputSig <- pollSpecialInputs
-      let touchStateSig = foldp updateTouchState initialTouchState toucheSig
-      let mergedInputSig = mergeToInput <$> touchStateSig <*> inputSig
+      let mergedInputSig = mergeToInput <$> toucheSig <*> inputSig
       let debugInputSig = withDebugInput <$> mergedInputSig <*> specialInputSig
       let initialDebugState = initDebugState state
       let debugStateSig = foldp (\i s -> updateDebugState i s asset) initialDebugState (sampleOn frameSigs debugInputSig)
