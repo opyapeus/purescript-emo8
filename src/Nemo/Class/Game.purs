@@ -2,7 +2,7 @@ module Nemo.Class.Game where
 
 import Prelude (const)
 import Nemo.Types (Asset, AudioOp, RenderOp)
-import Nemo.Data.Input (Input)
+import Nemo.Input (Input)
 
 -- NOTE: Default method implementations
 -- https://github.com/purescript/purescript/issues/3067

@@ -1,7 +1,6 @@
 module Nemo.Data.TouchInput
   ( TouchInput
   , pollTouchInput
-  , mergeToInput
   ) where
   
 import Prelude
@@ -12,7 +11,6 @@ import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Math (atan2, pi)
-import Nemo.Data.Input (Input)
 import Signal (Signal, foldp)
 import Signal.DOM (Touch, DimensionPair, touch, windowDimensions)
 
@@ -156,16 +154,3 @@ pickTouchPosF op td = head <<< filter f <<< map touchToPos $ td.touches
 
 touchToPos :: Touch -> Position
 touchToPos t = { x: t.screenX, y: t.screenY }
-
--- TODO
-mergeToInput :: TouchInput -> Input -> Input
-mergeToInput s i =
-  { isLeft : i.isLeft || s.isLeft
-  , isRight : i.isRight || s.isRight
-  , isUp : i.isUp || s.isUp
-  , isDown : i.isDown || s.isDown
-  , isW : i.isW || s.isW
-  , isA : i.isA || s.isA
-  , isS : i.isS || s.isS
-  , isD : i.isD || s.isD
-  }

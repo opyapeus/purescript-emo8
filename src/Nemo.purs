@@ -16,9 +16,8 @@ import Effect.Timer (setTimeout)
 import Graphics.Canvas (getCanvasElementById, getContext2D)
 import Nemo.Class.Game (class Game, draw, sound, update)
 import Nemo.Constants (canvasId)
-import Nemo.Data.Input (pollInputs)
+import Nemo.Input (pollInput)
 import Nemo.Data.SpecialInput (pollSpecialInputs)
-import Nemo.Data.TouchInput (mergeToInput, pollTouchInput)
 import Nemo.Debug (debugDraw, initDebugState, providedSave, providedUpdate, updateDebugState, withDebugInput)
 import Nemo.Startup (startupView, showStartupViewTime)
 import Nemo.Types (Asset, DebugConfig)
@@ -39,10 +38,8 @@ nemo state asset = do
       startupView context
       _ <- setTimeout showStartupViewTime $ do
         frameSig <- animationFrame
-        inputSig <- pollInputs
-        toucheSig <- pollTouchInput
-        let mergedInputSig = mergeToInput <$> toucheSig <*> inputSig
-        let stateSig = foldp (\i s -> update i s asset) state (sampleOn frameSig mergedInputSig)
+        inputSig <- pollInput
+        let stateSig = foldp (\i s -> update i s asset) state (sampleOn frameSig inputSig)
         runSignal $ rens drawCtx <$> stateSig
         runSignal $ auds soundCtx <$> stateSig
       pure unit
@@ -66,11 +63,9 @@ nemoDev state asset dc = do
       let soundCtx = { ctx: audCtx, soundData: asset.soundData }
 
       frameSigs <- animationFrame
-      inputSig <- pollInputs
-      toucheSig <- pollTouchInput
+      inputSig <- pollInput
       specialInputSig <- pollSpecialInputs
-      let mergedInputSig = mergeToInput <$> toucheSig <*> inputSig
-      let debugInputSig = withDebugInput <$> mergedInputSig <*> specialInputSig
+      let debugInputSig = withDebugInput <$> inputSig <*> specialInputSig
       let initialDebugState = initDebugState state
       let debugStateSig = foldp (\i s -> updateDebugState i s asset) initialDebugState (sampleOn frameSigs debugInputSig)
       runSignal $ catLog <$> debugStateSig

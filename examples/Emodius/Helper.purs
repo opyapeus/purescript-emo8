@@ -10,7 +10,7 @@ import Data.Foldable (foldr)
 import Data.Player (Player(..))
 import Data.Tuple (Tuple(..))
 import Nemo.Constants (scene)
-import Nemo.Data.Input (Input)
+import Nemo.Input (Input)
 import Nemo.Draw (emap)
 import Nemo.Types (Asset, MapId, RenderOp, X)
 
