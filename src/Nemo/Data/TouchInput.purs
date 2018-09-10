@@ -8,7 +8,6 @@ import Prelude
 import Data.Array (elem, filter, head)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Math (atan2, pi)
 import Signal (Signal, foldp)
@@ -134,10 +133,10 @@ updateTouchState td ts =
     nextRightBasePos = updateBasePos ts.rightBasePos mRightPos
 
 updateBasePos :: Maybe Position -> Maybe Position -> Maybe Position
-updateBasePos bp tp = case Tuple bp tp of
-  Tuple (Just p) (Just _) -> Just p
-  Tuple (Just _) Nothing -> Nothing
-  Tuple Nothing mp -> mp
+updateBasePos bp tp = case bp, tp of
+  (Just p), (Just _) -> Just p
+  (Just _), Nothing -> Nothing
+  Nothing, mp -> mp
 
 pickLeftTouchPos :: TouchData -> Maybe Position
 pickLeftTouchPos = pickTouchPosF (<)

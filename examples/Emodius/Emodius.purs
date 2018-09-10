@@ -6,15 +6,14 @@ import Asset (map0, map1, map2, map3)
 import Class.Object (draw, position)
 import Collision (isCollideObjects, isOutOfWorld)
 import Constants (speed)
-import Data.Array (any, filter)
+import Data.Array (any, filter, partition)
 import Data.Bullet (Bullet, updateBullet)
 import Data.Enemy (Enemy(..), addEnemyBullet, emergeTable, updateEnemy)
 import Data.EnemyBullet (EnemyBullet, updateEnemyBullet)
 import Data.Particle (Particle, initParticle, updateParticle)
 import Data.Player (Player, addBullet, initialPlayer, updatePlayer)
-import Data.Tuple (Tuple(..))
 import Effect (Effect)
-import Helper (beInMonitor, divideArray, drawScrollMap, isCollideScrollMap, isInputAny)
+import Helper (beInMonitor, drawScrollMap, isCollideScrollMap, isInputAny)
 import Nemo (nemo)
 import Nemo.Class.Game (class Game)
 import Nemo.Data.Color (Color(..))
@@ -55,10 +54,10 @@ instance gameState :: Game State where
             else ClearState { isButtonPressed: isPressed }
         where isPressed = isInputAny input
     update input (PlayState s) asset =
-        case Tuple isGameClear isGameOver of
-            Tuple true _ -> ClearState { isButtonPressed: true }
-            Tuple false true -> OverState { isButtonPressed: true }
-            Tuple false false -> PlayState $ s 
+        case isGameClear, isGameOver of
+            true, _ -> ClearState { isButtonPressed: true }
+            false, true -> OverState { isButtonPressed: true }
+            false, false -> PlayState $ s 
                 { distance = s.distance + speed
                 , player = nnp
                 , bullets = nnbullets <> newBullets
@@ -80,8 +79,8 @@ instance gameState :: Game State where
                 isEnemyBulletColl = any (isCollideObjects np) nenemyBullets
 
                 -- separate objects
-                Tuple collidedEnemies notCollidedEnemies = divideArray (\e -> any (isCollideObjects e) nbullets) nenemies
-                Tuple collidedBullets notCollidedBullets = divideArray (\b -> any (isCollideObjects b) nenemies) nbullets
+                { yes: collidedEnemies, no: notCollidedEnemies } = partition (\e -> any (isCollideObjects e) nbullets) nenemies
+                { yes: collidedBullets, no: notCollidedBullets } = partition (\b -> any (isCollideObjects b) nenemies) nbullets
 
                 -- add new objects
                 newBullets = addBullet input s.player

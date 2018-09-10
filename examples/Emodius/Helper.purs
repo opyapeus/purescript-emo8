@@ -5,25 +5,11 @@ import Prelude
 import Class.Object (class Object, position, size)
 import Collision (isCollMap, isCollWorld)
 import Constants (mapSize)
-import Data.Array (cons)
-import Data.Foldable (foldr)
 import Data.Player (Player(..))
-import Data.Tuple (Tuple(..))
 import Nemo.Constants (scene)
 import Nemo.Input (Input)
 import Nemo.Draw (emap)
 import Nemo.Types (Asset, MapId, RenderOp, X)
-
-
--- Divide array into two arrays with given condition
-divideArray :: forall a. (a -> Boolean) -> Array a -> Tuple (Array a) (Array a)
-divideArray f =
-    foldr
-        (\x (Tuple ta fa) ->
-            if f x
-                then Tuple (cons x ta) fa
-                else Tuple ta (cons x fa))
-        (Tuple [] [])
 
 beInMonitor :: Player -> Player -> Player
 beInMonitor p np@(Player ns) = Player $ ns { pos = { x: npx, y: npy } }
@@ -33,14 +19,14 @@ beInMonitor p np@(Player ns) = Player $ ns { pos = { x: npx, y: npy } }
         npos = position np
         isCollX = isCollWorld size' { x: npos.x, y: pos.y }
         isCollY = isCollWorld size' { x: pos.x, y: npos.y }
-        npx = case Tuple isCollX (npos.x < pos.x) of
-            Tuple true true -> 0
-            Tuple true false -> scene.width - size'
-            _ -> npos.x
-        npy = case Tuple isCollY (npos.y < pos.y) of
-            Tuple true true -> 0
-            Tuple true false -> scene.height - size'
-            _ -> npos.y
+        npx = case isCollX, (npos.x < pos.x) of
+            true, true -> 0
+            true, false -> scene.width - size'
+            _, _ -> npos.x
+        npy = case isCollY, (npos.y < pos.y) of
+            true, true -> 0
+            true, false -> scene.height - size'
+            _, _ -> npos.y
 
 mapTileWidth :: Int
 mapTileWidth = 64

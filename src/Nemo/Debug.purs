@@ -11,7 +11,6 @@ module Nemo.Debug
 import Prelude
 
 import Data.Int (toNumber)
-import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Graphics.Canvas (fillText, restore, save, setFillStyle, setFont)
 import Nemo.Class.Game (class Game, update)
@@ -47,13 +46,13 @@ updateDebugState i s ass = nnns
     updatedSaveAction = updatePressState i.specialInput.isSave s.saveAction
     updatedLoadAction = updatePressState i.specialInput.isLoad s.loadAction
     updatedForwardAction = updatePressState i.specialInput.isForward s.forwardAction
-    ns = case Tuple s.loopState i.specialInput of
-      Tuple Resume { isSuspend: true, isResume: false } -> s { loopState = JustSuspend }
-      Tuple Resume _ -> s { state = updatedState }
-      Tuple Suspend { isSuspend: false, isResume: true } -> s { state = updatedState, loopState = Resume }
-      Tuple Suspend _ -> s
-      Tuple JustSuspend { isSuspend: false, isResume: true } -> s { state = updatedState, loopState = Resume }
-      Tuple JustSuspend _ -> s { loopState = Suspend }
+    ns = case s.loopState, i.specialInput of
+      Resume, { isSuspend: true, isResume: false } -> s { loopState = JustSuspend }
+      Resume, _ -> s { state = updatedState }
+      Suspend, { isSuspend: false, isResume: true } -> s { state = updatedState, loopState = Resume }
+      Suspend, _ -> s
+      JustSuspend, { isSuspend: false, isResume: true } -> s { state = updatedState, loopState = Resume }
+      JustSuspend, _ -> s { loopState = Suspend }
     nns = case { sa: updatedSaveAction, la: updatedLoadAction, fa: updatedForwardAction } of
       { sa: Catched, la: Catched, fa: _ } -> ns
       { sa: Catched, la: _, fa: Catched } -> ns

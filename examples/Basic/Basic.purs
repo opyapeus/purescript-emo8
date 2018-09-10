@@ -5,7 +5,6 @@ import Prelude
 import Data.Foldable (any)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
-import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Nemo (nemoDev)
 import Nemo.Class.Game (class Game)
@@ -65,10 +64,10 @@ instance gameState :: Game State where
               ]
         
         -- next x
-        nx = case Tuple input.isLeft input.isRight of
-              Tuple true false -> state.x - 10
-              Tuple false true-> state.x + 10
-              _ -> state.x
+        nx = case input.isLeft, input.isRight of
+              true, false -> state.x - 10
+              false, true-> state.x + 10
+              _, _ -> state.x
 
         -- next y, dy
         canJump = isCollide state.x (state.y - gravity)
@@ -87,10 +86,10 @@ instance gameState :: Game State where
 
         -- next appearance
         appear =
-          case Tuple input.isLeft input.isRight of
-            Tuple true false -> if isAppearRun then LeftRun else LeftWalk 
-            Tuple false true -> if isAppearRun then RightRun else RightWalk
-            _ -> case state.appear of
+          case input.isLeft, input.isRight of
+            true, false -> if isAppearRun then LeftRun else LeftWalk 
+            false, true -> if isAppearRun then RightRun else RightWalk
+            _, _ -> case state.appear of
                   LeftRun -> LeftWalk
                   RightRun -> RightWalk
                   _ -> state.appear

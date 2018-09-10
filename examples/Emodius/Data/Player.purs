@@ -5,7 +5,6 @@ import Prelude
 import Class.Object (class Object, class ObjectDraw, position, size)
 import Constants (emoSize)
 import Data.Bullet (Bullet(..))
-import Data.Tuple (Tuple(..))
 import Nemo.Constants (scene)
 import Nemo.Data.Emoji (Emoji(..))
 import Nemo.Input (Input)
@@ -42,29 +41,27 @@ updatePlayer i (Player s) =
         }
     where
         newPos = updatePos i s.pos
-        newEnergy = case Tuple (canEmit s.energy) (i.isW || i.isS || i.isD) of
-            Tuple true true -> 0
-            Tuple true false -> s.energy
-            Tuple false _ -> s.energy + 1
+        newEnergy = case (canEmit s.energy), (i.isW || i.isS || i.isD) of
+            true, true -> 0
+            true, false -> s.energy
+            false, _ -> s.energy + 1
         newAppear =
-            case Tuple i.isLeft i.isRight of
-                Tuple true false -> Backword 
-                Tuple false true -> Forword
-                _ -> Stable 
+            case i.isLeft, i.isRight of
+                true, false -> Backword 
+                false, true -> Forword
+                _, _ -> Stable 
 
 updatePos :: Input -> Pos -> Pos
 updatePos i p = { x: nx, y: ny }
     where
-        nx = case
-            { l: i.isLeft, r: i.isRight } of
-                { l: true , r: false } -> p.x - 5
-                { l: false , r: true } -> p.x + 5
-                _ -> p.x
-        ny = case
-            { u: i.isUp, d: i.isDown } of
-                { u: true , d: false } -> p.y + 5
-                { u: false , d: true } -> p.y - 5
-                _ -> p.y
+        nx = case i.isLeft, i.isRight of
+                true, false -> p.x - 5
+                false, true -> p.x + 5
+                _, _ -> p.x
+        ny = case i.isUp, i.isDown of
+                true, false -> p.y + 5
+                false, true -> p.y - 5
+                _, _ -> p.y
 
 addBullet :: Input -> Player -> Array Bullet
 addBullet i (Player p) =
