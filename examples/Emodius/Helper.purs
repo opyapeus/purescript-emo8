@@ -67,7 +67,7 @@ isCollideScrollMap ass distance o
             where
                 base = num * mapWidth
 
-isInputAny :: Input -> Boolean
-isInputAny i
-    = i.isW || i.isS || i.isA || i.isD
-    || i.isUp || i.isDown || i.isLeft || i.isRight 
+isInputCatchAny :: Input -> Boolean
+isInputCatchAny i
+    = i.isWCat || i.isSCat || i.isACat || i.isDCat
+   || i.isUpCat || i.isDownCat || i.isLeftCat || i.isRightCat

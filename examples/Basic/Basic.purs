@@ -71,7 +71,7 @@ instance gameState :: Game State where
 
         -- next y, dy
         canJump = isCollide state.x (state.y - gravity)
-        isJump = canJump && input.isUp
+        isJump = canJump && input.isUpCat
         ddy = if isJump then 40 else 0
         ndy = state.dy - gravity + ddy
         ny = state.y + ndy

@@ -13,7 +13,7 @@ import Data.EnemyBullet (EnemyBullet, updateEnemyBullet)
 import Data.Particle (Particle, initParticle, updateParticle)
 import Data.Player (Player, addBullet, initialPlayer, updatePlayer)
 import Effect (Effect)
-import Helper (beInMonitor, drawScrollMap, isCollideScrollMap, isInputAny)
+import Helper (beInMonitor, drawScrollMap, isCollideScrollMap, isInputCatchAny)
 import Nemo (nemo)
 import Nemo.Class.Game (class Game)
 import Nemo.Data.Color (Color(..))
@@ -23,11 +23,8 @@ import Nemo.Utils (mkAsset)
 
 data State
     = TitleState
-        { isButtonPressed :: Boolean }
     | OverState
-        { isButtonPressed :: Boolean }
     | ClearState
-        { isButtonPressed :: Boolean }
     | PlayState
         { distance :: Int
         , player :: Player
@@ -38,25 +35,16 @@ data State
         }
 
 instance gameState :: Game State where
-    update input (TitleState s) _ =
-        if isPressed && not s.isButtonPressed
-            then initialPlayState
-            else TitleState { isButtonPressed: isPressed }
-        where isPressed = isInputAny input
-    update input (OverState s) _ =
-        if isPressed && not s.isButtonPressed
-            then initialState
-            else OverState { isButtonPressed: isPressed }
-        where isPressed = isInputAny input
-    update input (ClearState s) _ =
-        if isPressed && not s.isButtonPressed
-            then initialState
-            else ClearState { isButtonPressed: isPressed }
-        where isPressed = isInputAny input
+    update input TitleState _ =
+        if isInputCatchAny input then initialPlayState else TitleState
+    update input OverState _ =
+        if isInputCatchAny input then initialState else OverState
+    update input ClearState _ =
+        if isInputCatchAny input then initialState else ClearState
     update input (PlayState s) asset =
         case isGameClear, isGameOver of
-            true, _ -> ClearState { isButtonPressed: true }
-            false, true -> OverState { isButtonPressed: true }
+            true, _ -> ClearState
+            false, true -> OverState
             false, false -> PlayState $ s 
                 { distance = s.distance + speed
                 , player = nnp
@@ -103,7 +91,7 @@ instance gameState :: Game State where
                 isCatchOct _ = false  
                 isGameClear = any isCatchOct collidedEnemies
 
-    draw (TitleState _) =
+    draw TitleState =
         [ cls Aqua
         , emor' 30 Helicopter 384 100 100
         , emo SpiderWeb 512 400 400
@@ -112,13 +100,13 @@ instance gameState :: Game State where
         , emor 75 Pill 128 200 600
         , emo FastForwardButton 128 700 200
         ]
-    draw (OverState _) =
+    draw OverState =
         [ cls Maroon
         , emo Hole 512 250 300
         , emor 160 Helicopter 256 350 400
         , emo RecyclingSymbol 256 375 700
         ]
-    draw (ClearState _) =
+    draw ClearState =
         [ cls Lime
         , emor 15 Helicopter 128 700 800
         , emor (-15) Octopus 256 350 350
@@ -149,7 +137,6 @@ initialPlayState = PlayState
 
 initialState :: State
 initialState = TitleState
-    { isButtonPressed: true }
 
 main :: Effect Unit
 main = do
