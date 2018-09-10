@@ -1,4 +1,6 @@
-module Nemo.KeyPress where
+module Nemo.Data.PressState where
+
+import Prelude
 
 -- | Press state for watching press action.
 data PressState
@@ -6,6 +8,8 @@ data PressState
     | Unpressed -- ^ hold key up
     | Catched -- ^ just key down
     | Released -- ^ jsut key up
+
+derive instance eqPressState :: Eq PressState
 
 -- | Update press state function for convenience.
 updatePressState :: Boolean -> PressState -> PressState

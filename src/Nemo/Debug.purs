@@ -18,7 +18,7 @@ import Nemo.Constants (scene)
 import Nemo.Data.Color (colorToCode)
 import Nemo.Input (Input)
 import Nemo.Data.SpecialInput (SpecialInput)
-import Nemo.KeyPress (PressState(..), updatePressState)
+import Nemo.Data.PressState (PressState(..), updatePressState)
 import Nemo.Patch.TextBaseline (TextBaseline(..), setTextBaseline)
 import Nemo.Types (Asset, DebugConfig, DebugDisplay(..), RenderOp)
 
