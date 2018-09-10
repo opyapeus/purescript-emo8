@@ -45,7 +45,7 @@ class Game s where
   sound :: s -> Array AudioOp
 ```
 
-s is game state data which you can flexibly defined.
+s is game state data which you can flexibly define.
 
 each methods are called in order update, draw, sound at every frame.
 
