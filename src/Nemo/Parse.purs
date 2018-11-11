@@ -1,22 +1,32 @@
 module Nemo.Parse
-  ( parseEmojiMap
+  ( RawMap(..)
+  , RawSound(..)
+  , parseEmojiMap
   , parseSound
   ) where
 
 import Prelude
-
 import Data.Array (concat, slice, zip)
 import Data.Either (Either(..))
 import Data.Foldable (length)
 import Data.String.EmojiSplitter (splitEmoji)
 import Data.String.Utils (lines)
+import Data.String (Pattern(..), Replacement(..), replace)
 import Data.Traversable (traverse)
 import Data.Tuple (Tuple(..), uncurry)
 import Nemo.Class.Read (read)
 import Nemo.Constants (maxNoteSize)
 import Nemo.Data.Audio (Note, Octave, nextOctave, notes)
 import Nemo.Data.Emoji (Emoji(..))
-import Nemo.Types (EmojiMap, RawMap(..), RawSound(..), Sound, Tick, Scale)
+import Nemo.Types (EmojiMap, Sound, Tick, Scale)
+
+newtype RawMap = RawMap String
+
+newtype RawSound = RawSound String
+
+instance semigroupRawSound :: Semigroup RawSound where
+  append (RawSound a) (RawSound b) = RawSound (a <> removeTopLF b)
+    where removeTopLF = replace (Pattern "\n") (Replacement "")
 
 type EmojiString = String
 type EmojiStringArray = Array EmojiString
@@ -68,7 +78,7 @@ matchNote n "🎹" = Right [n]
 matchNote _ "🈳" = Right []
 matchNote _ s = Left $ s <> " can not be parsed."
 
-satisfyNoteLen :: Array Note -> Array Note -> Either String (Tuple NoteArray NoteArray)
+satisfyNoteLen :: NoteArray -> NoteArray -> Either String (Tuple NoteArray NoteArray)
 satisfyNoteLen xs ys = if length (xs <> ys) <= maxNoteSize
   then Right $ Tuple xs ys
   else Left $ "exceeded max note count " <> show maxNoteSize <> "."
@@ -78,9 +88,7 @@ mkScale o n = { octave: o, note: n }
 
 
 rawStringToSingletonArray :: String -> Either String EmojiStringMatrix
-rawStringToSingletonArray s = eEmojis
+rawStringToSingletonArray s = traverse splitEmoji rows'
   where
     rows = lines s
-    -- NOTE: remove "\n" top and bottom
-    rows' = slice 1 (length rows - 1) rows
-    eEmojis = traverse splitEmoji rows'
+    rows' = slice 1 (length rows - 1) rows -- NOTE: remove "\n" top and bottom

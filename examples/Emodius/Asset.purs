@@ -2,7 +2,7 @@ module Asset where
 
 
 import Nemo.Data.Emoji as E
-import Nemo.Types (RawMap(..))
+import Nemo.Parse (RawMap(..))
 
 walls :: Array E.Emoji
 walls =

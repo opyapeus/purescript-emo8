@@ -14,9 +14,9 @@ import Nemo.Data.Emoji as E
 import Nemo.Data.Tone (Tone(..))
 import Nemo.Draw (cls, emap, emo, emo')
 import Nemo.Sound (play)
-import Nemo.Types (RawMap(..), RawSound(..), Size, X, Y)
-import Nemo.Utils (defaultDebugConfig, isMapCollide, isMonitorCollide, mkAsset)
-
+import Nemo.Types (Size, X, Y)
+import Nemo.Utils (isMapCollide, isMonitorCollide, mkAsset, defaultDebugConfig)
+import Nemo.Parse (RawMap(..), RawSound(..))
 
 emoSize :: Size
 emoSize = 64

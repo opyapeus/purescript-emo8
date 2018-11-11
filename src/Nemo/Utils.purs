@@ -19,11 +19,11 @@ import Data.Traversable (traverse)
 import Effect (Effect)
 import Effect.Exception (throw)
 import Nemo.Constants (scene)
-import Nemo.Data.Color (Color(..))
 import Nemo.Data.Emoji (Emoji)
-import Nemo.Parse (parseEmojiMap, parseSound)
-import Nemo.Types (Asset, DebugConfig, DebugDisplay(..), IdX, IdY, MapId, RawMap, RawSound, Size, X, Y)
-
+import Nemo.Data.Color (Color(..))
+import Nemo.Data.DebugDisplay (DebugDisplay(..))
+import Nemo.Parse (RawMap, RawSound, parseEmojiMap, parseSound)
+import Nemo.Types (Asset, IdX, IdY, MapId, Size, X, Y, DebugConfig)
 
 -- | Map collision detection.
 -- | Given emojis are treated as walls.
@@ -94,9 +94,8 @@ mkAsset rms rss = do
     pure { mapData: ms, soundData: ss }
 
 orErrMsg :: forall a. Either String a -> Effect a
-orErrMsg = case _ of
-    Right val -> pure val
-    Left msg -> throw msg
+orErrMsg (Right val) = pure val
+orErrMsg (Left msg) = throw msg
 
 -- | Empty asset for convenience. 
 emptyAsset :: Asset

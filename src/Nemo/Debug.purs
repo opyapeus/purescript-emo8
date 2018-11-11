@@ -16,12 +16,12 @@ import Graphics.Canvas (fillText, restore, save, setFillStyle, setFont)
 import Nemo.Class.Game (class Game, update)
 import Nemo.Constants (scene)
 import Nemo.Data.Color (colorToCode)
-import Nemo.Input (Input)
-import Nemo.Data.SpecialInput (SpecialInput)
+import Nemo.Data.DebugDisplay (DebugDisplay(..))
 import Nemo.Data.PressState (PressState(..), updatePressState)
+import Nemo.Data.SpecialInput (SpecialInput)
+import Nemo.Input (Input)
 import Nemo.Patch.TextBaseline (TextBaseline(..), setTextBaseline)
-import Nemo.Types (Asset, DebugConfig, DebugDisplay(..), RenderOp)
-
+import Nemo.Types (Asset, RenderOp, DebugConfig)
 
 type DebugInput =
   { input :: Input
