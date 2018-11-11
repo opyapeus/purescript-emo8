@@ -1,8 +1,9 @@
 module Nemo.Data.Audio where
 
 import Prelude
-import Nemo.Class.Read (class Read, defaultRead, Patterns)
-
+import Data.Either (Either(..))
+import Data.String (joinWith)
+import Nemo.Class.Read (class Read)
 
 data Note
   = C | CS | D | DS
@@ -63,10 +64,14 @@ instance showOctave :: Show Octave where
   show Seventh = "7️⃣"
 
 instance readOctave :: Read Octave where
-  read = defaultRead octaves
-
-octaves :: Patterns Octave
-octaves = [ First, Second, Third, Fourth, Fifth, Sixth, Seventh ]
+  read "1️⃣" = Right First
+  read "2️⃣" = Right Second
+  read "3️⃣" = Right Third
+  read "4️⃣" = Right Fourth
+  read "5️⃣" = Right Fifth
+  read "6️⃣" = Right Sixth
+  read "7️⃣" = Right Seventh
+  read s = Left $ joinWith " " ["Sorry.", s, "is not supported."]
 
 nextOctave :: Octave -> Octave
 nextOctave First = Second
@@ -98,10 +103,11 @@ instance showVol :: Show Vol where
   show High = "🔊"
 
 instance readVol :: Read Vol where
-  read = defaultRead vols
-
-vols :: Patterns Vol
-vols = [ Mute, Low, Med, High ]
+  read "🔇" = Right Mute
+  read "🔈" = Right Low
+  read "🔉" = Right Med
+  read "🔊" = Right High
+  read s = Left $ joinWith " " ["Sorry.", s, "is not supported."]
 
 volToGain :: Vol -> Number
 volToGain Mute = 0.0
@@ -119,10 +125,9 @@ instance showEfct :: Show Efct where
   show Detune = "🎛"
 
 instance readEfct :: Read Efct where
-  read = defaultRead efcts
-
-efcts :: Patterns Efct
-efcts = [ None, Detune ]
+  read "🎼" = Right None
+  read "🎛" = Right Detune
+  read s = Left $ joinWith " " ["Sorry.", s, "is not supported."]
 
 efctToDetune :: Efct -> Number
 efctToDetune None = 0.0
