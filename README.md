@@ -4,7 +4,7 @@
 
 ※ it's beta for now
 
-A functional game engine that can create emoji games.
+A functional game engine for creating emoji games.
 
 ![nemo](nemo.png)
 ![emodius](https://opyapeus.github.io/nemo/img/emodius-half.gif)
@@ -134,23 +134,11 @@ public/index.html#emodius
 
 ## Under Developing List
 
-### high
-
-- [x] add debug mode
-- [x] more sound effect support (ex. noise)
-- [x] improve touch screen operation
-
-### middle
-
 - [ ] interpreter which executes code on the web
 - [ ] performance tuning
 - [ ] iOS sound support
 
-### low
-
-- [x] emoji parser ([purescript-emoji-splitter](https://github.com/opyapeus/purescript-emoji-splitter))
-  
-### wait and see
+## Wait And See
 
 - emoji rotate (45°, 135°, 225°, 315°) problem on canvas
 - default emoji presentation [CSS Fonts Module Level 4 - Editor’s Draft, 17 August 2018](https://drafts.csswg.org/css-fonts-4/#font-variant-emoji-prop)

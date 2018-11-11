@@ -134,23 +134,11 @@ public/index.html#emodius
 
 ## 開発中のリスト
 
-### 優先度高い
-
-- [x] デバッグモードの追加
-- [x] サウンドの充実（ノイズなど）
-- [x] タッチスクリーン入力の改善
-
-### 中程度
-
 - [ ] Web上でオンライン実行できる環境
 - [ ] パフォーマンスの調整
 - [ ] iOSのサウンド対応
 
-### 低い
-
-- [x] 絵文字パーサー ([purescript-emoji-splitter](https://github.com/opyapeus/purescript-emoji-splitter))
-  
-### 様子見
+## 様子見
 
 - canvasの絵文字の回転 (45°, 135°, 225°, 315°) 表示の問題
 - 絵文字のデフォルト表示形式 [CSS Fonts Module Level 4 - Editor’s Draft, 17 August 2018](https://drafts.csswg.org/css-fonts-4/#font-variant-emoji-prop)
