@@ -1,19 +1,19 @@
 module Asset where
 
 
-import Nemo.Data.Emoji (Emoji(..))
+import Nemo.Data.Emoji as E
 import Nemo.Types (RawMap(..))
 
-walls :: Array Emoji
+walls :: Array E.Emoji
 walls =
-    [ WaterWave -- 🌊
-    , EvergreenTree -- 🌲
-    , DeciduousTree -- 🌳
-    , Mountain -- ⛰️
-    , MountFuji -- 🗻
-    , CloudWithLightning -- 🌩️
-    , Tornado -- 🌪️
-    , Fire -- 🔥
+    [ E.waterWave -- 🌊
+    , E.evergreenTree -- 🌲
+    , E.deciduousTree -- 🌳
+    , E.mountain -- ⛰️
+    , E.mountFuji -- 🗻
+    , E.cloudWithLightning -- 🌩️
+    , E.tornado -- 🌪️
+    , E.fire -- 🔥
     ]
 
 map0 :: RawMap

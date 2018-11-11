@@ -4,7 +4,7 @@ import Prelude
 
 import Constants (emoSize)
 import Class.Object (class ObjectDraw, class Object, position, size)
-import Nemo.Data.Emoji (Emoji(..))
+import Nemo.Data.Emoji as E
 import Nemo.Draw (emo, emor)
 import Types (Pos)
 
@@ -22,7 +22,7 @@ instance objectBullet :: Object Bullet where
     position (Downer s) = s.pos
 
 instance objectDrawBullet :: ObjectDraw Bullet where
-    draw o = emoF SpiderWeb (size o) (position o).x (position o).y
+    draw o = emoF E.spiderWeb (size o) (position o).x (position o).y
         where
             emoF = case o of
                 Normal _ -> emo 

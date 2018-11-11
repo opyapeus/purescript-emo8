@@ -6,7 +6,7 @@ import Effect (Effect)
 import Nemo (nemo)
 import Nemo.Class.Game (class Game)
 import Nemo.Data.Color (Color(..))
-import Nemo.Data.Emoji (Emoji(..))
+import Nemo.Data.Emoji as E
 import Nemo.Draw (cls, emo)
 import Nemo.Utils (emptyAsset)
 
@@ -18,7 +18,7 @@ instance gameState :: Game Empty where
 
   draw _ =
     [ cls Maroon
-    , emo HatchingChick 256 384 384
+    , emo E.hatchingChick 256 384 384
     ]
 
   sound _ = []

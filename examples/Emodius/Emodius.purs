@@ -17,7 +17,7 @@ import Helper (beInMonitor, drawScrollMap, isCollideScrollMap, isInputCatchAny)
 import Nemo (nemo)
 import Nemo.Class.Game (class Game)
 import Nemo.Data.Color (Color(..))
-import Nemo.Data.Emoji (Emoji(..))
+import Nemo.Data.Emoji as E
 import Nemo.Draw (cls, emo, emor, emor')
 import Nemo.Utils (mkAsset)
 
@@ -93,25 +93,25 @@ instance gameState :: Game State where
 
     draw TitleState =
         [ cls Aqua
-        , emor' 30 Helicopter 384 100 100
-        , emo SpiderWeb 512 400 400
-        , emor (-15) Octopus 256 600 600
-        , emo Pill 128 250 800
-        , emor 75 Pill 128 200 600
-        , emo FastForwardButton 128 700 200
+        , emor' 30 E.helicopter 384 100 100
+        , emo E.spiderWeb 512 400 400
+        , emor (-15) E.octopus 256 600 600
+        , emo E.pill 128 250 800
+        , emor 75 E.pill 128 200 600
+        , emo E.fastForwardButton 128 700 200
         ]
     draw OverState =
         [ cls Maroon
-        , emo Hole 512 250 300
-        , emor 160 Helicopter 256 350 400
-        , emo RecyclingSymbol 256 375 700
+        , emo E.hole 512 250 300
+        , emor 160 E.helicopter 256 350 400
+        , emo E.recyclingSymbol 256 375 700
         ]
     draw ClearState =
         [ cls Lime
-        , emor 15 Helicopter 128 700 800
-        , emor (-15) Octopus 256 350 350
-        , emo GlobeWithMeridians 512 150 150
-        , emo ThumbsUp 128 200 800
+        , emor 15 E.helicopter 128 700 800
+        , emor (-15) E.octopus 256 350 350
+        , emo E.globeWithMeridians 512 150 150
+        , emo E.thumbsUp 128 200 800
         ]
     draw (PlayState s) =
         [ cls Aqua

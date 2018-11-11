@@ -15,6 +15,7 @@ import Data.Tuple (Tuple(..), uncurry)
 import Nemo.Class.Read (read)
 import Nemo.Constants (maxNoteSize)
 import Nemo.Data.Audio (Note, Octave, nextOctave, notes)
+import Nemo.Data.Emoji (Emoji(..))
 import Nemo.Types (EmojiMap, RawMap(..), RawSound(..), Sound, Tick, Scale)
 
 type EmojiString = String
@@ -27,7 +28,8 @@ parseEmojiMap :: RawMap -> Either String EmojiMap
 parseEmojiMap (RawMap s) = stringMatrixToEmojiMap =<< rawStringToSingletonArray s
 
 stringMatrixToEmojiMap :: EmojiStringMatrix -> Either String EmojiMap
-stringMatrixToEmojiMap = traverse (traverse read)
+stringMatrixToEmojiMap = traverse (traverse readEmoji)
+  where readEmoji = Right <<< Emoji
 
 
 -- | Convert raw sound string to sound

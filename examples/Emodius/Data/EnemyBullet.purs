@@ -4,7 +4,7 @@ import Prelude
 
 import Class.Object (class ObjectDraw, class Object, position, size)
 import Constants (emoSize)
-import Nemo.Data.Emoji (Emoji(..))
+import Nemo.Data.Emoji as E
 import Nemo.Draw (emor)
 import Types (Pos)
 
@@ -20,8 +20,8 @@ instance objectEnemyBullet :: Object EnemyBullet where
     position (ParseBull s) = s.pos
 
 instance objectDrawEnemyBullet :: ObjectDraw EnemyBullet where
-    draw o@(NormalBull _) = emor (-40) Pushpin (size o) (position o).x (position o).y
-    draw o@(ParseBull s) = emor (10 * s.t) Hammer (size o) (position o).x (position o).y
+    draw o@(NormalBull _) = emor (-40) E.pushpin (size o) (position o).x (position o).y
+    draw o@(ParseBull s) = emor (10 * s.t) E.hammer (size o) (position o).x (position o).y
 
 updateEnemyBullet :: EnemyBullet -> EnemyBullet
 updateEnemyBullet (NormalBull s) = NormalBull $ s { pos { x = s.pos.x - 15 } }

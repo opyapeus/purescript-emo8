@@ -7,7 +7,7 @@ import Constants (emoSize)
 import Data.EnemyBullet (EnemyBullet(..))
 import Data.Player (Player(..))
 import Nemo.Constants (scene)
-import Nemo.Data.Emoji (Emoji(..))
+import Nemo.Data.Emoji as E
 import Nemo.Draw (emo)
 import Types (Pos)
 
@@ -29,11 +29,11 @@ instance objectEnemy :: Object Enemy where
     position (Oct s) = s.pos
 
 instance objectDrawEnemy :: ObjectDraw Enemy where
-    draw o@(Invader _) = emo AlienMonster (size o) (position o).x (position o).y
-    draw o@(Moi _) = emo Moai (size o) (position o).x (position o).y
-    draw o@(Bee _) = emo Honeybee (size o) (position o).x (position o).y
-    draw o@(Rex _) = emo TRex (size o) (position o).x (position o).y
-    draw o@(Oct _) = emo Octopus (size o) (position o).x (position o).y
+    draw o@(Invader _) = emo E.alienMonster (size o) (position o).x (position o).y
+    draw o@(Moi _) = emo E.moai (size o) (position o).x (position o).y
+    draw o@(Bee _) = emo E.honeybee (size o) (position o).x (position o).y
+    draw o@(Rex _) = emo E.tRex (size o) (position o).x (position o).y
+    draw o@(Oct _) = emo E.octopus (size o) (position o).x (position o).y
 
 updateEnemy :: Player -> Enemy -> Enemy
 updateEnemy p@(Player _) e@(Invader s) = Invader $ s { pos { x = s.pos.x - 5, y = s.pos.y + dy } }

@@ -10,7 +10,7 @@ import Nemo (nemoDev)
 import Nemo.Class.Game (class Game)
 import Nemo.Constants (scene)
 import Nemo.Data.Color (Color(..))
-import Nemo.Data.Emoji (Emoji(..))
+import Nemo.Data.Emoji as E
 import Nemo.Data.Tone (Tone(..))
 import Nemo.Draw (cls, emap, emo, emo')
 import Nemo.Sound (play)
@@ -103,10 +103,10 @@ instance gameState :: Game State where
     ]
     where
       emoF = case state.appear of
-        LeftWalk -> emo PersonWalking
-        RightWalk -> emo' PersonWalking
-        LeftRun -> emo PersonRunning
-        RightRun -> emo' PersonRunning
+        LeftWalk -> emo E.personWalking
+        RightWalk -> emo' E.personWalking
+        LeftRun -> emo E.personRunning
+        RightRun -> emo' E.personRunning
 
   sound (State state) =
     [ if state.isJump then play 0 Saw 4096 else const $ pure unit
@@ -127,8 +127,8 @@ initialState = State
   , frame: 0
   }
 
-walls :: Array Emoji
-walls = [JapaneseNoVacancyButton] -- 🈵
+walls :: Array E.Emoji
+walls = [E.japaneseNoVacancyButton] -- 🈵
 
 map0 :: RawMap
 map0 = RawMap """

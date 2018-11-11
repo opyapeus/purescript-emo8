@@ -47,7 +47,7 @@ fillTextWithT e size x y op dctx = do
         halfSize = toNumber size / 2.0
 
 fillTextConsVoid :: Emoji -> Size -> Number -> Number -> Context2D -> Effect Unit
-fillTextConsVoid JapaneseVacancyButton size x y ctx = pure unit
+fillTextConsVoid (Emoji "🈳") size x y ctx = pure unit
 fillTextConsVoid e size x y ctx = do
     setFont ctx font
     setTextBaseline ctx BaselineIdeographic

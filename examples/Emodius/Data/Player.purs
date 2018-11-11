@@ -6,7 +6,7 @@ import Class.Object (class Object, class ObjectDraw, position, size)
 import Constants (emoSize)
 import Data.Bullet (Bullet(..))
 import Nemo.Constants (scene)
-import Nemo.Data.Emoji (Emoji(..))
+import Nemo.Data.Emoji as E
 import Nemo.Input (Input)
 import Nemo.Draw (emo', emor')
 import Types (Pos)
@@ -25,7 +25,7 @@ instance objectPlayer :: Object Player where
     position (Player s) = s.pos
 
 instance objectDrawPlayer :: ObjectDraw Player where
-    draw o@(Player p) = emoF Helicopter (size o) (position o).x (position o).y
+    draw o@(Player p) = emoF E.helicopter (size o) (position o).x (position o).y
         where
             emoF = case p.appear of
                 Stable -> emo'

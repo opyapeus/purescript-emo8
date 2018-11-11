@@ -4,7 +4,7 @@ import Prelude
 
 import Constants (emoSize)
 import Class.Object (class ObjectDraw, class Object, position, size)
-import Nemo.Data.Emoji (Emoji(..))
+import Nemo.Data.Emoji as E
 import Nemo.Draw (emo)
 import Types (Pos)
 
@@ -19,7 +19,7 @@ instance objectParticle :: Object Particle where
     position (Normal s) = s.pos
 
 instance objectDrawParticle :: ObjectDraw Particle where
-    draw o = emo GlobeWithMeridians (size o) (position o).x (position o).y
+    draw o = emo E.globeWithMeridians (size o) (position o).x (position o).y
 
 updateParticle :: Particle -> Particle
 updateParticle (Normal s) = Normal $ s { pos { y = s.pos.y - 2 } }
