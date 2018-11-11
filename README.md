@@ -68,13 +68,13 @@ bower i purescript-nemo
 
 - Language: PureScript
 - Monitor Size: 1024x1024
-- Emoji: 1388 unicode emojis
+- Emoji: unicode emojis
 - Color: 16 html base colors
 - Map Editor: Raw text (emoji) editing
 - Sound Editor: Raw text (emoji) editing
 - Input Interface: Keyboard, Touch Screen
 - Frame Rate: About 60 FPS
-- Working Environment: Browers on any device (It needs some GPU power)
+- Working Environment: Browers on any device (It requires some GPU power)
 
 ## Input Interface
 
