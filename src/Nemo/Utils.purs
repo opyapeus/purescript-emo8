@@ -2,8 +2,6 @@ module Nemo.Utils
     ( mkAsset
     , emptyAsset
     , defaultDebugConfig
-    , isMapCollide
-    , getMapEmoji
     , isMonitorCollide
     , isOutOfMonitor
     , isCollide
@@ -11,46 +9,15 @@ module Nemo.Utils
 
 import Prelude
 
-import Data.Array (reverse, (!!))
 import Data.Either (Either(..))
-import Data.Foldable (elem, foldr)
-import Data.Maybe (Maybe(..))
 import Data.Traversable (traverse)
 import Effect (Effect)
 import Effect.Exception (throw)
 import Nemo.Constants (scene)
-import Nemo.Data.Emoji (Emoji)
 import Nemo.Data.Color (Color(..))
 import Nemo.Data.DebugDisplay (DebugDisplay(..))
 import Nemo.Parse (RawMap, RawSound, parseEmojiMap, parseSound)
-import Nemo.Types (Asset, IdX, IdY, MapId, Size, X, Y, DebugConfig)
-
--- | Map collision detection.
--- | Given emojis are treated as walls.
--- TODO: large object detection
-isMapCollide :: Asset -> MapId -> Size -> Array Emoji -> Size -> X -> Y -> Boolean
-isMapCollide asset mId mSize walls size x y = foldr f false [lbE, rbE, ltE, rtE]
-    where
-        lx = x
-        rx = x + size - 1
-        by = y
-        ty = y + size - 1
-        lbE = getMapEmoji asset mId (lx / mSize) (by / mSize)
-        rbE = getMapEmoji asset mId (rx / mSize) (by / mSize)
-        ltE = getMapEmoji asset mId (lx / mSize) (ty / mSize)
-        rtE = getMapEmoji asset mId (rx / mSize) (ty / mSize)
-        f :: Maybe Emoji -> Boolean -> Boolean
-        f mE b = case mE of
-            Just e | elem e walls -> true
-            _ -> b
-
--- | Get map emoji with given indices.
--- | Return Nothing there is not emoji.
-getMapEmoji :: Asset -> MapId -> IdX -> IdY -> Maybe Emoji
-getMapEmoji ass mId xId yId =
-    case ass.mapData !! mId of
-        Nothing -> Nothing -- NOTE: Prioritize simplicity
-        Just em -> reverse em !! yId >>= flip (!!) xId
+import Nemo.Types (Asset, DebugConfig, Size, X, Y)
 
 -- | Collision detection if an object protrudes out of monitor
 isMonitorCollide :: Size -> X -> Y -> Boolean

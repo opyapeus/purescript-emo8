@@ -14,7 +14,7 @@ import Nemo.Utils (emptyAsset)
 data Empty = Void 
 
 instance gameState :: Game Empty where
-  update _ _ = pure
+  update _ = pure
 
   draw _ = do
     cls Maroon

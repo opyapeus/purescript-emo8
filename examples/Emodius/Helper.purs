@@ -9,7 +9,8 @@ import Data.Player (Player(..))
 import Nemo.Constants (scene)
 import Nemo.Draw.Action (Draw, emap)
 import Nemo.Input (Input)
-import Nemo.Types (Asset, MapId, X)
+import Nemo.Types (MapId, X)
+import Nemo.Update.Action (Update)
 
 beInMonitor :: Player -> Player -> Player
 beInMonitor p np@(Player ns) = Player $ ns { pos = { x: npx, y: npy } }
@@ -51,18 +52,19 @@ drawScrollMap distance = do
                 base = num * mapWidth
 
 -- TODO: readable
-isCollideScrollMap :: forall a. Object a => Asset -> X -> a -> Boolean
-isCollideScrollMap ass distance o
-    = collCond 0 0 distance
-    || collCond 1 1 distance
-    || collCond 2 2 distance
-    || collCond 3 3 distance
+isCollideScrollMap :: forall a. Object a => X -> a -> Update Boolean
+isCollideScrollMap distance o =
+    (\a b c d -> a || b || c || d)
+        <$> collCond 0 0 distance
+        <*> collCond 1 1 distance
+        <*> collCond 2 2 distance
+        <*> collCond 3 3 distance
     where
-        collCond :: MapId -> Int -> X -> Boolean
-        collCond mId num d =
-            if base - mapSize * mapTileInMonitor <= d && d < base + mapWidth
-                then isCollMap ass mId mapSize (size o) { x: (position o).x + (d - base), y: (position o).y }
-                else false
+        collCond :: MapId -> Int -> X -> Update Boolean
+        collCond mId num d = do
+            if (base - mapSize * mapTileInMonitor <= d && d < base + mapWidth)
+                then isCollMap mId mapSize (size o) { x: (position o).x + (d - base), y: (position o).y }
+                else pure false
             where
                 base = num * mapWidth
 

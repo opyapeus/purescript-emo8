@@ -40,7 +40,7 @@ for convenience, special key signal below.
 
 ```PureScript
 class Game s where
-  update :: Asset -> Input -> s -> Effect s
+  update :: Input -> s -> Update s
   draw :: s -> Draw Unit
   sound :: s -> Sound Unit
 ```

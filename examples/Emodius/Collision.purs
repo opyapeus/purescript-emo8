@@ -3,16 +3,17 @@ module Collision where
 import Asset (walls)
 import Class.Object (class Object, position, size)
 import Control.Monad.Gen (Size)
-import Nemo.Types (Asset, MapId)
-import Nemo.Utils (isCollide, isMapCollide, isMonitorCollide, isOutOfMonitor)
+import Nemo.Types (MapId)
+import Nemo.Update.Action (Update, isMapCollide)
+import Nemo.Utils (isCollide, isMonitorCollide, isOutOfMonitor)
 import Types (Pos)
 
 
-isCollideMap :: forall a. Object a => Asset -> MapId -> Size -> a -> Boolean
-isCollideMap asset mId mSize o = isCollMap asset mId mSize (size o) (position o)  
+isCollideMap :: forall a. Object a => MapId -> Size -> a -> Update Boolean
+isCollideMap mId mSize o = isCollMap mId mSize (size o) (position o)  
 
-isCollMap :: Asset -> MapId -> Size -> Size -> Pos -> Boolean
-isCollMap asset mId mSize size {x, y} = isMapCollide asset mId mSize walls size x y  
+isCollMap :: MapId -> Size -> Size -> Pos -> Update Boolean
+isCollMap mId mSize size {x, y} = isMapCollide mId mSize walls size x y  
 
 isCollideWorld :: forall a. Object a => a -> Boolean
 isCollideWorld o = isCollWorld (size o) (position o)

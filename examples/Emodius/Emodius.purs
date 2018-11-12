@@ -36,13 +36,13 @@ data State
         }
 
 instance gameState :: Game State where
-    update _ input TitleState =
+    update input TitleState =
         pure $ if isInputCatchAny input then initialPlayState else TitleState
-    update _ input OverState =
+    update input OverState =
         pure $ if isInputCatchAny input then initialState else OverState
-    update _ input ClearState =
+    update input ClearState =
         pure $ if isInputCatchAny input then initialState else ClearState
-    update asset input (PlayState s) = do
+    update input (PlayState s) = do
         -- update pos
         let np = updatePlayer input s.player
             nbullets = map updateBullet s.bullets
@@ -51,8 +51,8 @@ instance gameState :: Game State where
             nenemyBullets = map updateEnemyBullet s.enemyBullets
 
         -- player collision
-        let isMapColl = isCollideScrollMap asset s.distance np
-            isEnemyColl = any (isCollideObjects np) nenemies
+        isMapColl <- isCollideScrollMap s.distance np
+        let isEnemyColl = any (isCollideObjects np) nenemies
             isEnemyBulletColl = any (isCollideObjects np) nenemyBullets
 
         -- separate objects

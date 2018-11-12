@@ -4,7 +4,7 @@ module Nemo.Debug
   , initDebugState
   , providedSave
   , providedUpdate
-  , updateDebugState
+  , updateThenRunDebugState
   , withDebugInput
   ) where
 
@@ -21,7 +21,8 @@ import Nemo.Data.PressState (PressState(..), updatePressState)
 import Nemo.Data.SpecialInput (SpecialInput)
 import Nemo.Input (Input)
 import Nemo.Patch.TextBaseline (TextBaseline(..), setTextBaseline)
-import Nemo.Types (Asset, DebugConfig, DrawContext)
+import Nemo.Types (DebugConfig, DrawContext, Asset)
+import Nemo.Update.Interpreter (runUpdate)
 
 type DebugInput =
   { input :: Input
@@ -39,9 +40,10 @@ type DebugState s =
 
 data LoopState = Resume | Suspend | JustSuspend
 
-updateDebugState :: forall s. Game s => Asset -> DebugInput -> DebugState s -> Effect (DebugState s)
-updateDebugState ass i s = do
-    updatedState <- update ass i.input s.state
+-- TODO: refactor
+updateThenRunDebugState :: forall s. Game s => Asset -> DebugInput -> DebugState s -> Effect (DebugState s)
+updateThenRunDebugState ass i s = do
+    updatedState <- runUpdate ass $ update i.input s.state
     let updatedSaveAction = updatePressState i.specialInput.isSave s.saveAction
         updatedLoadAction = updatePressState i.specialInput.isLoad s.loadAction
         updatedForwardAction = updatePressState i.specialInput.isForward s.forwardAction

@@ -2,7 +2,6 @@ module Basic where
 
 import Prelude
 
-import Data.Foldable (any)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Effect (Effect)
@@ -13,10 +12,11 @@ import Nemo.Data.Color (Color(..))
 import Nemo.Data.Emoji as E
 import Nemo.Data.Tone (Tone(..))
 import Nemo.Draw.Action (cls, emap, emo, emo')
+import Nemo.Parse (RawMap(..), RawSound(..))
 import Nemo.Sound.Action (play)
 import Nemo.Types (Size, X, Y)
-import Nemo.Utils (isMapCollide, isMonitorCollide, mkAsset, defaultDebugConfig)
-import Nemo.Parse (RawMap(..), RawSound(..))
+import Nemo.Update.Action (Update, isMapCollide)
+import Nemo.Utils (isMonitorCollide, mkAsset, defaultDebugConfig)
 
 emoSize :: Size
 emoSize = 64
@@ -45,7 +45,7 @@ instance showAppear :: Show Appear where
   show = genericShow
 
 instance gameState :: Game State where
-  update asset input (State state) = do
+  update input (State state) = do
     -- next x
     let nx = case input.isLeft, input.isRight of
           true, false -> state.x - 10
@@ -53,17 +53,17 @@ instance gameState :: Game State where
           _, _ -> state.x
 
     -- next y, dy
-    let canJump = isCollide state.x (state.y - gravity)
-        isJump = canJump && input.isUpCat
+    canJump <- isCollide state.x (state.y - gravity)
+    let isJump = canJump && input.isUpCat
         ddy = if isJump then 40 else 0
         ndy = state.dy - gravity + ddy
         ny = state.y + ndy
 
     -- final x, y, dy
     -- FIXME: rough adjust
-    let isCollX = isCollide nx state.y
-        isCollY = isCollide state.x ny
-        nnx = if isCollX then state.x else nx
+    isCollX <- isCollide nx state.y
+    isCollY <- isCollide state.x ny
+    let nnx = if isCollX then state.x else nx
         nny = if isCollY then state.y else ny
         nndy = if isCollY then gravity else ndy
 
@@ -87,13 +87,11 @@ instance gameState :: Game State where
       , frame = state.frame + 1
       }
     where
-      isCollide :: X -> Y -> Boolean
-      isCollide x y =
-        any
-          (\f -> f emoSize x y)
-          [ isMapCollide asset 0 mapSize walls
-          , isMonitorCollide
-          ]
+      isCollide :: X -> Y -> Update Boolean
+      isCollide x y = do
+        isMapColl <- isMapCollide 0 mapSize walls emoSize x y
+        let isMonitorColl = isMonitorCollide emoSize x y
+        pure $ isMapColl || isMonitorColl
 
   draw (State state) = do
     cls Silver
