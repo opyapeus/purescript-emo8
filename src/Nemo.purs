@@ -6,9 +6,8 @@ module Nemo
 import Prelude
 
 import Audio.WebAudio.BaseAudioContext (newAudioContext)
-import Data.Maybe (Maybe(Just, Nothing))
+import Data.Maybe (Maybe(..))
 import Data.String (joinWith)
-import Data.Traversable (sequence_)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Effect.Exception (throw)
@@ -18,7 +17,9 @@ import Nemo.Class.Game (class Game, draw, sound, update)
 import Nemo.Constants (canvasId)
 import Nemo.Data.SpecialInput (pollSpecialInputs)
 import Nemo.Debug (debugDraw, initDebugState, providedSave, providedUpdate, updateDebugState, withDebugInput)
+import Nemo.Draw.Interpreter (runDraw)
 import Nemo.Input (mkInputSig, pollKeyTouchInput)
+import Nemo.Sound.Interpreter (runSound)
 import Nemo.Startup (startupView, showStartupViewTime)
 import Nemo.Types (Asset, DebugConfig)
 import Signal (runSignal, sampleOn)
@@ -43,13 +44,10 @@ nemo state asset = do
         let keyTouchInputSampleSig = sampleOn frameSig keyTouchInputSig
         let inputSampleSig = mkInputSig keyTouchInputSampleSig
         stateSig <- foldEffect (update asset) state inputSampleSig
-        runSignal $ rens drawCtx <$> stateSig
-        runSignal $ auds soundCtx <$> stateSig
+        runSignal $ runDraw drawCtx <$> draw <$> stateSig
+        runSignal $ runSound soundCtx <$> sound <$> stateSig
       pure unit
     Nothing -> throw $ joinWith " " ["canvas id:", canvasId, "was not found."]
-  where
-    rens ctx stt = sequence_ $ (draw stt) <*> [ctx] 
-    auds ctx stt = sequence_ $ (sound stt) <*> [ctx] 
 
 -- | Run game function for developing.
 -- | It short cuts startup view.
@@ -78,6 +76,10 @@ nemoDev state asset dc = do
       runSignal $ auds soundCtx <$> debugStateSig
     Nothing -> throw $ joinWith " " ["canvas id:", canvasId, "was not found."]
   where
-    catLog ds = providedSave ds $ log $ show ds.state
-    rens ctx ds = providedUpdate ds $ sequence_ $ (draw ds.state <> [debugDraw dc ds]) <*> [ctx]
-    auds ctx ds = providedUpdate ds $ sequence_ $ (sound ds.state) <*> [ctx]
+    catLog ds = providedSave ds $ do
+      log $ show ds.state
+    rens ctx ds = providedUpdate ds $ do
+      runDraw ctx $ draw ds.state
+      debugDraw dc ds ctx
+    auds ctx ds = providedUpdate ds $ do
+      runSound ctx $ sound ds.state

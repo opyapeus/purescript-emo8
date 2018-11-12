@@ -1,7 +1,4 @@
-module Nemo.Sound
-    ( play
-    , haltall
-    ) where
+module Nemo.Sound.Interpreter where
 
 import Prelude
 
@@ -10,9 +7,11 @@ import Audio.WebAudio.BaseAudioContext (createGain, createOscillator, currentTim
 import Audio.WebAudio.GainNode (gain)
 import Audio.WebAudio.Oscillator (detune, frequency, startOscillator, stopOscillator)
 import Audio.WebAudio.Types (GainNode, OscillatorNode, Seconds, connect)
+import Control.Monad.Free (foldFree)
 import Data.Array (length, zip, (!!), (..))
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(..))
+import Data.NaturalTransformation (NaturalTransformation)
 import Data.Traversable (for_)
 import Data.Tuple (Tuple(..))
 import Data.Unfoldable (replicateA)
@@ -20,11 +19,19 @@ import Effect (Effect)
 import Nemo.Constants (maxNoteSize)
 import Nemo.Data.Audio (Efct, Vol, efctToDetune, noteToFreq, octaveToMult, volToGain)
 import Nemo.Data.Tone (Tone, setTone)
-import Nemo.Types (AudioOp, Bpm, Scale, SoundId)
+import Nemo.Sound.Action (Sound, SoundF(..))
+import Nemo.Types (Bpm, Scale, SoundContext, SoundId)
 
--- ENHANCE: more detail control.
+type AudioOp = SoundContext -> Effect Unit
 
 type Frequency = Number
+
+runSound :: forall a. SoundContext -> Sound a -> Effect a
+runSound sctx = foldFree interpret
+  where
+    interpret :: NaturalTransformation SoundF Effect
+    interpret (HaltAll n) = const n <$> haltall sctx
+    interpret (Play sId tone tempo n) = const n <$> play sId tone tempo sctx
 
 -- | Play sound with given tone and bpm.
 play :: SoundId -> Tone -> Bpm -> AudioOp

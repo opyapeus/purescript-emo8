@@ -7,9 +7,9 @@ import Collision (isCollMap, isCollWorld)
 import Constants (mapSize)
 import Data.Player (Player(..))
 import Nemo.Constants (scene)
+import Nemo.Draw.Action (Draw, emap)
 import Nemo.Input (Input)
-import Nemo.Draw (emap)
-import Nemo.Types (Asset, MapId, RenderOp, X)
+import Nemo.Types (Asset, MapId, X)
 
 beInMonitor :: Player -> Player -> Player
 beInMonitor p np@(Player ns) = Player $ ns { pos = { x: npx, y: npy } }
@@ -36,18 +36,17 @@ mapTileInMonitor :: Int
 mapTileInMonitor = scene.width / mapSize
 
 -- TODO: readable
-drawScrollMap :: X -> RenderOp
-drawScrollMap distance = \ctx -> do
-    drawCond 0 0 distance ctx
-    drawCond 1 1 distance ctx
-    drawCond 2 2 distance ctx
-    drawCond 3 3 distance ctx
+drawScrollMap :: X -> Draw Unit
+drawScrollMap distance = do
+    drawCond 0 0 distance
+    drawCond 1 1 distance
+    drawCond 2 2 distance
+    drawCond 3 3 distance
     where
-        drawCond :: MapId -> Int -> X -> RenderOp
-        drawCond mId num d ctx =
-            if base - mapSize * mapTileInMonitor <= d && d < base + mapWidth 
-                then emap mId mapSize (base - d) 0 ctx
-                else pure unit
+        drawCond :: MapId -> Int -> X -> Draw Unit
+        drawCond mId num d = do
+            when (base - mapSize * mapTileInMonitor <= d && d < base + mapWidth) $
+                emap mId mapSize (base - d) 0
             where
                 base = num * mapWidth
 
@@ -61,7 +60,7 @@ isCollideScrollMap ass distance o
     where
         collCond :: MapId -> Int -> X -> Boolean
         collCond mId num d =
-            if base - mapSize * mapTileInMonitor <= d && d < base + mapWidth 
+            if base - mapSize * mapTileInMonitor <= d && d < base + mapWidth
                 then isCollMap ass mId mapSize (size o) { x: (position o).x + (d - base), y: (position o).y }
                 else false
             where

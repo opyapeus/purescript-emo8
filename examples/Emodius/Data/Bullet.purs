@@ -5,7 +5,7 @@ import Prelude
 import Constants (emoSize)
 import Class.Object (class ObjectDraw, class Object, position, size)
 import Nemo.Data.Emoji as E
-import Nemo.Draw (emo, emor)
+import Nemo.Draw.Action (emo, emor)
 import Types (Pos)
 
 

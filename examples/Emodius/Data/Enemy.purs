@@ -8,7 +8,7 @@ import Data.EnemyBullet (EnemyBullet(..))
 import Data.Player (Player(..))
 import Nemo.Constants (scene)
 import Nemo.Data.Emoji as E
-import Nemo.Draw (emo)
+import Nemo.Draw.Action (emo)
 import Types (Pos)
 
 

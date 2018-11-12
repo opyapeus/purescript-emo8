@@ -1,6 +1,8 @@
 module Class.Object where
   
-import Nemo.Types (RenderOp)
+import Prelude
+
+import Nemo.Draw.Action (Draw)
 import Types (Pos)
   
 class Object s where
@@ -8,4 +10,4 @@ class Object s where
     position :: s -> Pos
 
 class Object s <= ObjectDraw s where
-    draw :: s -> RenderOp
+    draw :: s -> Draw Unit

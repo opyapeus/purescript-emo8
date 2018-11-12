@@ -21,7 +21,7 @@ import Nemo.Data.PressState (PressState(..), updatePressState)
 import Nemo.Data.SpecialInput (SpecialInput)
 import Nemo.Input (Input)
 import Nemo.Patch.TextBaseline (TextBaseline(..), setTextBaseline)
-import Nemo.Types (Asset, RenderOp, DebugConfig)
+import Nemo.Types (Asset, DebugConfig, DrawContext)
 
 type DebugInput =
   { input :: Input
@@ -95,7 +95,7 @@ providedUpdate { loopState: Suspend, saveAction: Catched } op = op
 providedUpdate { loopState: JustSuspend } op = op
 providedUpdate _ op = pure unit
 
-debugDraw :: forall s. Game s => DebugConfig -> DebugState s -> RenderOp
+debugDraw :: forall s. Game s => DebugConfig -> DebugState s -> DrawContext -> Effect Unit
 debugDraw dc ds dctx = do
   save dctx.ctx
   setFillStyle dctx.ctx (colorToCode dc.color)

@@ -1,9 +1,6 @@
 module Nemo.Types where
 
-import Prelude
-
 import Audio.WebAudio.Types (AudioContext)
-import Effect (Effect)
 import Graphics.Canvas (Context2D)
 import Nemo.Data.Audio (Efct, Note, Octave, Vol)
 import Nemo.Data.Emoji (Emoji)
@@ -30,9 +27,6 @@ type Scale =
   { octave :: Octave
   , note :: Note
   }
-
-type RenderOp = DrawContext -> Effect Unit
-type AudioOp = SoundContext -> Effect Unit
 
 type DrawContext =
   { ctx :: Context2D

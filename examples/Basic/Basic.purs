@@ -12,8 +12,8 @@ import Nemo.Constants (scene)
 import Nemo.Data.Color (Color(..))
 import Nemo.Data.Emoji as E
 import Nemo.Data.Tone (Tone(..))
-import Nemo.Draw (cls, emap, emo, emo')
-import Nemo.Sound (play)
+import Nemo.Draw.Action (cls, emap, emo, emo')
+import Nemo.Sound.Action (play)
 import Nemo.Types (Size, X, Y)
 import Nemo.Utils (isMapCollide, isMonitorCollide, mkAsset, defaultDebugConfig)
 import Nemo.Parse (RawMap(..), RawSound(..))
@@ -95,11 +95,10 @@ instance gameState :: Game State where
           , isMonitorCollide
           ]
 
-  draw (State state) =
-    [ cls Silver
-    , emap 0 emoSize 0 0
-    , emoF emoSize state.x state.y
-    ]
+  draw (State state) = do
+    cls Silver
+    emap 0 emoSize 0 0
+    emoF emoSize state.x state.y
     where
       emoF = case state.appear of
         LeftWalk -> emo E.personWalking
@@ -107,9 +106,9 @@ instance gameState :: Game State where
         LeftRun -> emo E.personRunning
         RightRun -> emo' E.personRunning
 
-  sound (State state) =
-    [ if state.isJump then play 0 Saw 4096 else const $ pure unit
-    ]
+  sound (State state) = do
+    when state.isJump $
+      play 0 Saw 4096
 
 main :: Effect Unit
 main = do

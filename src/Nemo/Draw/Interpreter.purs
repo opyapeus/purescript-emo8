@@ -1,29 +1,38 @@
-module Nemo.Draw
-    ( cls
-    , emo
-    , emo'
-    , emor
-    , emor'
-    , emap
-    , emap'
-    ) where
+module Nemo.Draw.Interpreter where
 
 import Prelude
 
+import Control.Monad.Free (foldFree)
 import Data.Array (length, zip, (!!), (..))
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(..))
+import Data.NaturalTransformation (NaturalTransformation)
 import Data.String (joinWith)
 import Data.Traversable (for_)
 import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Graphics.Canvas (Context2D, fillRect, fillText, restore, rotate, save, scale, setFillStyle, setFont, translate)
 import Math (pi)
+import Nemo.Draw.Action (Appearance(..), Draw, DrawF(..))
 import Nemo.Constants (fontFamily, scene)
 import Nemo.Data.Color (Color(..), colorToCode)
 import Nemo.Data.Emoji (Emoji(..))
 import Nemo.Patch.TextBaseline (TextBaseline(..), setTextBaseline)
-import Nemo.Types (Deg, IdX, IdY, MapId, RenderOp, Size, X, Y)
+import Nemo.Types (Deg, IdX, IdY, MapId, Size, X, Y, DrawContext)
+
+type RenderOp = DrawContext -> Effect Unit
+
+runDraw :: forall a. DrawContext -> Draw a -> Effect a
+runDraw dctx = foldFree interpret
+  where
+    interpret :: NaturalTransformation DrawF Effect
+    interpret (ClearScreen c n) = const n <$> cls c dctx
+    interpret (Emo Normal e size x y n) = const n <$> emo e size x y dctx
+    interpret (Emo Mirrored e size x y n) = const n <$> emo' e size x y dctx
+    interpret (Emor Normal deg e size x y n) = const n <$> emor deg e size x y dctx
+    interpret (Emor Mirrored deg e size x y n) = const n <$> emor' deg e size x y dctx
+    interpret (Emap Normal mId size x y n) = const n <$> emap mId size x y dctx
+    interpret (Emap Mirrored mId size x y n) = const n <$> emap' mId size x y dctx
 
 -- | Clear screen with given color.
 cls :: Color -> RenderOp

@@ -10,6 +10,7 @@ import Data.Array (any, filter, partition)
 import Data.Bullet (Bullet, updateBullet)
 import Data.Enemy (Enemy(..), addEnemyBullet, emergeTable, updateEnemy)
 import Data.EnemyBullet (EnemyBullet, updateEnemyBullet)
+import Data.Foldable (traverse_)
 import Data.Particle (Particle, initParticle, updateParticle)
 import Data.Player (Player, addBullet, initialPlayer, updatePlayer)
 import Effect (Effect)
@@ -18,7 +19,7 @@ import Nemo (nemo)
 import Nemo.Class.Game (class Game)
 import Nemo.Data.Color (Color(..))
 import Nemo.Data.Emoji as E
-import Nemo.Draw (cls, emo, emor, emor')
+import Nemo.Draw.Action (cls, emo, emor, emor')
 import Nemo.Utils (mkAsset)
 
 data State
@@ -91,39 +92,35 @@ instance gameState :: Game State where
                 , enemyBullets = nnenemyBullets <> newEnemyBullets
                 }
 
-    draw TitleState =
-        [ cls Aqua
-        , emor' 30 E.helicopter 384 100 100
-        , emo E.spiderWeb 512 400 400
-        , emor (-15) E.octopus 256 600 600
-        , emo E.pill 128 250 800
-        , emor 75 E.pill 128 200 600
-        , emo E.fastForwardButton 128 700 200
-        ]
-    draw OverState =
-        [ cls Maroon
-        , emo E.hole 512 250 300
-        , emor 160 E.helicopter 256 350 400
-        , emo E.recyclingSymbol 256 375 700
-        ]
-    draw ClearState =
-        [ cls Lime
-        , emor 15 E.helicopter 128 700 800
-        , emor (-15) E.octopus 256 350 350
-        , emo E.globeWithMeridians 512 150 150
-        , emo E.thumbsUp 128 200 800
-        ]
-    draw (PlayState s) =
-        [ cls Aqua
-        , drawScrollMap s.distance
-        , draw s.player
-        ]
-        <> map draw s.bullets
-        <> map draw s.enemies
-        <> map draw s.particles
-        <> map draw s.enemyBullets
+    draw TitleState = do
+        cls Aqua
+        emor' 30 E.helicopter 384 100 100
+        emo E.spiderWeb 512 400 400
+        emor (-15) E.octopus 256 600 600
+        emo E.pill 128 250 800
+        emor 75 E.pill 128 200 600
+        emo E.fastForwardButton 128 700 200
+    draw OverState = do
+        cls Maroon
+        emo E.hole 512 250 300
+        emor 160 E.helicopter 256 350 400
+        emo E.recyclingSymbol 256 375 700
+    draw ClearState = do
+        cls Lime
+        emor 15 E.helicopter 128 700 800
+        emor (-15) E.octopus 256 350 350
+        emo E.globeWithMeridians 512 150 150
+        emo E.thumbsUp 128 200 800
+    draw (PlayState s) = do
+        cls Aqua
+        drawScrollMap s.distance
+        draw s.player
+        traverse_ draw s.bullets
+        traverse_ draw s.enemies
+        traverse_ draw s.particles
+        traverse_ draw s.enemyBullets
 
-    sound _ = []
+    sound _ = pure unit
 
 initialPlayState :: State
 initialPlayState = PlayState
