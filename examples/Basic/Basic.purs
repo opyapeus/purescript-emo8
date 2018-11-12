@@ -45,8 +45,40 @@ instance showAppear :: Show Appear where
   show = genericShow
 
 instance gameState :: Game State where
-  update input (State state) asset =
-    State $ state
+  update asset input (State state) = do
+    -- next x
+    let nx = case input.isLeft, input.isRight of
+          true, false -> state.x - 10
+          false, true-> state.x + 10
+          _, _ -> state.x
+
+    -- next y, dy
+    let canJump = isCollide state.x (state.y - gravity)
+        isJump = canJump && input.isUpCat
+        ddy = if isJump then 40 else 0
+        ndy = state.dy - gravity + ddy
+        ny = state.y + ndy
+
+    -- final x, y, dy
+    -- FIXME: rough adjust
+    let isCollX = isCollide nx state.y
+        isCollY = isCollide state.x ny
+        nnx = if isCollX then state.x else nx
+        nny = if isCollY then state.y else ny
+        nndy = if isCollY then gravity else ndy
+
+    -- next appearance
+    let isAppearRun = mod state.frame 8 < 4
+        appear = case input.isLeft, input.isRight of
+          true, false -> if isAppearRun then LeftRun else LeftWalk 
+          false, true -> if isAppearRun then RightRun else RightWalk
+          _, _ -> case state.appear of
+                LeftRun -> LeftWalk
+                RightRun -> RightWalk
+                _ -> state.appear
+
+    -- next state  
+    pure <<< State $ state
       { x = nnx
       , y = nny
       , dy = nndy
@@ -54,48 +86,15 @@ instance gameState :: Game State where
       , appear = appear
       , frame = state.frame + 1
       }
-      where
-        isCollide :: X -> Y -> Boolean
-        isCollide x y =
-            any
-              (\f -> f emoSize x y)
-              [ isMapCollide asset 0 mapSize walls
-              , isMonitorCollide
-              ]
-        
-        -- next x
-        nx = case input.isLeft, input.isRight of
-              true, false -> state.x - 10
-              false, true-> state.x + 10
-              _, _ -> state.x
+    where
+      isCollide :: X -> Y -> Boolean
+      isCollide x y =
+        any
+          (\f -> f emoSize x y)
+          [ isMapCollide asset 0 mapSize walls
+          , isMonitorCollide
+          ]
 
-        -- next y, dy
-        canJump = isCollide state.x (state.y - gravity)
-        isJump = canJump && input.isUpCat
-        ddy = if isJump then 40 else 0
-        ndy = state.dy - gravity + ddy
-        ny = state.y + ndy
-
-        -- final x, y, dy
-        -- FIXME: rough adjust
-        isCollX = isCollide nx state.y
-        isCollY = isCollide state.x ny
-        nnx = if isCollX then state.x else nx
-        nny = if isCollY then state.y else ny
-        nndy = if isCollY then gravity else ndy
-
-        -- next appearance
-        appear =
-          case input.isLeft, input.isRight of
-            true, false -> if isAppearRun then LeftRun else LeftWalk 
-            false, true -> if isAppearRun then RightRun else RightWalk
-            _, _ -> case state.appear of
-                  LeftRun -> LeftWalk
-                  RightRun -> RightWalk
-                  _ -> state.appear
-          where
-            isAppearRun = mod state.frame 8 < 4
-            
   draw (State state) =
     [ cls Silver
     , emap 0 emoSize 0 0

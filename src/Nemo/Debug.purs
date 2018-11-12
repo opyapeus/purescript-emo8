@@ -39,33 +39,33 @@ type DebugState s =
 
 data LoopState = Resume | Suspend | JustSuspend
 
-updateDebugState :: forall s. Game s => DebugInput -> DebugState s -> (Asset -> DebugState s)
-updateDebugState i s ass = nnns
-  where
-    updatedState = update i.input s.state ass
-    updatedSaveAction = updatePressState i.specialInput.isSave s.saveAction
-    updatedLoadAction = updatePressState i.specialInput.isLoad s.loadAction
-    updatedForwardAction = updatePressState i.specialInput.isForward s.forwardAction
-    ns = case s.loopState, i.specialInput of
-      Resume, { isSuspend: true, isResume: false } -> s { loopState = JustSuspend }
-      Resume, _ -> s { state = updatedState }
-      Suspend, { isSuspend: false, isResume: true } -> s { state = updatedState, loopState = Resume }
-      Suspend, _ -> s
-      JustSuspend, { isSuspend: false, isResume: true } -> s { state = updatedState, loopState = Resume }
-      JustSuspend, _ -> s { loopState = Suspend }
-    nns = case { sa: updatedSaveAction, la: updatedLoadAction, fa: updatedForwardAction } of
-      { sa: Catched, la: Catched, fa: _ } -> ns
-      { sa: Catched, la: _, fa: Catched } -> ns
-      { sa: _, la: Catched, fa: Catched } -> ns
-      { sa: Catched, la: _, fa: _ } -> ns { savedState = s.state }
-      { sa: _, la: Catched, fa: _ } -> ns { state = s.savedState }
-      { sa: _, la: _, fa: Catched } -> ns { state = updatedState }
-      _ -> ns
-    nnns = nns
-      { saveAction = updatedSaveAction
-      , loadAction = updatedLoadAction
-      , forwardAction = updatedForwardAction
-      }
+updateDebugState :: forall s. Game s => Asset -> DebugInput -> DebugState s -> Effect (DebugState s)
+updateDebugState ass i s = do
+    updatedState <- update ass i.input s.state
+    let updatedSaveAction = updatePressState i.specialInput.isSave s.saveAction
+        updatedLoadAction = updatePressState i.specialInput.isLoad s.loadAction
+        updatedForwardAction = updatePressState i.specialInput.isForward s.forwardAction
+        ns = case s.loopState, i.specialInput of
+          Resume, { isSuspend: true, isResume: false } -> s { loopState = JustSuspend }
+          Resume, _ -> s { state = updatedState }
+          Suspend, { isSuspend: false, isResume: true } -> s { state = updatedState, loopState = Resume }
+          Suspend, _ -> s
+          JustSuspend, { isSuspend: false, isResume: true } -> s { state = updatedState, loopState = Resume }
+          JustSuspend, _ -> s { loopState = Suspend }
+        nns = case { sa: updatedSaveAction, la: updatedLoadAction, fa: updatedForwardAction } of
+          { sa: Catched, la: Catched, fa: _ } -> ns
+          { sa: Catched, la: _, fa: Catched } -> ns
+          { sa: _, la: Catched, fa: Catched } -> ns
+          { sa: Catched, la: _, fa: _ } -> ns { savedState = s.state }
+          { sa: _, la: Catched, fa: _ } -> ns { state = s.savedState }
+          { sa: _, la: _, fa: Catched } -> ns { state = updatedState }
+          _ -> ns
+        nnns = nns
+          { saveAction = updatedSaveAction
+          , loadAction = updatedLoadAction
+          , forwardAction = updatedForwardAction
+          }
+    pure nnns
 
 withDebugInput :: Input -> SpecialInput -> DebugInput
 withDebugInput i si = { input: i, specialInput: si }

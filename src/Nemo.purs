@@ -21,8 +21,9 @@ import Nemo.Debug (debugDraw, initDebugState, providedSave, providedUpdate, upda
 import Nemo.Input (mkInputSig, pollKeyTouchInput)
 import Nemo.Startup (startupView, showStartupViewTime)
 import Nemo.Types (Asset, DebugConfig)
-import Signal (foldp, runSignal, sampleOn)
+import Signal (runSignal, sampleOn)
 import Signal.DOM (animationFrame)
+import Signal.Effect (foldEffect)
 
 -- | Run game function.
 nemo :: forall s. Game s => s -> Asset -> Effect Unit
@@ -41,7 +42,7 @@ nemo state asset = do
         keyTouchInputSig <- pollKeyTouchInput
         let keyTouchInputSampleSig = sampleOn frameSig keyTouchInputSig
         let inputSampleSig = mkInputSig keyTouchInputSampleSig
-        let stateSig = foldp (\i s -> update i s asset) state inputSampleSig
+        stateSig <- foldEffect (update asset) state inputSampleSig
         runSignal $ rens drawCtx <$> stateSig
         runSignal $ auds soundCtx <$> stateSig
       pure unit
@@ -71,7 +72,7 @@ nemoDev state asset dc = do
       specialInputSig <- pollSpecialInputs
       let debugInputSampleSig = withDebugInput <$> inputSampleSig <*> specialInputSig
       let initialDebugState = initDebugState state
-      let debugStateSig = foldp (\i s -> updateDebugState i s asset) initialDebugState debugInputSampleSig
+      debugStateSig <- foldEffect (updateDebugState asset) initialDebugState debugInputSampleSig
       runSignal $ catLog <$> debugStateSig
       runSignal $ rens drawCtx <$> debugStateSig
       runSignal $ auds soundCtx <$> debugStateSig

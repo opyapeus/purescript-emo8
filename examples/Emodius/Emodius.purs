@@ -35,14 +35,51 @@ data State
         }
 
 instance gameState :: Game State where
-    update input TitleState _ =
-        if isInputCatchAny input then initialPlayState else TitleState
-    update input OverState _ =
-        if isInputCatchAny input then initialState else OverState
-    update input ClearState _ =
-        if isInputCatchAny input then initialState else ClearState
-    update input (PlayState s) asset =
-        case isGameClear, isGameOver of
+    update _ input TitleState =
+        pure $ if isInputCatchAny input then initialPlayState else TitleState
+    update _ input OverState =
+        pure $ if isInputCatchAny input then initialState else OverState
+    update _ input ClearState =
+        pure $ if isInputCatchAny input then initialState else ClearState
+    update asset input (PlayState s) = do
+        -- update pos
+        let np = updatePlayer input s.player
+            nbullets = map updateBullet s.bullets
+            nenemies = map (updateEnemy s.player) s.enemies
+            nparticles = map updateParticle s.particles
+            nenemyBullets = map updateEnemyBullet s.enemyBullets
+
+        -- player collision
+        let isMapColl = isCollideScrollMap asset s.distance np
+            isEnemyColl = any (isCollideObjects np) nenemies
+            isEnemyBulletColl = any (isCollideObjects np) nenemyBullets
+
+        -- separate objects
+        let { yes: collidedEnemies, no: notCollidedEnemies } = partition (\e -> any (isCollideObjects e) nbullets) nenemies
+            { yes: collidedBullets, no: notCollidedBullets } = partition (\b -> any (isCollideObjects b) nenemies) nbullets
+
+        -- add new objects
+        let newBullets = addBullet input s.player
+            newParticles = map (\e -> initParticle (position e)) collidedEnemies
+            newEnemies = emergeTable s.distance
+            newEnemyBullets = notCollidedEnemies >>= addEnemyBullet s.player
+
+        -- fix player position
+        let nnp = beInMonitor s.player np
+
+        -- delete objects (out of monitor)
+        let nnbullets = filter (not <<< isOutOfWorld) notCollidedBullets
+            nnenemies = filter (not <<< isOutOfWorld) notCollidedEnemies
+            nnparticles = filter (not <<< isOutOfWorld) nparticles
+            nnenemyBullets = filter (not <<< isOutOfWorld) nenemyBullets
+
+        -- game condition
+        let isGameOver = isMapColl || isEnemyColl || isEnemyBulletColl
+            isCatchOct (Oct _) = true
+            isCatchOct _ = false  
+            isGameClear = any isCatchOct collidedEnemies
+
+        pure $ case isGameClear, isGameOver of
             true, _ -> ClearState
             false, true -> OverState
             false, false -> PlayState $ s 
@@ -53,43 +90,6 @@ instance gameState :: Game State where
                 , particles = nnparticles <> newParticles
                 , enemyBullets = nnenemyBullets <> newEnemyBullets
                 }
-            where
-                -- update pos
-                np = updatePlayer input s.player
-                nbullets = map updateBullet s.bullets
-                nenemies = map (updateEnemy s.player) s.enemies
-                nparticles = map updateParticle s.particles
-                nenemyBullets = map updateEnemyBullet s.enemyBullets
-
-                -- player collision
-                isMapColl = isCollideScrollMap asset s.distance np
-                isEnemyColl = any (isCollideObjects np) nenemies
-                isEnemyBulletColl = any (isCollideObjects np) nenemyBullets
-
-                -- separate objects
-                { yes: collidedEnemies, no: notCollidedEnemies } = partition (\e -> any (isCollideObjects e) nbullets) nenemies
-                { yes: collidedBullets, no: notCollidedBullets } = partition (\b -> any (isCollideObjects b) nenemies) nbullets
-
-                -- add new objects
-                newBullets = addBullet input s.player
-                newParticles = map (\e -> initParticle (position e)) collidedEnemies
-                newEnemies = emergeTable s.distance
-                newEnemyBullets = notCollidedEnemies >>= addEnemyBullet s.player
-
-                -- fix player position
-                nnp = beInMonitor s.player np
-
-                -- delete objects (out of monitor)
-                nnbullets = filter (not <<< isOutOfWorld) notCollidedBullets
-                nnenemies = filter (not <<< isOutOfWorld) notCollidedEnemies
-                nnparticles = filter (not <<< isOutOfWorld) nparticles
-                nnenemyBullets = filter (not <<< isOutOfWorld) nenemyBullets
-
-                -- game condition
-                isGameOver = isMapColl || isEnemyColl || isEnemyBulletColl
-                isCatchOct (Oct _) = true
-                isCatchOct _ = false  
-                isGameClear = any isCatchOct collidedEnemies
 
     draw TitleState =
         [ cls Aqua
