@@ -40,9 +40,9 @@ for convenience, special key signal below.
 
 ```PureScript
 class Game s where
-  update :: Input -> s -> (Asset -> s)
-  draw :: s -> Array RenderOp
-  sound :: s -> Array AudioOp
+  update :: Asset -> Input -> s -> Effect s
+  draw :: s -> Draw Unit
+  sound :: s -> Sound Unit
 ```
 
 s is game state data which you can flexibly define.
@@ -71,7 +71,7 @@ mkAsset :: Array RawMap -> Array RawSound -> Effect Asset
 ### Draw Emoji
 
 ```PureScript
-emo :: Emoji -> Size -> X -> Y -> RenderOp
+emo :: Emoji -> Size -> X -> Y -> Draw Unit
 ```
 
 Arguments
@@ -89,7 +89,7 @@ Because these appearances depend on running device or browser.
 ### Draw Map
 
 ```PureScript
-emap :: MapId -> Size -> X -> Y -> RenderOp
+emap :: MapId -> Size -> X -> Y -> Draw Unit
 ```
 
 Arguments
@@ -104,7 +104,7 @@ Arguments
 ### Play Sound
 
 ```PureScript
-play :: SoundId -> Tone -> Bpm -> AudioOp
+play :: SoundId -> Tone -> Bpm -> Sound Unit
 ```
 
 Arguments
