@@ -1,10 +1,12 @@
 # NEMO
 
-[ [日本語](README.ja.md) ]
+[![Build status](https://travis-ci.org/opyapeus/purescript-nemo.svg?branch=master)](https://travis-ci.org/opyapeus/purescript-nemo)
+
+A functional game engine for creating emoji games.
 
 ※ it's beta for now
 
-A functional game engine for creating emoji games.
+[ [日本語](README.ja.md) ]
 
 ![nemo](nemo.png)
 ![emodius](https://opyapeus.github.io/nemo/img/emodius-half.gif)

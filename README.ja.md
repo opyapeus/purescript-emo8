@@ -1,10 +1,12 @@
 # NEMO
 
-[ [English](README.md) ]
+[![Build status](https://travis-ci.org/opyapeus/purescript-nemo.svg?branch=master)](https://travis-ci.org/opyapeus/purescript-nemo)
+
+絵文字のゲームを作れる関数型ゲームエンジン。
 
 ※ 今のところBeta版です
 
-絵文字のゲームを作れる関数型ゲームエンジン。
+[ [English](README.md) ]
 
 ![nemo](nemo.png)
 ![emodius](https://opyapeus.github.io/nemo/img/emodius-half.gif)
