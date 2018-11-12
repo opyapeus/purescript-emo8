@@ -3,9 +3,8 @@ module Nemo.Draw.Interpreter where
 import Prelude
 
 import Control.Monad.Free (foldFree)
-import Data.Array (length, zip, (!!), (..))
+import Data.Array (length, zip, (..))
 import Data.Int (toNumber)
-import Data.Maybe (Maybe(..))
 import Data.NaturalTransformation (NaturalTransformation)
 import Data.String (joinWith)
 import Data.Traversable (for_)
@@ -19,6 +18,7 @@ import Nemo.Data.Color (Color(..), colorToCode)
 import Nemo.Data.Emoji (Emoji(..))
 import Nemo.Patch.TextBaseline (TextBaseline(..), setTextBaseline)
 import Nemo.Types (Deg, IdX, IdY, MapId, Size, X, Y, DrawContext)
+import Nemo.Excepiton (providedMap)
 
 type RenderOp = DrawContext -> Effect Unit
 
@@ -108,16 +108,14 @@ emap' = emapF emo'
 emapF :: (Emoji -> Size -> X -> Y -> RenderOp) -> MapId -> Size -> X -> Y -> RenderOp
 emapF f mId size x y =
     withLocalDraw $ \dctx ->
-        case dctx.mapData !! mId of
-            Nothing -> pure unit -- NOTE: Prioritize simplicity
-            Just em ->
-                for_ (emapWithIndex em) $
-                    \(Tuple vertId withIdRow) -> for_ withIdRow $
-                        \(Tuple horiId e) ->
-                            when (isVisible horiId vertId)
-                                let xx = x + size * horiId
-                                    yy = y + size * vertId 
-                                in f e size xx yy dctx
+        providedMap dctx.mapData mId $ \em -> 
+            for_ (emapWithIndex em) $
+                \(Tuple vertId withIdRow) -> for_ withIdRow $
+                    \(Tuple horiId e) ->
+                        when (isVisible horiId vertId)
+                            let xx = x + size * horiId
+                                yy = y + size * vertId 
+                            in f e size xx yy dctx
     where
         withIndex :: forall a. Array a -> Array (Tuple Int a)
         withIndex arr = zip (0..((length arr) - 1)) arr

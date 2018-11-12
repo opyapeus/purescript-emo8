@@ -9,13 +9,12 @@ module Nemo.Utils
 
 import Prelude
 
-import Data.Either (Either(..))
 import Data.Traversable (traverse)
 import Effect (Effect)
-import Effect.Exception (throw)
 import Nemo.Constants (scene)
 import Nemo.Data.Color (Color(..))
 import Nemo.Data.DebugDisplay (DebugDisplay(..))
+import Nemo.Excepiton (orErrMsg)
 import Nemo.Parse (RawMap, RawSound, parseEmojiMap, parseSound)
 import Nemo.Types (Asset, DebugConfig, Size, X, Y)
 
@@ -59,10 +58,6 @@ mkAsset rms rss = do
     ms <- orErrMsg $ traverse parseEmojiMap rms
     ss <- orErrMsg $ traverse parseSound rss
     pure { mapData: ms, soundData: ss }
-
-orErrMsg :: forall a. Either String a -> Effect a
-orErrMsg (Right val) = pure val
-orErrMsg (Left msg) = throw msg
 
 -- | Empty asset for convenience. 
 emptyAsset :: Asset

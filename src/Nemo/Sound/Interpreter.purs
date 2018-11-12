@@ -19,6 +19,7 @@ import Effect (Effect)
 import Nemo.Constants (maxNoteSize)
 import Nemo.Data.Audio (Efct, Vol, efctToDetune, noteToFreq, octaveToMult, volToGain)
 import Nemo.Data.Tone (Tone, setTone)
+import Nemo.Excepiton (providedSound)
 import Nemo.Sound.Action (Sound, SoundF(..))
 import Nemo.Types (Bpm, Scale, SoundContext, SoundId)
 
@@ -36,9 +37,8 @@ runSound sctx = foldFree interpret
 -- | Play sound with given tone and bpm.
 play :: SoundId -> Tone -> Bpm -> AudioOp
 play sId tone tempo sctx =
-    case sctx.soundData !! sId of
-        Nothing -> pure unit -- NOTE: Prioritize simplicity
-        Just ticks -> do
+    providedSound sctx.soundData sId $
+        \ticks -> do
             resume sctx.ctx
 
             osclNodes <- replicateA maxNoteSize $ createOscillator sctx.ctx
