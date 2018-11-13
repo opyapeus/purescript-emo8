@@ -11,105 +11,59 @@
 ![nemo](nemo.png)
 ![emodius](https://opyapeus.github.io/nemo/img/emodius-half.gif)
 
-## 主な特徴
+## 特徴
 
-- 関数型言語（PureScript）で簡単にゲームを作れます。
-- 素材は絵文字しか使えません。そのかわり創意工夫の余地があります。
-- JavaScriptの知識は基本不要です。関数型言語でロジックの実装に集中できます。
-- ブラウザが動作するあらゆる端末でプレイできます。
+- 関数型言語（PureScript）でゲームロジックを見通し良く書けます。
+- 絵文字素材を組み合わせて色々な表現ができます。
+- ブラウザで動作するので配布が簡単です。
 
-### なぜPureScriptなのですか
+### なぜPureScript？
 
-関数型言語でゲームを作るとき、下記の選択肢がありました。
+記述力と配布性の両方を担保できる関数型言語だからです。
 
-Haskell ->
-もしこれで全てができれば最も良かったです。
-しかし、あらゆる端末でプレイすることが難しいです。
+|            | 記述力 | 配布性 |
+| ---------- | ------ | ------ |
+| Haskell    | ○      | △      |
+| Elm        | △      | ○      |
+| PureScript | ○      | ○      |
 
-Elm ->
-端末に依存しないことを考えた場合、良い選択肢の一つでした。
-しかし、型クラスのサポートがありません。
-また、Elmアーキテクチャに従うことが推奨されます。
+### なぜ絵文字？
 
-PureScript ->
-Haskellのような型クラスサポートがあります。
-また、Javascriptにコンパイルされます。
-したがって、あらゆる端末のブラウザでプレイ可能です！
+制約があることで創造の余地が生まれるからです。
 
-### なぜ絵文字だけなのですか
+私は[PICO-8](https://www.lexaloffle.com/pico-8.php)のファンです。
+PICO-8は、ドット絵や容量など厳しい制約がありますが、それがゲーム作りを楽しくしていると思います。
 
-何か制約があったほうが、創造性を刺激します。
-
-私は[PICO-8](https://www.lexaloffle.com/pico-8.php)に代表されるファンタジーコンソールにとても触発されました。
-
-それらは、使用できるスプライトやサウンド、容量などに厳しい制約があります。
-
-これらの制約は、逆に創造力を掻き立て、ゲーム作りをより楽しいものにしています。
-
-同じように、Webプラットフォームにおいて、あえて絵文字しか使えない制約を設けることは、面白いと思っています。
-
-## オンラインで遊ぶ
-
-- [NEMO GAMES](https://opyapeus.github.io/nemo/index.html)
-
-NEMOで作ったあなたのゲームも、ここに追加することができます。
-
-もし希望があれば、Github Pagesの[Repository](https://github.com/opyapeus/nemo)にissueかPRを作ってください。
-
-## インストール
-
-```sh
-bower i purescript-nemo
-```
-
-## 始めてみよう
-
-- [Usage](docs/usage.md)
+同じように、あえて絵文字しか使えない制約があることで、また一味違ったゲーム作りの楽しみがあると考えています。
 
 ## 仕様
 
 - 言語: PureScript
 - 画面サイズ: 1024x1024
-- 絵文字: ユニコード絵文字
-- 色: HTML基本色16色
-- マップエディタ: 生のテキスト（絵文字）の編集
-- サウンドエディタ: 生のテキスト（絵文字）の編集
-- 入力: キーボード、タッチスクリーン
-- フレームレート: おおよそ 60 FPS
-- 動作環境: あらゆる端末のブラウザ (いくらかGPUの力が必要です)
+- 絵文字: ユニコード絵文字各種 ※[Supported Emojis](docs/emoji.md)
+- 背景色: HTML基本カラー16色
+- コントローラ: キーボード（PC）、スワイプ（スマホ、タブレット）
+- フレームレート: 約60FPS
+- 動作環境: あらゆるブラウザ
 
-## 入力
+## 簡易マニュアル（英語）
 
-### キーボード
-
-```plain
- /¯¯¯\_/¯¯¯\
-|  W  |  ↑  |
-| A D | ← → |
-|  S  |  ↓  |
- \___/¯\___/
- ```
-
-### タッチスクリーン
-
-スマホやタブレットの操作については、キーボードの割り当てがそのまま、画面の右側か左側をスワイプすることに対応します。
-
-※ スワイプの原点は、タッチの開始位置になります。
+- [Usage](docs/usage.md)
 
 ## サンプルプログラム
 
-最初にこのレポジトリをクローンしてください。
+最初にこのレポジトリをクローンします。
 
-インストール
+### インストール
 
 ```sh
 npm i
 bower i
 ```
 
-ビルド
+### ビルド
 
-※ もしwarningでビルドできない場合は、いったん```pulp build```してください。
+※ もしwarningでビルドできない場合は、`pulp build`します。
 
 ```sh
 npm run build
@@ -122,7 +76,7 @@ npm run build:examples
 npm run open
 ```
 
-タグを指定してアクセス（リロードが必要かもしれません）
+タグを指定してアクセス
 
 ```url
 public/index.html#hello
@@ -130,9 +84,14 @@ public/index.html#basic
 public/index.html#emodius
 ```
 
-## 利用可能な絵文字
+## オンラインで遊ぶ
 
-- [Supported Emojis](docs/emoji.md)
+サンプルプログラムの「Emodius」をオンラインでプレイできます。
+
+- [NEMO GAMES](https://opyapeus.github.io/nemo/index.html)
+
+また、NEMOで作ったあなたのゲームもここに追加できます。
+もし希望があれば、Github Pagesの[Repository](https://github.com/opyapeus/nemo)にissueかPRを立ててください。
 
 ## 開発中のリスト
 
@@ -145,7 +104,7 @@ public/index.html#emodius
 - canvasの絵文字の回転 (45°, 135°, 225°, 315°) 表示の問題
 - 絵文字のデフォルト表示形式 [CSS Fonts Module Level 4 - Editor’s Draft, 17 August 2018](https://drafts.csswg.org/css-fonts-4/#font-variant-emoji-prop)
 
-## モジュールのドキュメント
+## APIドキュメント
 
 - [Module documentation on Pursuit](https://pursuit.purescript.org/packages/purescript-nemo/)
 
@@ -159,4 +118,4 @@ Beta版なので、しばらく待ってください。
 
 [MIT](LICENSE)
 
-※ 絵文字のグラフィックのライセンスについては、各ベンダーが所有しています。
+※ 絵文字のグラフィックのライセンスは、各ベンダーが所有しています。

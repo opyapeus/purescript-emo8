@@ -13,88 +13,42 @@ A functional game engine for creating emoji games.
 
 ## Major Features
 
-- Easy to create games with powerful functional languages ​​(PureScript).
-- Only emojis can be used as materials. Instead, there is room for creativity.
-- JavaScript knowledge is basically unnecessary. You can concentrate on implementing game logic with functional languages.
-- You can play on any device on which the browser runs.
+- You can write game logic well in a functional language (PureScript).
+- You can express various ideas by combining emojis.
+- Easy to distribute to any browser.
 
 ### Why PureScript
 
-When making games in functional language, there were the following options.
+It is a functional language that can guarantee both descriptive power and distributability.
 
-Haskell ->
-If everything could be done with this, it was the best.
-However, it is difficult to play on any device.
+|            | descriptive power | distributability |
+| ---------- | ----------------- | ---------------- |
+| Haskell    | ○                 | △                |
+| Elm        | △                 | ○                |
+| PureScript | ○                 | ○                |
 
-Elm ->
-It was one of the good options when thinking about device independence.
-But there is no type class support.
-It is also recommended that you follow the Elm architecture.
+### Why Emoji
 
-PureScript ->
-There is type class support like Haskell.
-It will also be compiled into Javascript.
-Therefore, you can play on any device browser!
+Because there is room for creation if there is constraint.
 
-### Why Only Emojis
+I am a fan of [PICO-8](https://www.lexaloffle.com/pico-8.php).
+PICO-8 has strict restrictions such as dot picture and capacity, but I think that these make creating game more fun.
 
-Something restricted stimulates creativity.
-
-I was very inspired by fantasy consoles represented by [PICO-8](https://www.lexaloffle.com/pico-8.php).
-
-There are severe restrictions on sprites, sounds, capacity, etc. that can be used.
-
-On the contrary, These constraints inspire creativity and making the game more fun.
-
-Just like this, I think that it is very interesting to have constraints that only emojis can be used in the Web platform.
-
-## Play Online
-
-- [NEMO GAMES](https://opyapeus.github.io/nemo/index.html)
-
-You can also add games you made with NEMO here.
-
-If you want, please make issue or PR at Github Pages [Repository](https://github.com/opyapeus/nemo)
-
-## Installation
-
-```sh
-bower i purescript-nemo
-```
-
-## Getting Started
-
-- [Usage](docs/usage.md)
+In the same way, if there are restrictions that only emojis can be used, there is a different enjoyment of game making.
 
 ## Specification
 
 - Language: PureScript
 - Monitor Size: 1024x1024
-- Emoji: unicode emojis
+- Emoji: unicode emojis ※[Supported Emojis](docs/emoji.md)
 - Color: 16 html base colors
-- Map Editor: Raw text (emoji) editing
-- Sound Editor: Raw text (emoji) editing
-- Input Interface: Keyboard, Touch Screen
+- Input Interface: Keyboard (PC), Swipe (SP, Tablet)
 - Frame Rate: About 60 FPS
-- Working Environment: Browers on any device (It requires some GPU power)
+- Working Environment: Any brower
 
-## Input Interface
+## Simple Manual
 
-### Keyboard
-
-```plain
- /¯¯¯\_/¯¯¯\
-|  W  |  ↑  |
-| A D | ← → |
-|  S  |  ↓  |
- \___/¯\___/
- ```
-
-### Touch Screen
-
-For mobile, it is equivalent to keyboard inputs that swiping on the right or left side of the screen.
-
-※ The swipe origin is the touch position which started.
+- [Usage](docs/usage.md)
 
 ## Examples
 
@@ -109,7 +63,7 @@ bower i
 
 build
 
-※ if you can not build with warning, please ```pulp build``` once.
+※ if you can not build with warning, please `pulp build` once.
 
 ```sh
 npm run build
@@ -130,9 +84,14 @@ public/index.html#basic
 public/index.html#emodius
 ```
 
-## Emojis
+## Play Online
 
-- [Supported Emojis](docs/emoji.md)
+You can play "Emodius" of the sample program online.
+
+- [NEMO GAMES](https://opyapeus.github.io/nemo/index.html)
+
+You can also add games you made with NEMO here.
+If you want, please make issue or PR at Github Pages [Repository](https://github.com/opyapeus/nemo)
 
 ## Under Developing List
 
@@ -145,7 +104,7 @@ public/index.html#emodius
 - emoji rotate (45°, 135°, 225°, 315°) problem on canvas
 - default emoji presentation [CSS Fonts Module Level 4 - Editor’s Draft, 17 August 2018](https://drafts.csswg.org/css-fonts-4/#font-variant-emoji-prop)
 
-## Module Documentation
+## API Documentation
 
 - [Module documentation on Pursuit](https://pursuit.purescript.org/packages/purescript-nemo/)
 
@@ -159,4 +118,4 @@ Thank you.
 
 [MIT](LICENSE)
 
-※ About license of emojis' graphics are owned by each vendor.
+※ License of emojis' graphics are owned by each vendor.
