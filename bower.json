@@ -20,7 +20,6 @@
     "purescript-signal": "^10.1.0",
     "purescript-stringutils": "^0.0.8",
     "purescript-webaudio": "^0.1.2",
-    "purescript-tuples": "^5.0.0",
     "purescript-generics-rep": "^6.0.0",
     "purescript-emoji-splitter": "^0.1.0",
     "purescript-free": "^5.1.0",
