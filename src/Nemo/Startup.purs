@@ -17,16 +17,18 @@ startupView ctx = do
   save ctx
   setFillStyle ctx (colorToCode Black)
   fillRect ctx { x: 0.0, y: 0.0, width: toNumber $ scene.width, height: toNumber $ scene.height }
+  setFont ctx "bold 256px sans-serif"
+  fillText ctx "📦" 384.0 575.0
   setFont ctx "bold 128px sans-serif"
   setFillStyle ctx (colorToCode Lime)
-  fillText ctx "N" 300.0 544.0
+  fillText ctx "N" 300.0 512.0
   setFillStyle ctx (colorToCode Aqua)
-  fillText ctx "E" 415.0 544.0
+  fillText ctx "E" 415.0 512.0
   setFillStyle ctx (colorToCode Fuchsia)
-  fillText ctx "M" 515.0 544.0
+  fillText ctx "M" 515.0 512.0
   setFillStyle ctx (colorToCode Yellow)
-  fillText ctx "O" 640.0 544.0
+  fillText ctx "O" 640.0 512.0
   setFont ctx "64px sans-serif"
   setFillStyle ctx (colorToCode White)
-  fillText ctx "HAVE FUN!" 350.0 700.0
+  fillText ctx "Powered by Creativity" 180.0 700.0
   restore ctx
