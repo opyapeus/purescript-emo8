@@ -1,7 +1,7 @@
 {
   "name": "purescript-nemo",
   "license": "MIT",
-  "description": "Simple 2D game engine based on emoji.",
+  "description": "A functional game engine for creating emoji games.",
   "repository": {
     "type": "git",
     "url": "git://github.com/opyapeus/purescript-nemo.git"
