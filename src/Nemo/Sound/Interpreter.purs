@@ -11,7 +11,6 @@ import Control.Monad.Free (foldFree)
 import Data.Array (length, zip, (!!), (..))
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(..))
-import Data.NaturalTransformation (NaturalTransformation)
 import Data.Traversable (for_)
 import Data.Tuple (Tuple(..))
 import Data.Unfoldable (replicateA)
@@ -30,11 +29,10 @@ type Frequency = Number
 runSound :: forall a. SoundContext -> Sound a -> Effect a
 runSound sctx = foldFree interpret
   where
-    interpret :: NaturalTransformation SoundF Effect
+    interpret :: SoundF ~> Effect
     interpret (HaltAll n) = const n <$> haltall sctx
     interpret (Play sId tone tempo n) = const n <$> play sId tone tempo sctx
 
--- | Play sound with given tone and bpm.
 play :: SoundId -> Tone -> Bpm -> AudioOp
 play sId tone tempo sctx =
     providedSound sctx.soundData sId $
@@ -101,7 +99,6 @@ setFreq t on freq = do
     _ <- setValueAtTime freq t freqParam
     pure unit
 
--- | Halt all sound.
 haltall :: AudioOp
 haltall sctx =
     suspend sctx.ctx

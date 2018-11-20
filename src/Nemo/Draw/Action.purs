@@ -18,23 +18,30 @@ data DrawF n
 
 data Appearance = Normal | Mirrored
 
+-- | Clear screen with given color.
 cls :: Color -> Draw Unit
 cls c = liftF $ ClearScreen c unit
 
+-- | Draw emoji.
 emo :: Emoji -> Size -> X -> Y -> Draw Unit
 emo e size x y = liftF $ Emo Normal e size x y unit
 
+-- | Draw rotated emoji.
 emo' :: Emoji -> Size -> X -> Y -> Draw Unit
 emo' e size x y = liftF $ Emo Mirrored e size x y unit
 
+-- | Draw mirrored emoji.
 emor :: Deg -> Emoji -> Size -> X -> Y -> Draw Unit
 emor deg e size x y = liftF $ Emor Normal deg e size x y unit
 
+-- | Draw mirrored rotated emoji.
 emor' :: Deg -> Emoji -> Size -> X -> Y -> Draw Unit
 emor' deg e size x y = liftF $ Emor Mirrored deg e size x y unit
 
+-- | Draw emoji map.
 emap :: MapId -> Size -> X -> Y -> Draw Unit
 emap mId size x y = liftF $ Emap Normal mId size x y unit
 
+-- | Draw mirrored emoji map.
 emap' :: MapId -> Size -> X -> Y -> Draw Unit
 emap' mId size x y = liftF $ Emap Mirrored mId size x y unit

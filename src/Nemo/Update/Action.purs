@@ -14,11 +14,15 @@ data UpdateF n
     | RandomNumber Number Number (Number -> n)
     | IsMapCollide MapId Size (Array Emoji) Size X Y (Boolean -> n)
 
+-- | Get random int.
 randomInt :: Int -> Int -> Update Int
 randomInt min max = liftF $ RandomInt min max identity
 
+-- | Get random number.
 randomNumber :: Number -> Number -> Update Number
 randomNumber min max = liftF $ RandomNumber min max identity
 
+-- | Detect map collision.
+-- | Given emojis are treated as walls.
 isMapCollide :: MapId -> Size -> Array Emoji -> Size -> X -> Y -> Update Boolean
 isMapCollide mId mSize walls size x y = liftF $ IsMapCollide mId mSize walls size x y identity

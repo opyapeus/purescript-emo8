@@ -5,7 +5,6 @@ import Prelude
 import Control.Monad.Free (foldFree)
 import Data.Array (length, zip, (..))
 import Data.Int (toNumber)
-import Data.NaturalTransformation (NaturalTransformation)
 import Data.String (joinWith)
 import Data.Traversable (for_)
 import Data.Tuple (Tuple(..))
@@ -25,7 +24,7 @@ type RenderOp = DrawContext -> Effect Unit
 runDraw :: forall a. DrawContext -> Draw a -> Effect a
 runDraw dctx = foldFree interpret
   where
-    interpret :: NaturalTransformation DrawF Effect
+    interpret :: DrawF ~> Effect
     interpret (ClearScreen c n) = const n <$> cls c dctx
     interpret (Emo Normal e size x y n) = const n <$> emo e size x y dctx
     interpret (Emo Mirrored e size x y n) = const n <$> emo' e size x y dctx
@@ -34,7 +33,6 @@ runDraw dctx = foldFree interpret
     interpret (Emap Normal mId size x y n) = const n <$> emap mId size x y dctx
     interpret (Emap Mirrored mId size x y n) = const n <$> emap' mId size x y dctx
 
--- | Clear screen with given color.
 cls :: Color -> RenderOp
 cls c dctx = do
     setFillStyle dctx.ctx (colorToCode c)
@@ -65,7 +63,6 @@ fillTextConsVoid e size x y ctx = do
     where
         font = sizeToFont size
 
--- | Draw emoji.
 emo :: Emoji -> Size -> X -> Y -> RenderOp
 emo e size x y =
     withLocalDraw $ \dctx -> do
@@ -73,23 +70,20 @@ emo e size x y =
     where
         y' = toBaseY y
 
--- | Draw rotated emoji.
--- | CAUTION: It does not display correctly (Deg = 45, 135, 225, 315).
+-- | NOTE: It does not display correctly (Deg = 45, 135, 225, 315).
 emor :: Deg -> Emoji -> Size -> X -> Y -> RenderOp
 emor rot e size x y =
     withLocalDraw $ \dctx -> do
         flip (fillTextWithT e size x y) dctx $ \ctx2d -> do
             rotate ctx2d (- degToRad rot)
 
--- | Draw mirrored emoji.
 emo' :: Emoji -> Size -> X -> Y -> RenderOp
 emo' e size x y =
     withLocalDraw $ \dctx -> do
         flip (fillTextWithT e size x y) dctx $ \ctx2d -> do
             scale ctx2d { scaleX: -1.0, scaleY: 1.0 }
   
--- | Draw mirrored rotated emoji.
--- | CAUTION: It does not display correctly (Deg = 45, 135, 225, 315).
+-- | NOTE: It does not display correctly (Deg = 45, 135, 225, 315).
 emor' :: Deg -> Emoji -> Size -> X -> Y -> RenderOp
 emor' rot e size x y =
     withLocalDraw $ \dctx -> do
@@ -97,11 +91,9 @@ emor' rot e size x y =
             rotate ctx2d (- degToRad rot)
             scale ctx2d { scaleX: -1.0, scaleY: 1.0 }
 
--- | Draw emoji map.
 emap :: MapId -> Size -> X -> Y -> RenderOp
 emap = emapF emo
 
--- | Draw mirrored emoji map.
 emap' :: MapId -> Size -> X -> Y -> RenderOp
 emap' = emapF emo'
 

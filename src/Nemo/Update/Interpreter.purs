@@ -7,7 +7,6 @@ import Control.Monad.Gen (Size)
 import Data.Array (reverse, (!!))
 import Data.Foldable (elem, foldr)
 import Data.Maybe (Maybe(..))
-import Data.NaturalTransformation (NaturalTransformation)
 import Effect (Effect)
 import Nemo.Class.Game (class Game)
 import Nemo.Data.Emoji (Emoji)
@@ -19,13 +18,11 @@ import Random.PseudoRandom (randomREff)
 runUpdate :: forall s. Game s => Asset -> Update s -> Effect s
 runUpdate ass = foldFree interpret
   where
-    interpret :: NaturalTransformation UpdateF Effect
+    interpret :: UpdateF ~> Effect
     interpret (RandomInt min max f) = f <$> randomREff min max
     interpret (RandomNumber min max f) = f <$> randomREff min max
     interpret (IsMapCollide mId mSize walls size x y f) = f <$> isMapCollide ass mId mSize walls size x y
 
--- | Map collision detection.
--- | Given emojis are treated as walls.
 -- TODO: large object detection
 isMapCollide :: Asset -> MapId -> Size -> Array Emoji -> Size -> X -> Y -> Effect Boolean
 isMapCollide asset mId mSize walls size x y = do
@@ -44,8 +41,6 @@ isMapCollide asset mId mSize walls size x y = do
             Just e | elem e walls -> true
             _ -> b
 
--- | Get map emoji with given indices.
--- | Return Nothing there is not emoji.
 getMapEmoji :: Asset -> MapId -> IdX -> IdY -> Effect (Maybe Emoji)
 getMapEmoji ass mId xId yId =
     providedMap ass.mapData mId $ \em ->
