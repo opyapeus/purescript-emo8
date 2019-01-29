@@ -6,9 +6,9 @@ import Class.Object (class ObjectDraw, class Object, position, size)
 import Constants (emoSize)
 import Data.EnemyBullet (EnemyBullet(..))
 import Data.Player (Player(..))
-import Nemo.Constants (scene)
 import Nemo.Data.Emoji as E
 import Nemo.Draw.Action (emo)
+import Nemo.Utils (defaultMonitorSize)
 import Types (Pos)
 
 
@@ -52,7 +52,7 @@ updateEnemy (Player p) (Rex s) = Rex $ if mod s.cnt 32 < 16
         else s { pos { x = s.pos.x - 4, y = s.pos.y - 4 } , cnt = s.cnt + 1 }
 updateEnemy _ (Oct s) = Oct $ s { pos { x = s.pos.x + dx } }
     where
-        dx = if s.pos.x > scene.width / 2 then -2 else 0
+        dx = if s.pos.x > defaultMonitorSize.width / 2 then -2 else 0
 
 addEnemyBullet :: Player -> Enemy -> Array EnemyBullet
 addEnemyBullet _ (Moi s) = if mod s.cnt 16 == 0 then [ NormalBull { pos: s.pos } ] else []
@@ -67,51 +67,51 @@ diffVec a b = { x: (position a).x - (position b).x, y: (position a).y - (positio
 
 emergeTable :: Int -> Array Enemy
 emergeTable = case _ of
-    400 -> [ Invader { pos: { x: scene.width, y: 500 } } ]
+    400 -> [ Invader { pos: { x: defaultMonitorSize.width, y: 500 } } ]
     500 ->
-        [ Invader { pos: { x: scene.width, y: 800 } }
-        , Invader { pos: { x: scene.width, y: 300 } }
+        [ Invader { pos: { x: defaultMonitorSize.width, y: 800 } }
+        , Invader { pos: { x: defaultMonitorSize.width, y: 300 } }
         ]
-    1400 -> [ Invader { pos: { x: scene.width, y: 500 } } ]
+    1400 -> [ Invader { pos: { x: defaultMonitorSize.width, y: 500 } } ]
     1500 ->
-        [ Invader { pos: { x: scene.width, y: 800 } }
-        , Invader { pos: { x: scene.width, y: 300 } }
+        [ Invader { pos: { x: defaultMonitorSize.width, y: 800 } }
+        , Invader { pos: { x: defaultMonitorSize.width, y: 300 } }
         ]
     2500 ->
-        [ Invader { pos: { x: scene.width, y: 500 } }
-        , Invader { pos: { x: scene.width, y: 700 } }
-        , Invader { pos: { x: scene.width, y: 900 } }
-        , Invader { pos: { x: scene.width, y: 300 } }
-        , Invader { pos: { x: scene.width, y: 100 } }
+        [ Invader { pos: { x: defaultMonitorSize.width, y: 500 } }
+        , Invader { pos: { x: defaultMonitorSize.width, y: 700 } }
+        , Invader { pos: { x: defaultMonitorSize.width, y: 900 } }
+        , Invader { pos: { x: defaultMonitorSize.width, y: 300 } }
+        , Invader { pos: { x: defaultMonitorSize.width, y: 100 } }
         ]
     -- second: 4096
-    4000 -> [ Bee { pos: { x: scene.width, y: 800 } } ]
-    4500 -> [ Bee { pos: { x: scene.width, y: 500 } } ]
-    5000 -> [ Bee { pos: { x: scene.width, y: 200 } } ]
+    4000 -> [ Bee { pos: { x: defaultMonitorSize.width, y: 800 } } ]
+    4500 -> [ Bee { pos: { x: defaultMonitorSize.width, y: 500 } } ]
+    5000 -> [ Bee { pos: { x: defaultMonitorSize.width, y: 200 } } ]
     6000 ->
-        [ Bee { pos: { x: scene.width, y: 800 } }
-        , Bee { pos: { x: scene.width, y: 500 } }
-        , Bee { pos: { x: scene.width, y: 200 } }
+        [ Bee { pos: { x: defaultMonitorSize.width, y: 800 } }
+        , Bee { pos: { x: defaultMonitorSize.width, y: 500 } }
+        , Bee { pos: { x: defaultMonitorSize.width, y: 200 } }
         ]
     6500 ->
-        [ Bee { pos: { x: scene.width, y: 900 } }
-        , Bee { pos: { x: scene.width, y: 600 } }
-        , Bee { pos: { x: scene.width, y: 300 } }
+        [ Bee { pos: { x: defaultMonitorSize.width, y: 900 } }
+        , Bee { pos: { x: defaultMonitorSize.width, y: 600 } }
+        , Bee { pos: { x: defaultMonitorSize.width, y: 300 } }
         ]
     -- third: 8192
-    8000 -> [ Rex { pos: { x: scene.width, y: emoSize }, cnt: 0 } ]
-    8500 -> [ Rex { pos: { x: scene.width, y: emoSize }, cnt: 0 } ]
-    10000 -> [ Rex { pos: { x: scene.width, y: emoSize }, cnt: 0 } ]
-    10500 -> [ Rex { pos: { x: scene.width, y: emoSize }, cnt: 0 } ]
+    8000 -> [ Rex { pos: { x: defaultMonitorSize.width, y: emoSize }, cnt: 0 } ]
+    8500 -> [ Rex { pos: { x: defaultMonitorSize.width, y: emoSize }, cnt: 0 } ]
+    10000 -> [ Rex { pos: { x: defaultMonitorSize.width, y: emoSize }, cnt: 0 } ]
+    10500 -> [ Rex { pos: { x: defaultMonitorSize.width, y: emoSize }, cnt: 0 } ]
     -- forth: 12288
-    12000 -> [ Moi { pos: { x: scene.width, y: 500 }, cnt: 0 } ]
-    12500 -> [ Moi { pos: { x: scene.width, y: 800 }, cnt: 0 } ]
-    13000 -> [ Moi { pos: { x: scene.width, y: 200 }, cnt: 0 } ]
+    12000 -> [ Moi { pos: { x: defaultMonitorSize.width, y: 500 }, cnt: 0 } ]
+    12500 -> [ Moi { pos: { x: defaultMonitorSize.width, y: 800 }, cnt: 0 } ]
+    13000 -> [ Moi { pos: { x: defaultMonitorSize.width, y: 200 }, cnt: 0 } ]
     14000 ->
-        [ Moi { pos: { x: scene.width, y: 500 }, cnt: 0 }
-        , Moi { pos: { x: scene.width, y: 800 }, cnt: 0 }
-        , Moi { pos: { x: scene.width, y: 200 }, cnt: 0 }
+        [ Moi { pos: { x: defaultMonitorSize.width, y: 500 }, cnt: 0 }
+        , Moi { pos: { x: defaultMonitorSize.width, y: 800 }, cnt: 0 }
+        , Moi { pos: { x: defaultMonitorSize.width, y: 200 }, cnt: 0 }
         ]
     -- fifth: 16384
-    16000 -> [ Oct { pos: { x: scene.width, y: 500 } } ]
+    16000 -> [ Oct { pos: { x: defaultMonitorSize.width, y: 500 } } ]
     _ -> []

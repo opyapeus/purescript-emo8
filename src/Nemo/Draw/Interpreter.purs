@@ -12,11 +12,11 @@ import Effect (Effect)
 import Graphics.Canvas (Context2D, fillRect, fillText, restore, rotate, save, scale, setFillStyle, setFont, translate)
 import Math (pi)
 import Nemo.Draw.Action (Appearance(..), Draw, DrawF(..))
-import Nemo.Constants (fontFamily, scene)
+import Nemo.Constants (fontFamily)
 import Nemo.Data.Color (Color(..), colorToCode)
 import Nemo.Data.Emoji (Emoji(..))
 import Nemo.Patch.TextBaseline (TextBaseline(..), setTextBaseline)
-import Nemo.Types (Deg, IdX, IdY, MapId, Size, X, Y, DrawContext)
+import Nemo.Types (Deg, IdX, IdY, MapId, MonitorSize, Size, X, Y, DrawContext)
 import Nemo.Excepiton (providedMap)
 
 type RenderOp = DrawContext -> Effect Unit
@@ -36,7 +36,7 @@ runDraw dctx = foldFree interpret
 cls :: Color -> RenderOp
 cls c dctx = do
     setFillStyle dctx.ctx (colorToCode c)
-    fillRect dctx.ctx { x: 0.0, y: 0.0, width: toNumber $ scene.width, height: toNumber $ scene.height }
+    fillRect dctx.ctx { x: 0.0, y: 0.0, width: toNumber dctx.monitorSize.width, height: toNumber dctx.monitorSize.height }
 
 withLocalDraw :: RenderOp -> RenderOp
 withLocalDraw op dctx = do
@@ -50,7 +50,7 @@ fillTextWithT e size x y op dctx = do
     op dctx.ctx
     fillTextConsVoid e size (- halfSize) halfSize dctx.ctx
     where
-        y' = toBaseY y
+        y' = toBaseY dctx.monitorSize y
         halfSize = toNumber size / 2.0
 
 fillTextConsVoid :: Emoji -> Size -> Number -> Number -> Context2D -> Effect Unit
@@ -66,9 +66,9 @@ fillTextConsVoid e size x y ctx = do
 emo :: Emoji -> Size -> X -> Y -> RenderOp
 emo e size x y =
     withLocalDraw $ \dctx -> do
-        fillTextConsVoid e size (toNumber x) (toNumber y') dctx.ctx
+        fillTextConsVoid e size (toNumber x) (toNumber $ y' dctx) dctx.ctx
     where
-        y' = toBaseY y
+        y' dctx' = toBaseY dctx'.monitorSize y
 
 -- | NOTE: It does not display correctly (Deg = 45, 135, 225, 315).
 emor :: Deg -> Emoji -> Size -> X -> Y -> RenderOp
@@ -104,7 +104,7 @@ emapF f mId size x y =
             for_ (emapWithIndex em) $
                 \(Tuple vertId withIdRow) -> for_ withIdRow $
                     \(Tuple horiId e) ->
-                        when (isVisible horiId vertId)
+                        when (isVisible dctx.monitorSize horiId vertId)
                             let xx = x + size * horiId
                                 yy = y + size * vertId 
                             in f e size xx yy dctx
@@ -116,25 +116,25 @@ emapF f mId size x y =
         withIndexRev arr = zip (((length arr) - 1)..0) arr
         emapWithIndex = withIndexRev <<< (map withIndex)
 
-        isVisible :: IdX -> IdY -> Boolean
-        isVisible xId yId =
+        isVisible :: MonitorSize -> IdX -> IdY -> Boolean
+        isVisible ms xId yId =
             ( xId >= xlBoundId
-            && xId <= xrBoundId
+            && xId <= xrBoundId ms
             && yId >= ybBoundId
-            && yId <= ytBoundId
+            && yId <= ytBoundId ms
             )
-        maxMapElemX = scene.width / size
-        maxMapElemY = scene.height / size
+        maxMapElemX ms = ms.width / size
+        maxMapElemY ms = ms.height / size
         xMapId = x / size
         yMapId = y / size
         xlBoundId = - (xMapId + 1)
-        xrBoundId = xlBoundId + maxMapElemX 
+        xrBoundId ms = xlBoundId + maxMapElemX ms
         ybBoundId = - (yMapId + 1)
-        ytBoundId = ybBoundId + maxMapElemY
+        ytBoundId ms = ybBoundId + maxMapElemY ms
 
 
-toBaseY :: Y -> Y
-toBaseY y = scene.height - y
+toBaseY :: MonitorSize -> Y -> Y
+toBaseY ms y = ms.height - y
 
 degToRad :: Deg -> Number
 degToRad d = 2.0 * pi * toNumber d / 360.0

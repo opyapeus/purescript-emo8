@@ -2,6 +2,7 @@ module Nemo.Utils
     ( mkAsset
     , emptyAsset
     , defaultDebugConfig
+    , defaultMonitorSize
     , isMonitorCollide
     , isOutOfMonitor
     , isCollide
@@ -11,28 +12,27 @@ import Prelude
 
 import Data.Traversable (traverse)
 import Effect (Effect)
-import Nemo.Constants (scene)
 import Nemo.Data.Color (Color(..))
 import Nemo.Data.DebugDisplay (DebugDisplay(..))
 import Nemo.Excepiton (orErrMsg)
 import Nemo.Parse (RawMap, RawSound, parseEmojiMap, parseSound)
-import Nemo.Types (Asset, DebugConfig, Size, X, Y)
+import Nemo.Types (Asset, DebugConfig, Size, X, Y, MonitorSize)
 
 -- | Collision detection if an object protrudes out of monitor
-isMonitorCollide :: Size -> X -> Y -> Boolean
-isMonitorCollide size x y
+isMonitorCollide :: MonitorSize -> Size -> X -> Y -> Boolean
+isMonitorCollide ms size x y
     = x < 0
-    || x + size - 1 > scene.width
+    || x + size - 1 > ms.width
     || y < 0
-    || y + size - 1 > scene.height
+    || y + size - 1 > ms.height
 
 -- | Collision detection if an object completely protrudes out of monitor
-isOutOfMonitor :: Size -> X -> Y -> Boolean
-isOutOfMonitor size x y
+isOutOfMonitor :: MonitorSize -> Size -> X -> Y -> Boolean
+isOutOfMonitor ms size x y
     = x + size - 1 < 0
-    || x > scene.width
+    || x > ms.width
     || y + size - 1 < 0
-    || y > scene.height
+    || y > ms.height
 
 -- | Collision detection between two objects
 isCollide :: Size -> X -> Y -> Size -> X -> Y -> Boolean
@@ -66,3 +66,9 @@ emptyAsset = { mapData: [], soundData: [] }
 -- | Default debug config for convenience. 
 defaultDebugConfig :: DebugConfig
 defaultDebugConfig = { debugDisplay: LeftTop, color: White }
+
+defaultMonitorSize :: MonitorSize
+defaultMonitorSize =
+    { width: 1024
+    , height: 1024
+    }

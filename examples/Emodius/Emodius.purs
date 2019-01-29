@@ -20,7 +20,7 @@ import Nemo.Class.Game (class Game)
 import Nemo.Data.Color (Color(..))
 import Nemo.Data.Emoji as E
 import Nemo.Draw.Action (cls, emo, emor, emor')
-import Nemo.Utils (mkAsset)
+import Nemo.Utils (defaultMonitorSize, mkAsset)
 
 data State
     = TitleState
@@ -140,4 +140,4 @@ main = do
     asset <- mkAsset
         [map0, map1, map2, map3]
         []
-    nemo initialState asset
+    nemo initialState asset defaultMonitorSize

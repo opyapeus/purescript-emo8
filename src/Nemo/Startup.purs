@@ -5,18 +5,19 @@ import Prelude
 import Data.Int (toNumber)
 import Effect (Effect)
 import Graphics.Canvas (Context2D, fillRect, fillText, restore, save, setFillStyle, setFont)
-import Nemo.Constants (scene)
 import Nemo.Data.Color (Color(..), colorToCode)
+import Nemo.Types (MonitorSize)
 
 
 showStartupViewTime :: Int
 showStartupViewTime = 2000
 
-startupView :: Context2D -> Effect Unit
-startupView ctx = do
+-- TODO: variable position
+startupView :: MonitorSize -> Context2D -> Effect Unit
+startupView ms ctx = do
   save ctx
   setFillStyle ctx (colorToCode Black)
-  fillRect ctx { x: 0.0, y: 0.0, width: toNumber $ scene.width, height: toNumber $ scene.height }
+  fillRect ctx { x: 0.0, y: 0.0, width: toNumber $ ms.width, height: toNumber $ ms.height }
   setFont ctx "bold 256px sans-serif"
   fillText ctx "📦" 384.0 575.0
   setFont ctx "bold 128px sans-serif"

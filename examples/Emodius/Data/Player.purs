@@ -5,10 +5,10 @@ import Prelude
 import Class.Object (class Object, class ObjectDraw, position, size)
 import Constants (emoSize)
 import Data.Bullet (Bullet(..))
-import Nemo.Constants (scene)
 import Nemo.Data.Emoji as E
-import Nemo.Input (Input)
 import Nemo.Draw.Action (emo', emor')
+import Nemo.Input (Input)
+import Nemo.Utils (defaultMonitorSize)
 import Types (Pos)
 
 
@@ -75,7 +75,7 @@ initialPlayer :: Player
 initialPlayer = Player
     { pos:
         { x: 0
-        , y: scene.height / 2
+        , y: defaultMonitorSize.height / 2
         }
     , energy: 30
     , appear: Stable

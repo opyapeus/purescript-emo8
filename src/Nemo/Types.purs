@@ -3,9 +3,14 @@ module Nemo.Types where
 import Audio.WebAudio.Types (AudioContext)
 import Graphics.Canvas (Context2D)
 import Nemo.Data.Audio (Efct, Note, Octave, Vol)
-import Nemo.Data.Emoji (Emoji)
 import Nemo.Data.Color (Color)
 import Nemo.Data.DebugDisplay (DebugDisplay)
+import Nemo.Data.Emoji (Emoji)
+
+type MonitorSize =
+  { width :: Int
+  , height :: Int
+  }
 
 -- | Asset type.
 -- | It contains map data and sound data.
@@ -31,6 +36,7 @@ type Scale =
 type DrawContext =
   { ctx :: Context2D
   , mapData :: Array EmojiMap
+  , monitorSize :: MonitorSize
   }
 
 type SoundContext =

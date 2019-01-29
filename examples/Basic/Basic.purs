@@ -7,7 +7,6 @@ import Data.Generic.Rep.Show (genericShow)
 import Effect (Effect)
 import Nemo (nemoDev)
 import Nemo.Class.Game (class Game)
-import Nemo.Constants (scene)
 import Nemo.Data.Color (Color(..))
 import Nemo.Data.Emoji as E
 import Nemo.Data.Tone (Tone(..))
@@ -16,7 +15,7 @@ import Nemo.Parse (RawMap(..), RawSound(..))
 import Nemo.Sound.Action (play)
 import Nemo.Types (Size, X, Y)
 import Nemo.Update.Action (Update, isMapCollide)
-import Nemo.Utils (isMonitorCollide, mkAsset, defaultDebugConfig)
+import Nemo.Utils (defaultDebugConfig, defaultMonitorSize, isMonitorCollide, mkAsset)
 
 emoSize :: Size
 emoSize = 64
@@ -90,7 +89,7 @@ instance gameState :: Game State where
       isCollide :: X -> Y -> Update Boolean
       isCollide x y = do
         isMapColl <- isMapCollide 0 mapSize walls emoSize x y
-        let isMonitorColl = isMonitorCollide emoSize x y
+        let isMonitorColl = isMonitorCollide defaultMonitorSize emoSize x y
         pure $ isMapColl || isMonitorColl
 
   draw (State state) = do
@@ -111,11 +110,11 @@ instance gameState :: Game State where
 main :: Effect Unit
 main = do
   asset <- mkAsset [map0] [snd0]
-  nemoDev initialState asset defaultDebugConfig
+  nemoDev initialState asset defaultMonitorSize defaultDebugConfig
 
 initialState :: State 
 initialState = State
-  { x: scene.width / 2
+  { x: defaultMonitorSize.width / 2
   , y: mapSize
   , dy: 0
   , isJump: false

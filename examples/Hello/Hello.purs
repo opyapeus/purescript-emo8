@@ -8,7 +8,7 @@ import Nemo.Class.Game (class Game)
 import Nemo.Data.Color (Color(..))
 import Nemo.Data.Emoji as E
 import Nemo.Draw.Action (cls, emo)
-import Nemo.Utils (emptyAsset)
+import Nemo.Utils (defaultMonitorSize, emptyAsset)
 
 
 data Empty = Void 
@@ -23,5 +23,5 @@ instance gameState :: Game Empty where
   sound _ = pure unit
 
 main :: Effect Unit
-main = nemo Void emptyAsset
+main = nemo Void emptyAsset defaultMonitorSize
 

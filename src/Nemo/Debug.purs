@@ -14,14 +14,13 @@ import Data.Int (toNumber)
 import Effect (Effect)
 import Graphics.Canvas (fillText, restore, save, setFillStyle, setFont)
 import Nemo.Class.Game (class Game, update)
-import Nemo.Constants (scene)
 import Nemo.Data.Color (colorToCode)
 import Nemo.Data.DebugDisplay (DebugDisplay(..))
 import Nemo.Data.PressState (PressState(..), updatePressState)
 import Nemo.Data.SpecialInput (SpecialInput)
 import Nemo.Input (Input)
 import Nemo.Patch.TextBaseline (TextBaseline(..), setTextBaseline)
-import Nemo.Types (DebugConfig, DrawContext, Asset)
+import Nemo.Types (Asset, DebugConfig, DrawContext)
 import Nemo.Update.Interpreter (runUpdate)
 
 type DebugInput =
@@ -117,8 +116,8 @@ debugDraw dc ds dctx = do
       _ -> pure unit
   restore dctx.ctx
   where
-    xHalf = toNumber scene.width / 2.0
+    xHalf = toNumber dctx.monitorSize.width / 2.0
     yBase = case dc.debugDisplay of
       None -> 0.0 -- out of monitor
       LeftTop -> 64.0
-      LeftBottom -> toNumber scene.height
+      LeftBottom -> toNumber dctx.monitorSize.height
