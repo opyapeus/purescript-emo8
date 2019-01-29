@@ -18,7 +18,7 @@ instance gameState :: Game Empty where
 
   draw _ = do
     cls Maroon
-    emo E.hatchingChick 256 384 384
+    emo E.hatchingChick 128 192 192
 
   sound _ = pure unit
 

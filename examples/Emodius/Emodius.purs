@@ -94,23 +94,23 @@ instance gameState :: Game State where
 
     draw TitleState = do
         cls Aqua
-        emor' 30 E.helicopter 384 100 100
-        emo E.spiderWeb 512 400 400
-        emor (-15) E.octopus 256 600 600
-        emo E.pill 128 250 800
-        emor 75 E.pill 128 200 600
-        emo E.fastForwardButton 128 700 200
+        emor' 30 E.helicopter 192 50 50
+        emo E.spiderWeb 256 200 200
+        emor (-15) E.octopus 128 300 300
+        emo E.pill 64 150 400
+        emor 75 E.pill 64 100 300
+        emo E.fastForwardButton 64 350 100
     draw OverState = do
         cls Maroon
-        emo E.hole 512 250 300
-        emor 160 E.helicopter 256 350 400
-        emo E.recyclingSymbol 256 375 700
+        emo E.hole 256 125 150
+        emor 160 E.helicopter 128 175 200
+        emo E.recyclingSymbol 128 185 350
     draw ClearState = do
         cls Lime
-        emor 15 E.helicopter 128 700 800
-        emor (-15) E.octopus 256 350 350
-        emo E.globeWithMeridians 512 150 150
-        emo E.thumbsUp 128 200 800
+        emor 15 E.helicopter 64 350 400
+        emor (-15) E.octopus 128 175 175
+        emo E.globeWithMeridians 256 75 75
+        emo E.thumbsUp 64 100 400
     draw (PlayState s) = do
         cls Aqua
         drawScrollMap s.distance

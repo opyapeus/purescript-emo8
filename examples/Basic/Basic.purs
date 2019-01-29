@@ -18,10 +18,10 @@ import Nemo.Update.Action (Update, isMapCollide)
 import Nemo.Utils (defaultDebugConfig, defaultMonitorSize, isMonitorCollide, mkAsset)
 
 emoSize :: Size
-emoSize = 64
+emoSize = 32
 
 mapSize :: Size
-mapSize = 64
+mapSize = 32
 
 gravity :: Int
 gravity = 2
@@ -47,14 +47,14 @@ instance gameState :: Game State where
   update input (State state) = do
     -- next x
     let nx = case input.isLeft, input.isRight of
-          true, false -> state.x - 10
-          false, true-> state.x + 10
+          true, false -> state.x - 5
+          false, true-> state.x + 5
           _, _ -> state.x
 
     -- next y, dy
     canJump <- isCollide state.x (state.y - gravity)
     let isJump = canJump && input.isUpCat
-        ddy = if isJump then 40 else 0
+        ddy = if isJump then 25 else 0
         ndy = state.dy - gravity + ddy
         ny = state.y + ndy
 

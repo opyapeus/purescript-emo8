@@ -55,12 +55,12 @@ updatePos :: Input -> Pos -> Pos
 updatePos i p = { x: nx, y: ny }
     where
         nx = case i.isLeft, i.isRight of
-                true, false -> p.x - 5
-                false, true -> p.x + 5
+                true, false -> p.x - 4
+                false, true -> p.x + 4
                 _, _ -> p.x
         ny = case i.isUp, i.isDown of
-                true, false -> p.y + 5
-                false, true -> p.y - 5
+                true, false -> p.y + 4
+                false, true -> p.y - 4
                 _, _ -> p.y
 
 addBullet :: Input -> Player -> Array Bullet
