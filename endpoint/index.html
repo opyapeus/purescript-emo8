@@ -7,8 +7,12 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <!-- to prevent y bounce for mobile -->
-    <script src="patch/inobounce.js"></script>
+    <script src="inobounce.js"></script>
     <style>
+        html, body, .wrap {
+            height: 100%
+        }
+
         body {
             padding: 0;
             margin: 0;
@@ -16,7 +20,6 @@
         }
 
         .wrap {
-            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -34,14 +37,12 @@
         <canvas id="scene"></canvas>
     </div>
 
-    <!-- tmp -->
+    <script src="app.js"></script>
+    <!-- half size for retina -->
     <script>
-        var urlHash = location.hash;
-        if (urlHash) {
-            var script = document.createElement('script');
-            script.src = 'js/' + urlHash.replace('#', '') + '.js';
-            document.body.appendChild(script);
-        }
+        const canvas = document.getElementById('scene');
+        canvas.style.width = (canvas.width / devicePixelRatio).toString() + 'px';
+        canvas.style.height = (canvas.height / devicePixelRatio).toString() + 'px';
     </script>
 </body>
 
