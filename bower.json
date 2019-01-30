@@ -21,9 +21,9 @@
     "purescript-stringutils": "^0.0.8",
     "purescript-webaudio": "^0.1.2",
     "purescript-generics-rep": "^6.0.0",
-    "purescript-emoji-splitter": "^0.1.0",
+    "purescript-emoji-splitter": "^0.2.0",
     "purescript-free": "^5.1.0",
-    "purescript-pseudo-random": "^0.1.0"
+    "purescript-pseudo-random": "^0.2.1"
   },
   "devDependencies": {
     "purescript-psci-support": "^4.0.0",
