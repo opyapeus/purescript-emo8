@@ -39,7 +39,6 @@ PICO-8は、ドット絵や容量など厳しい制約がありますが、そ�
 ## 仕様
 
 - 言語: PureScript
-- 画面サイズ: 1024x1024
 - 絵文字: ユニコード絵文字各種 ※[Supported Emojis](docs/emoji.md)
 - 背景色: HTML基本カラー16色
 - コントローラ: キーボード（PC）、スワイプ（スマホ、タブレット）
@@ -57,31 +56,23 @@ PICO-8は、ドット絵や容量など厳しい制約がありますが、そ�
 ### インストール
 
 ```sh
-npm i
-bower i
+yarn
+yarn postinstall
 ```
 
 ### ビルド
 
-※ もしwarningでビルドできない場合は、`pulp build`します。
-
 ```sh
-npm run build
-npm run build:examples
+yarn build
+yarn example
 ```
 
-ブラウザでhtml（publicフォルダ）を開く
+ブラウザでhtml（distフォルダ）を開く
 
 ```sh
-npm run open
-```
-
-タグを指定してアクセス
-
-```url
-public/index.html#hello
-public/index.html#basic
-public/index.html#emodius
+open dist/hello/index.html
+open dist/basic/index.html
+open dist/emodius/index.html
 ```
 
 ## オンラインで遊ぶ

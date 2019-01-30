@@ -39,7 +39,6 @@ In the same way, if there are restrictions that only emojis can be used, there i
 ## Specification
 
 - Language: PureScript
-- Monitor Size: 1024x1024
 - Emoji: unicode emojis ※[Supported Emojis](docs/emoji.md)
 - Color: 16 html base colors
 - Input Interface: Keyboard (PC), Swipe (SP, Tablet)
@@ -57,31 +56,23 @@ clone this repository first.
 install
 
 ```sh
-npm i
-bower i
+yarn
+yarn postinstall
 ```
 
 build
 
-※ if you can not build with warning, please `pulp build` once.
-
 ```sh
-npm run build
-npm run build:examples
+yarn build
+yarn example
 ```
 
-open html (public folder) on browser
+open html (dist folder) on browser
 
 ```sh
-npm run open
-```
-
-access with tag (it may need reload)
-
-```url
-public/index.html#hello
-public/index.html#basic
-public/index.html#emodius
+open dist/hello/index.html
+open dist/basic/index.html
+open dist/emodius/index.html
 ```
 
 ## Play Online
