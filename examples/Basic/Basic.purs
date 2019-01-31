@@ -9,7 +9,7 @@ import Effect (Effect)
 import FFI.LocalStorage (LocalKey(..))
 import Foreign.Class (class Decode, class Encode)
 import Foreign.Generic (defaultOptions, genericDecode, genericEncode)
-import Nemo (nemoDev')
+import Nemo (nemoDev)
 import Nemo.Class.Game (class Game)
 import Nemo.Class.GameDev (class GameDev, loadStateWithDefault)
 import Nemo.Data.Color (Color(..))
@@ -137,7 +137,7 @@ main :: Effect Unit
 main = do
   s <- loadStateWithDefault initialState localKeys.jumped
   asset <- mkAsset [map0] [snd0]
-  nemoDev' s asset defaultMonitorSize
+  nemoDev s asset defaultMonitorSize
 
 initialState :: State 
 initialState = State

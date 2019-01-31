@@ -3,8 +3,6 @@ module Nemo.Types where
 import Audio.WebAudio.Types (AudioContext)
 import Graphics.Canvas (Context2D)
 import Nemo.Data.Audio (Efct, Note, Octave, Vol)
-import Nemo.Data.Color (Color)
-import Nemo.Data.DebugDisplay (DebugDisplay)
 import Nemo.Data.Emoji (Emoji)
 
 type MonitorSize =
@@ -54,8 +52,3 @@ type Bpm = Int
 
 type MapId = Int
 type SoundId = Int
-
-type DebugConfig =
-  { debugDisplay :: DebugDisplay
-  , color :: Color
-  }
