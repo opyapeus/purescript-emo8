@@ -28,46 +28,46 @@ import Signal.Effect (foldEffect)
 
 -- | Run game function.
 nemo :: forall s. Game s => s -> Asset -> MonitorSize -> Effect Unit
-nemo state asset ms = do
-  mcanvas <- getCanvasElementById canvasId
-  case mcanvas of
-    Just canvas -> do
-      setDim canvas ms
-      context <- getContext2D canvas
-      audCtx <- newAudioContext
-      let drawCtx = { ctx: context, mapData: asset.mapData, monitorSize: ms }
-      let soundCtx = { ctx: audCtx, soundData: asset.soundData }
+nemo state asset ms = withCanvas \canvas -> do
+  setDim canvas ms
+  context <- getContext2D canvas
+  audCtx <- newAudioContext
+  let drawCtx = { ctx: context, mapData: asset.mapData, monitorSize: ms }
+  let soundCtx = { ctx: audCtx, soundData: asset.soundData }
 
-      startupView ms context
-      _ <- setTimeout showStartupViewTime $ do
-        frameSig <- animationFrame
-        keyTouchInputSig <- pollKeyTouchInput
-        let keyTouchInputSampleSig = sampleOn frameSig keyTouchInputSig
-        let inputSampleSig = mkInputSig keyTouchInputSampleSig
-        stateSig <- foldEffect (\i -> runUpdate asset <<< update i) state inputSampleSig
-        runSignal $ runDraw drawCtx <$> draw <$> stateSig
-        runSignal $ runSound soundCtx <$> sound <$> stateSig
-      pure unit
-    Nothing -> throw $ joinWith " " ["canvas id:", canvasId, "was not found."]
+  startupView ms context
+  _ <- setTimeout showStartupViewTime $ do
+    frameSig <- animationFrame
+    keyTouchInputSig <- pollKeyTouchInput
+    let keyTouchInputSampleSig = sampleOn frameSig keyTouchInputSig
+    let inputSampleSig = mkInputSig keyTouchInputSampleSig
+    stateSig <- foldEffect (\i -> runUpdate asset <<< update i) state inputSampleSig
+    runSignal $ runDraw drawCtx <$> draw <$> stateSig
+    runSignal $ runSound soundCtx <$> sound <$> stateSig
+  pure unit
 
 nemoDev :: forall s. GameDev s => s -> Asset -> MonitorSize -> Effect Unit
-nemoDev state asset ms = do
-  mcanvas <- getCanvasElementById canvasId
-  case mcanvas of
-    Just canvas -> do
-      setDim canvas ms
-      context <- getContext2D canvas
-      audCtx <- newAudioContext
-      let drawCtx = { ctx: context, mapData: asset.mapData, monitorSize: ms }
-      let soundCtx = { ctx: audCtx, soundData: asset.soundData }
-      frameSig <- animationFrame
-      keyTouchInputSig <- pollKeyTouchInput
-      let keyTouchInputSampleSig = sampleOn frameSig keyTouchInputSig
-      let inputSampleSig = mkInputSig keyTouchInputSampleSig
-      stateSig <- foldEffect (\i -> runUpdate asset <<< update i) state inputSampleSig
-      runSignal $ runDraw drawCtx <$> draw <$> stateSig
-      runSignal $ runSound soundCtx <$> sound <$> stateSig
-      runSignal $ saveState <$> stateSig
+nemoDev state asset ms = withCanvas \canvas -> do
+  setDim canvas ms
+  context <- getContext2D canvas
+  audCtx <- newAudioContext
+  let drawCtx = { ctx: context, mapData: asset.mapData, monitorSize: ms }
+  let soundCtx = { ctx: audCtx, soundData: asset.soundData }
+
+  frameSig <- animationFrame
+  keyTouchInputSig <- pollKeyTouchInput
+  let keyTouchInputSampleSig = sampleOn frameSig keyTouchInputSig
+  let inputSampleSig = mkInputSig keyTouchInputSampleSig
+  stateSig <- foldEffect (\i -> runUpdate asset <<< update i) state inputSampleSig
+  runSignal $ runDraw drawCtx <$> draw <$> stateSig
+  runSignal $ runSound soundCtx <$> sound <$> stateSig
+  runSignal $ saveState <$> stateSig
+
+withCanvas :: (CanvasElement -> Effect Unit) -> Effect Unit
+withCanvas op = do
+  mCanvas <- getCanvasElementById canvasId
+  case mCanvas of
+    Just c -> op c
     Nothing -> throw $ joinWith " " ["canvas id:", canvasId, "was not found."]
 
 setDim :: CanvasElement -> MonitorSize -> Effect Unit
