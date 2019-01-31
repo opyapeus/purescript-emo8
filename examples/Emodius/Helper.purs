@@ -70,5 +70,5 @@ isCollideScrollMap distance o =
 
 isInputCatchAny :: Input -> Boolean
 isInputCatchAny i
-    = i.isWCat || i.isSCat || i.isACat || i.isDCat
-   || i.isUpCat || i.isDownCat || i.isLeftCat || i.isRightCat
+    = i.catched.isW || i.catched.isS || i.catched.isA || i.catched.isD
+   || i.catched.isUp || i.catched.isDown || i.catched.isLeft || i.catched.isRight

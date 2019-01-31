@@ -8,8 +8,8 @@ import Prelude
 
 import Effect (Effect)
 import Nemo.Data.KeyInput (KeyInput, pollKeyInput)
-import Nemo.Data.TouchInput (TouchInput, pollTouchInput)
 import Nemo.Data.PressState (PressState(..), updatePressState)
+import Nemo.Data.TouchInput (TouchInput, pollTouchInput)
 import Signal (Signal, foldp)
 
 type Input =
@@ -21,22 +21,26 @@ type Input =
   , isA :: Boolean
   , isS :: Boolean
   , isD :: Boolean
-  , isLeftCat :: Boolean
-  , isRightCat :: Boolean
-  , isUpCat :: Boolean
-  , isDownCat :: Boolean
-  , isWCat :: Boolean
-  , isACat :: Boolean
-  , isSCat :: Boolean
-  , isDCat :: Boolean
-  , isLeftRel :: Boolean
-  , isRightRel :: Boolean
-  , isUpRel :: Boolean
-  , isDownRel :: Boolean
-  , isWRel :: Boolean
-  , isARel :: Boolean
-  , isSRel :: Boolean
-  , isDRel :: Boolean
+  , catched :: 
+    { isLeft :: Boolean
+    , isRight :: Boolean
+    , isUp :: Boolean
+    , isDown :: Boolean
+    , isW :: Boolean
+    , isA :: Boolean
+    , isS :: Boolean
+    , isD :: Boolean
+    }
+  , released ::
+    { isLeft :: Boolean
+    , isRight :: Boolean
+    , isUp :: Boolean
+    , isDown :: Boolean
+    , isW :: Boolean
+    , isA :: Boolean
+    , isS :: Boolean
+    , isD :: Boolean
+    }
   }
 
 type InputState =
@@ -119,21 +123,28 @@ mkInput s =
   , isA: isOn s.aState
   , isS: isOn s.sState
   , isD: isOn s.dState
-  , isLeftCat: s.leftState == Catched
-  , isRightCat: s.rightState == Catched
-  , isUpCat: s.upState == Catched
-  , isDownCat: s.downState == Catched
-  , isWCat: s.wState == Catched
-  , isACat: s.aState == Catched
-  , isSCat: s.sState == Catched
-  , isDCat: s.dState == Catched
-  , isLeftRel: s.leftState == Released
-  , isRightRel: s.rightState == Released
-  , isUpRel: s.upState == Released
-  , isDownRel: s.downState == Released
-  , isWRel: s.wState == Released
-  , isARel: s.aState == Released
-  , isSRel: s.sState == Released
-  , isDRel: s.dState == Released
+  , catched:
+    { isLeft: isCatched s.leftState
+    , isRight: isCatched s.rightState
+    , isUp: isCatched s.upState
+    , isDown: isCatched s.downState
+    , isW: isCatched s.wState
+    , isA: isCatched s.aState
+    , isS: isCatched s.sState
+    , isD: isCatched s.dState
+    }
+  , released:
+    { isLeft: isReleased s.leftState
+    , isRight: isReleased s.rightState
+    , isUp: isReleased s.upState
+    , isDown: isReleased s.downState
+    , isW: isReleased s.wState
+    , isA: isReleased s.aState
+    , isS: isReleased s.sState
+    , isD: isReleased s.dState
+    }
   }
-  where isOn ps = ps == Catched || ps == Pressed
+  where
+    isOn ps = ps == Catched || ps == Pressed
+    isCatched = (==) Catched
+    isReleased = (==) Released
