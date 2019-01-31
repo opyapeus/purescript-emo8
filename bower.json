@@ -23,7 +23,8 @@
     "purescript-generics-rep": "^6.0.0",
     "purescript-emoji-splitter": "^0.2.0",
     "purescript-free": "^5.1.0",
-    "purescript-pseudo-random": "^0.2.1"
+    "purescript-pseudo-random": "^0.2.1",
+    "purescript-foreign-generic": "^8.0.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^4.0.0",

@@ -2,11 +2,16 @@ module Basic where
 
 import Prelude
 
+import Data.Array (catMaybes)
 import Data.Generic.Rep (class Generic)
-import Data.Generic.Rep.Show (genericShow)
+import Data.Maybe (Maybe(..))
 import Effect (Effect)
-import Nemo (nemoDev)
+import FFI.LocalStorage (LocalKey(..))
+import Foreign.Class (class Decode, class Encode)
+import Foreign.Generic (defaultOptions, genericDecode, genericEncode)
+import Nemo (nemoDev')
 import Nemo.Class.Game (class Game)
+import Nemo.Class.GameDev (class GameDev, loadStateWithDefault)
 import Nemo.Data.Color (Color(..))
 import Nemo.Data.Emoji as E
 import Nemo.Data.Tone (Tone(..))
@@ -15,7 +20,7 @@ import Nemo.Parse (RawMap(..), RawSound(..))
 import Nemo.Sound.Action (play)
 import Nemo.Types (Size, X, Y)
 import Nemo.Update.Action (Update, isMapCollide)
-import Nemo.Utils (defaultDebugConfig, defaultMonitorSize, isMonitorCollide, mkAsset)
+import Nemo.Utils (defaultMonitorSize, isMonitorCollide, mkAsset)
 
 emoSize :: Size
 emoSize = 32
@@ -34,14 +39,8 @@ data State = State
   , appear :: Appear
   , frame :: Int
   }
-derive instance genericState :: Generic State _
-instance showState :: Show State where
-  show = genericShow
 
 data Appear = LeftWalk | RightWalk | LeftRun | RightRun
-derive instance genericAppear :: Generic Appear _
-instance showAppear :: Show Appear where
-  show = genericShow
 
 instance gameState :: Game State where
   update input (State state) = do
@@ -107,10 +106,38 @@ instance gameState :: Game State where
     when state.isJump $
       play 0 Saw 4096
 
+derive instance genericAppear :: Generic Appear _
+instance encodeAppear :: Encode Appear where
+  encode = genericEncode defaultOptions
+instance decodeAppear :: Decode Appear where
+  decode = genericDecode defaultOptions
+
+derive instance genericState :: Generic State _
+instance decodeState :: Decode State where
+  decode = genericDecode defaultOptions
+instance encodeState :: Encode State where
+  encode = genericEncode defaultOptions
+
+instance gameDevState :: GameDev State where
+  saveLocal (State s) = catMaybes
+    [ if mod s.frame 60 == 0 then Just localKeys.per60frame else Nothing
+    , if s.isJump then Just localKeys.jumped else Nothing
+    ]
+
+localKeys ::
+  { jumped :: LocalKey
+  , per60frame :: LocalKey
+  }
+localKeys =
+  { jumped: LocalKey "jumped"
+  , per60frame: LocalKey "per60frame"
+  }
+
 main :: Effect Unit
 main = do
+  s <- loadStateWithDefault initialState localKeys.jumped
   asset <- mkAsset [map0] [snd0]
-  nemoDev initialState asset defaultMonitorSize defaultDebugConfig
+  nemoDev' s asset defaultMonitorSize
 
 initialState :: State 
 initialState = State

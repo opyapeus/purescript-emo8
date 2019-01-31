@@ -1,6 +1,6 @@
 module Nemo
   ( nemo
-  , nemoDev
+  , nemoDev'
   ) where
 
 import Prelude
@@ -15,6 +15,7 @@ import Effect.Exception (throw)
 import Effect.Timer (setTimeout)
 import Graphics.Canvas (CanvasElement, getCanvasElementById, getContext2D, setCanvasHeight, setCanvasWidth)
 import Nemo.Class.Game (class Game, draw, sound, update)
+import Nemo.Class.GameDev (class GameDev, saveState)
 import Nemo.Constants (canvasId)
 import Nemo.Data.SpecialInput (pollSpecialInputs)
 import Nemo.Debug (debugDraw, initDebugState, providedSave, providedUpdate, updateThenRunDebugState, withDebugInput)
@@ -50,6 +51,26 @@ nemo state asset ms = do
         runSignal $ runDraw drawCtx <$> draw <$> stateSig
         runSignal $ runSound soundCtx <$> sound <$> stateSig
       pure unit
+    Nothing -> throw $ joinWith " " ["canvas id:", canvasId, "was not found."]
+
+nemoDev' :: forall s. GameDev s => s -> Asset -> MonitorSize -> Effect Unit
+nemoDev' state asset ms = do
+  mcanvas <- getCanvasElementById canvasId
+  case mcanvas of
+    Just canvas -> do
+      setDim canvas ms
+      context <- getContext2D canvas
+      audCtx <- newAudioContext
+      let drawCtx = { ctx: context, mapData: asset.mapData, monitorSize: ms }
+      let soundCtx = { ctx: audCtx, soundData: asset.soundData }
+      frameSig <- animationFrame
+      keyTouchInputSig <- pollKeyTouchInput
+      let keyTouchInputSampleSig = sampleOn frameSig keyTouchInputSig
+      let inputSampleSig = mkInputSig keyTouchInputSampleSig
+      stateSig <- foldEffect (\i -> runUpdate asset <<< update i) state inputSampleSig
+      runSignal $ runDraw drawCtx <$> draw <$> stateSig
+      runSignal $ runSound soundCtx <$> sound <$> stateSig
+      runSignal $ saveState <$> stateSig
     Nothing -> throw $ joinWith " " ["canvas id:", canvasId, "was not found."]
 
 -- | Run game function for developing.
