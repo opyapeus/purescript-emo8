@@ -6,9 +6,9 @@ import Class.Object (class ObjectDraw, class Object, position, size)
 import Constants (emoSize, speed)
 import Data.EnemyBullet (EnemyBullet(..))
 import Data.Player (Player(..))
-import Nemo.Data.Emoji as E
-import Nemo.Draw.Action (emo)
-import Nemo.Utils (defaultMonitorSize)
+import Emo8.Data.Emoji as E
+import Emo8.Draw.Action (emo)
+import Emo8.Utils (defaultMonitorSize)
 import Types (Pos)
 
 

@@ -4,8 +4,8 @@ import Prelude
 
 import Data.Either (Either(..), isLeft)
 import Effect (Effect)
-import Nemo.Data.Audio (Efct(..), Note(..), Octave(..), Vol(..))
-import Nemo.Parse (RawSound(..), parseSound)
+import Emo8.Data.Audio (Efct(..), Note(..), Octave(..), Vol(..))
+import Emo8.Parse (RawSound(..), parseSound)
 import Test.Unit (suite, test)
 import Test.Unit.Assert (equal)
 import Test.Unit.Main (runTest)

@@ -6,11 +6,11 @@ import Class.Object (class Object, position, size)
 import Collision (isCollMap, isCollWorld)
 import Constants (mapSize)
 import Data.Player (Player(..))
-import Nemo.Draw.Action (Draw, emap)
-import Nemo.Input (Input)
-import Nemo.Types (MapId, X)
-import Nemo.Update.Action (Update)
-import Nemo.Utils (defaultMonitorSize)
+import Emo8.Draw.Action (Draw, emap)
+import Emo8.Input (Input)
+import Emo8.Types (MapId, X)
+import Emo8.Update.Action (Update)
+import Emo8.Utils (defaultMonitorSize)
 
 beInMonitor :: Player -> Player -> Player
 beInMonitor p np@(Player ns) = Player $ ns { pos = { x: npx, y: npy } }

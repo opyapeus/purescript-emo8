@@ -5,10 +5,10 @@ import Prelude
 import Class.Object (class Object, class ObjectDraw, position, size)
 import Constants (emoSize)
 import Data.Bullet (Bullet(..))
-import Nemo.Data.Emoji as E
-import Nemo.Draw.Action (emo', emor')
-import Nemo.Input (Input)
-import Nemo.Utils (defaultMonitorSize)
+import Emo8.Data.Emoji as E
+import Emo8.Draw.Action (emo', emor')
+import Emo8.Input (Input)
+import Emo8.Utils (defaultMonitorSize)
 import Types (Pos)
 
 

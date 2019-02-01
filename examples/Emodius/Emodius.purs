@@ -15,12 +15,12 @@ import Data.Particle (Particle, initParticle, updateParticle)
 import Data.Player (Player, addBullet, initialPlayer, updatePlayer)
 import Effect (Effect)
 import Helper (beInMonitor, drawScrollMap, isCollideScrollMap, isInputCatchAny)
-import Nemo (nemo)
-import Nemo.Class.Game (class Game)
-import Nemo.Data.Color (Color(..))
-import Nemo.Data.Emoji as E
-import Nemo.Draw.Action (cls, emo, emor, emor')
-import Nemo.Utils (defaultMonitorSize, mkAsset)
+import Emo8 (emo8)
+import Emo8.Class.Game (class Game)
+import Emo8.Data.Color (Color(..))
+import Emo8.Data.Emoji as E
+import Emo8.Draw.Action (cls, emo, emor, emor')
+import Emo8.Utils (defaultMonitorSize, mkAsset)
 
 data State
     = TitleState
@@ -140,4 +140,4 @@ main = do
     asset <- mkAsset
         [map0, map1, map2, map3]
         []
-    nemo initialState asset defaultMonitorSize
+    emo8 initialState asset defaultMonitorSize

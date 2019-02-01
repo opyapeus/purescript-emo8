@@ -9,18 +9,18 @@ import Effect (Effect)
 import FFI.LocalStorage (LocalKey(..))
 import Foreign.Class (class Decode, class Encode)
 import Foreign.Generic (defaultOptions, genericDecode, genericEncode)
-import Nemo (nemoDev)
-import Nemo.Class.Game (class Game)
-import Nemo.Class.GameDev (class GameDev, loadStateWithDefault)
-import Nemo.Data.Color (Color(..))
-import Nemo.Data.Emoji as E
-import Nemo.Data.Tone (Tone(..))
-import Nemo.Draw.Action (cls, emap, emo, emo')
-import Nemo.Parse (RawMap(..), RawSound(..))
-import Nemo.Sound.Action (play)
-import Nemo.Types (Size, X, Y)
-import Nemo.Update.Action (Update, isMapCollide)
-import Nemo.Utils (defaultMonitorSize, isMonitorCollide, mkAsset)
+import Emo8 (emo8Dev)
+import Emo8.Class.Game (class Game)
+import Emo8.Class.GameDev (class GameDev, loadStateWithDefault)
+import Emo8.Data.Color (Color(..))
+import Emo8.Data.Emoji as E
+import Emo8.Data.Tone (Tone(..))
+import Emo8.Draw.Action (cls, emap, emo, emo')
+import Emo8.Parse (RawMap(..), RawSound(..))
+import Emo8.Sound.Action (play)
+import Emo8.Types (Size, X, Y)
+import Emo8.Update.Action (Update, isMapCollide)
+import Emo8.Utils (defaultMonitorSize, isMonitorCollide, mkAsset)
 
 emoSize :: Size
 emoSize = 32
@@ -137,7 +137,7 @@ main :: Effect Unit
 main = do
   s <- loadStateWithDefault initialState localKeys.jumped
   asset <- mkAsset [map0] [snd0]
-  nemoDev s asset defaultMonitorSize
+  emo8Dev s asset defaultMonitorSize
 
 initialState :: State 
 initialState = State

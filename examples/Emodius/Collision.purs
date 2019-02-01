@@ -3,9 +3,9 @@ module Collision where
 import Asset (walls)
 import Class.Object (class Object, position, size)
 import Control.Monad.Gen (Size)
-import Nemo.Types (MapId)
-import Nemo.Update.Action (Update, isMapCollide)
-import Nemo.Utils (defaultMonitorSize, isCollide, isMonitorCollide, isOutOfMonitor)
+import Emo8.Types (MapId)
+import Emo8.Update.Action (Update, isMapCollide)
+import Emo8.Utils (defaultMonitorSize, isCollide, isMonitorCollide, isOutOfMonitor)
 import Types (Pos)
 
 

@@ -2,7 +2,7 @@ module Class.Object where
   
 import Prelude
 
-import Nemo.Draw.Action (Draw)
+import Emo8.Draw.Action (Draw)
 import Types (Pos)
   
 class Object s where

@@ -4,8 +4,8 @@ import Prelude
 
 import Class.Object (class ObjectDraw, class Object, position, size)
 import Constants (emoSize)
-import Nemo.Data.Emoji as E
-import Nemo.Draw.Action (emor)
+import Emo8.Data.Emoji as E
+import Emo8.Draw.Action (emor)
 import Types (Pos)
 
 
