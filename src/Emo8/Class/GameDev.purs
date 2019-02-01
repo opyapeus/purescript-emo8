@@ -8,11 +8,11 @@ import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.Traversable (for_)
 import Effect (Effect)
-import FFI.LocalStorage (LocalKey, getItem, setItem)
+import Emo.FFI.LocalStorage (LocalKey, getItem, setItem)
+import Emo8.Class.Game (class Game)
 import Foreign (MultipleErrors)
 import Foreign.Class (class Decode, class Encode)
 import Foreign.Generic (decodeJSON, encodeJSON)
-import Emo8.Class.Game (class Game)
 
 class (Game s, Encode s, Decode s) <= GameDev s where
     saveLocal :: s -> Array LocalKey
