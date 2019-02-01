@@ -15,9 +15,10 @@ import Effect.Timer (setTimeout)
 import Graphics.Canvas (CanvasElement, getCanvasElementById, getContext2D, setCanvasHeight, setCanvasWidth)
 import Nemo.Class.Game (class Game, draw, sound, update)
 import Nemo.Class.GameDev (class GameDev, saveState)
+import Nemo.Class.Input (poll)
 import Nemo.Constants (canvasId)
 import Nemo.Draw.Interpreter (runDraw)
-import Nemo.Input (mkInputSig, pollKeyTouchInput)
+import Nemo.Input (mkInputSig)
 import Nemo.Sound.Interpreter (runSound)
 import Nemo.Startup (startupView, showStartupViewTime)
 import Nemo.Types (Asset, MonitorSize)
@@ -38,7 +39,7 @@ nemo state asset ms = withCanvas \canvas -> do
   startupView ms context
   _ <- setTimeout showStartupViewTime $ do
     frameSig <- animationFrame
-    keyTouchInputSig <- pollKeyTouchInput
+    keyTouchInputSig <- poll
     let keyTouchInputSampleSig = sampleOn frameSig keyTouchInputSig
     let inputSampleSig = mkInputSig keyTouchInputSampleSig
     stateSig <- foldEffect (\i -> runUpdate asset <<< update i) state inputSampleSig
@@ -55,7 +56,7 @@ nemoDev state asset ms = withCanvas \canvas -> do
   let soundCtx = { ctx: audCtx, soundData: asset.soundData }
 
   frameSig <- animationFrame
-  keyTouchInputSig <- pollKeyTouchInput
+  keyTouchInputSig <- poll
   let keyTouchInputSampleSig = sampleOn frameSig keyTouchInputSig
   let inputSampleSig = mkInputSig keyTouchInputSampleSig
   stateSig <- foldEffect (\i -> runUpdate asset <<< update i) state inputSampleSig

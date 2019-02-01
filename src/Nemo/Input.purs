@@ -1,15 +1,12 @@
 module Nemo.Input
   ( Input
-  , pollKeyTouchInput
   , mkInputSig
   ) where
 
 import Prelude
 
-import Effect (Effect)
-import Nemo.Data.KeyInput (KeyInput, pollKeyInput)
+import Nemo.Data.KeyTouchInput (KeyTouchInput(..))
 import Nemo.Data.PressState (PressState(..), updatePressState)
-import Nemo.Data.TouchInput (TouchInput, pollTouchInput)
 import Signal (Signal, foldp)
 
 type Input =
@@ -43,6 +40,7 @@ type Input =
     }
   }
 
+-- NOTE: update after sampleOn not to miss catch and release state
 type InputState =
   { leftState :: PressState
   , rightState :: PressState
@@ -52,35 +50,6 @@ type InputState =
   , aState :: PressState
   , sState :: PressState
   , dState :: PressState
-  }
-
-type KeyTouchInput =
-  { isLeft :: Boolean
-  , isRight :: Boolean
-  , isUp :: Boolean
-  , isDown :: Boolean
-  , isW :: Boolean
-  , isA :: Boolean
-  , isS :: Boolean
-  , isD :: Boolean
-  }
-
-pollKeyTouchInput :: Effect (Signal KeyTouchInput)
-pollKeyTouchInput = do
-  keyInput <- pollKeyInput
-  touchInput <- pollTouchInput
-  pure $ mergeInput <$> keyInput <*> touchInput
-
-mergeInput :: KeyInput -> TouchInput -> KeyTouchInput
-mergeInput k t =
-  { isLeft : k.isLeft || t.isLeft
-  , isRight : k.isRight || t.isRight
-  , isUp : k.isUp || t.isUp
-  , isDown : k.isDown || t.isDown
-  , isW : k.isW || t.isW
-  , isA : k.isA || t.isA
-  , isS : k.isS || t.isS
-  , isD : k.isD || t.isD
   }
 
 mkInputSig :: Signal KeyTouchInput -> Signal Input
@@ -102,7 +71,7 @@ initialInputState =
   }
 
 updateInputState :: KeyTouchInput -> InputState -> InputState
-updateInputState i s =
+updateInputState (KeyTouchInput i) s =
   { leftState: updatePressState i.isLeft s.leftState
   , rightState: updatePressState i.isRight s.rightState
   , upState: updatePressState i.isUp s.upState
