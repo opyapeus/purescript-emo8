@@ -6,23 +6,25 @@ module Emo8
 import Prelude
 
 import Audio.WebAudio.BaseAudioContext (newAudioContext)
+import Data.Bitraversable (bitraverse)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(..))
 import Data.String (joinWith)
 import Effect (Effect)
 import Effect.Exception (throw)
-import Effect.Timer (setTimeout)
-import Graphics.Canvas (CanvasElement, getCanvasElementById, getContext2D, setCanvasHeight, setCanvasWidth)
+import Emo8.Boot (initialState)
 import Emo8.Class.Game (class Game, draw, sound, update)
 import Emo8.Class.GameDev (class GameDev, saveState)
 import Emo8.Class.Input (poll)
 import Emo8.Constants (canvasId)
+import Emo8.Data.GameWithBoot (GameWithBoot(..), switchOp)
 import Emo8.Draw.Interpreter (runDraw)
 import Emo8.Input (mkInputSig)
 import Emo8.Sound.Interpreter (runSound)
-import Emo8.Startup (startupView, showStartupViewTime)
 import Emo8.Types (Asset, MonitorSize)
 import Emo8.Update.Interpreter (runUpdate)
+import Emo8.Utils (emptyAsset)
+import Graphics.Canvas (CanvasElement, getCanvasElementById, getContext2D, setCanvasHeight, setCanvasWidth)
 import Signal (runSignal, sampleOn)
 import Signal.DOM (animationFrame)
 import Signal.Effect (foldEffect)
@@ -34,18 +36,30 @@ emo8 state asset ms = withCanvas \canvas -> do
   context <- getContext2D canvas
   audCtx <- newAudioContext
   let drawCtx = { ctx: context, mapData: asset.mapData, monitorSize: ms }
-  let soundCtx = { ctx: audCtx, soundData: asset.soundData }
+      soundCtx = { ctx: audCtx, soundData: asset.soundData }
+      bootState = initialState ms
+      bootAsset = emptyAsset
+      bootDrawCtx = { ctx: context, mapData: bootAsset.mapData, monitorSize: ms }
+      bootSoundCtx = { ctx: audCtx, soundData: bootAsset.soundData }
 
-  startupView ms context
-  _ <- setTimeout showStartupViewTime $ do
-    frameSig <- animationFrame
-    keyTouchInputSig <- poll
-    let keyTouchInputSampleSig = sampleOn frameSig keyTouchInputSig
-    let inputSampleSig = mkInputSig keyTouchInputSampleSig
-    stateSig <- foldEffect (\i -> runUpdate asset <<< update i) state inputSampleSig
-    runSignal $ runDraw drawCtx <$> draw <$> stateSig
-    runSignal $ runSound soundCtx <$> sound <$> stateSig
-  pure unit
+  frameSig <- animationFrame
+  keyTouchInputSig <- poll
+  let keyTouchInputSampleSig = sampleOn frameSig keyTouchInputSig
+      inputSampleSig = mkInputSig keyTouchInputSampleSig
+      biState = GameWithBoot state bootState 
+  biStateSig <- foldEffect
+    (\i -> bitraverse
+      (runUpdate asset <<< update i)
+      (runUpdate bootAsset <<< update i)
+    ) biState inputSampleSig
+  runSignal $ switchOp
+    (runDraw drawCtx <<< draw)
+    (runDraw bootDrawCtx <<< draw)
+    biStateSig
+  runSignal $ switchOp
+    (runSound soundCtx <<< sound)
+    (runSound bootSoundCtx <<< sound)
+    biStateSig
 
 emo8Dev :: forall s. GameDev s => s -> Asset -> MonitorSize -> Effect Unit
 emo8Dev state asset ms = withCanvas \canvas -> do
@@ -53,15 +67,15 @@ emo8Dev state asset ms = withCanvas \canvas -> do
   context <- getContext2D canvas
   audCtx <- newAudioContext
   let drawCtx = { ctx: context, mapData: asset.mapData, monitorSize: ms }
-  let soundCtx = { ctx: audCtx, soundData: asset.soundData }
+      soundCtx = { ctx: audCtx, soundData: asset.soundData }
 
   frameSig <- animationFrame
   keyTouchInputSig <- poll
   let keyTouchInputSampleSig = sampleOn frameSig keyTouchInputSig
-  let inputSampleSig = mkInputSig keyTouchInputSampleSig
+      inputSampleSig = mkInputSig keyTouchInputSampleSig
   stateSig <- foldEffect (\i -> runUpdate asset <<< update i) state inputSampleSig
-  runSignal $ runDraw drawCtx <$> draw <$> stateSig
-  runSignal $ runSound soundCtx <$> sound <$> stateSig
+  runSignal $ runDraw drawCtx <<< draw <$> stateSig
+  runSignal $ runSound soundCtx <<< sound <$> stateSig
   runSignal $ saveState <$> stateSig
 
 withCanvas :: (CanvasElement -> Effect Unit) -> Effect Unit
