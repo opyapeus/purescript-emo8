@@ -4,10 +4,11 @@ import Prelude
 
 import Data.Bifoldable (class Bifoldable)
 import Data.Bifunctor (class Bifunctor)
-import Data.Bitraversable (class Bitraversable)
+import Data.Bitraversable (class Bitraversable, bitraverse)
 import Effect (Effect)
 import Emo8.Class.Game (class Game)
 import Emo8.Class.GameBoot (class GameBoot, finished)
+import Emo8.Input (Input)
 import Signal (Signal)
 
 data GameWithBoot a b = GameWithBoot a b
@@ -24,3 +25,9 @@ instance bitraversableGameWithBoot :: Bitraversable GameWithBoot where
 
 switchOp :: forall s s'. Game s => GameBoot s' => (s -> Effect Unit) -> (s' -> Effect Unit) -> Signal (GameWithBoot s s') -> Signal (Effect Unit)
 switchOp op op' = map \(GameWithBoot s s') -> if finished s' then op s else op' s'
+
+switchFoldOp :: forall s' s. Game s => GameBoot s' => (Input -> s -> Effect s) -> (Input -> s' -> Effect s') -> Input -> GameWithBoot s s' -> Effect (GameWithBoot s s')
+switchFoldOp op op' i st@(GameWithBoot s s') =
+  if finished s'
+    then bitraverse (op i) pure st
+    else bitraverse pure (op' i) st

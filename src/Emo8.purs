@@ -6,7 +6,6 @@ module Emo8
 import Prelude
 
 import Audio.WebAudio.BaseAudioContext (newAudioContext)
-import Data.Bitraversable (bitraverse)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(..))
 import Data.String (joinWith)
@@ -17,7 +16,7 @@ import Emo8.Class.Game (class Game, draw, sound, update)
 import Emo8.Class.GameDev (class GameDev, saveState)
 import Emo8.Class.Input (poll)
 import Emo8.Constants (canvasId)
-import Emo8.Data.GameWithBoot (GameWithBoot(..), switchOp)
+import Emo8.Data.GameWithBoot (GameWithBoot(..), switchFoldOp, switchOp)
 import Emo8.Draw.Interpreter (runDraw)
 import Emo8.Input (mkInputSig)
 import Emo8.Sound.Interpreter (runSound)
@@ -48,10 +47,12 @@ emo8 state asset ms = withCanvas \canvas -> do
       inputSampleSig = mkInputSig keyTouchInputSampleSig
       biState = GameWithBoot state bootState 
   biStateSig <- foldEffect
-    (\i -> bitraverse
-      (runUpdate asset <<< update i)
-      (runUpdate bootAsset <<< update i)
-    ) biState inputSampleSig
+    ( switchFoldOp
+      (\i -> runUpdate asset <<< update i)
+      (\i -> runUpdate bootAsset <<< update i)
+    )
+    biState
+    inputSampleSig
   runSignal $ switchOp
     (runDraw drawCtx <<< draw)
     (runDraw bootDrawCtx <<< draw)
