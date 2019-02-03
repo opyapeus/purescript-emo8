@@ -25,8 +25,18 @@ import Emo8.Types (EmojiMap, Sound)
 
 newtype RawMap = RawMap String
 
+derive instance eqRawMap :: Eq RawMap
+instance showRawMap :: Show RawMap where
+  show (RawMap s) = "RawMap: " <> s
+instance semigroupRawMap :: Semigroup RawMap where
+  append (RawMap a) (RawMap b) = RawMap (a <> removeTopLF b)
+    where removeTopLF = replace (Pattern "\n") (Replacement "")
+
 newtype RawSound = RawSound String
 
+derive instance eqRawSound :: Eq RawSound
+instance showRawSound :: Show RawSound where
+  show (RawSound s) = "RawSound: " <> s
 instance semigroupRawSound :: Semigroup RawSound where
   append (RawSound a) (RawSound b) = RawSound (a <> removeTopLF b)
     where removeTopLF = replace (Pattern "\n") (Replacement "")
