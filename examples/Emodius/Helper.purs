@@ -6,9 +6,9 @@ import Class.Object (class Object, position, size)
 import Collision (isCollMap, isCollWorld)
 import Constants (mapSize)
 import Data.Player (Player(..))
-import Emo8.Draw.Action (Draw, emap)
+import Emo8.Action.Draw (Draw, emap)
+import Emo8.Action.Update (Update)
 import Emo8.Types (MapId, X)
-import Emo8.Update.Action (Update)
 import Emo8.Utils (defaultMonitorSize)
 
 beInMonitor :: Player -> Player -> Player

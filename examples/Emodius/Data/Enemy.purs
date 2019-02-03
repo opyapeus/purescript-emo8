@@ -6,8 +6,8 @@ import Class.Object (class ObjectDraw, class Object, position, size)
 import Constants (emoSize, speed)
 import Data.EnemyBullet (EnemyBullet(..))
 import Data.Player (Player(..))
+import Emo8.Action.Draw (emo)
 import Emo8.Data.Emoji as E
-import Emo8.Draw.Action (emo)
 import Emo8.Utils (defaultMonitorSize)
 import Types (Pos)
 

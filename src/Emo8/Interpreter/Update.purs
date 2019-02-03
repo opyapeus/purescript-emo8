@@ -1,4 +1,4 @@
-module Emo8.Update.Interpreter where
+module Emo8.Interpreter.Update where
 
 import Prelude
 
@@ -8,11 +8,11 @@ import Data.Array (reverse, (!!))
 import Data.Foldable (elem, foldr)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
+import Emo8.Action.Update (Update, UpdateF(..))
 import Emo8.Class.Game (class Game)
 import Emo8.Data.Emoji (Emoji)
 import Emo8.Excepiton (providedMap)
 import Emo8.Types (Asset, IdX, MapId, X, Y, IdY)
-import Emo8.Update.Action (Update, UpdateF(..))
 import Random.PseudoRandom (randomREff)
 
 runUpdate :: forall s. Game s => Asset -> Update s -> Effect s

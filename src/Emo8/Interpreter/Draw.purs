@@ -1,4 +1,4 @@
-module Emo8.Draw.Interpreter where
+module Emo8.Interpreter.Draw where
 
 import Prelude
 
@@ -9,15 +9,15 @@ import Data.String (joinWith)
 import Data.Traversable (for_)
 import Data.Tuple (Tuple(..))
 import Effect (Effect)
-import Graphics.Canvas (Context2D, fillRect, fillText, restore, rotate, save, scale, setFillStyle, setFont, translate)
-import Math (pi)
-import Emo8.Draw.Action (Appearance(..), Draw, DrawF(..))
+import Emo8.Action.Draw (Appearance(..), Draw, DrawF(..))
 import Emo8.Constants (fontFamily)
 import Emo8.Data.Color (Color(..), colorToCode)
 import Emo8.Data.Emoji (Emoji, japaneseVacancyButton)
-import Emo8.Patch.TextBaseline (TextBaseline(..), setTextBaseline)
-import Emo8.Types (Deg, IdX, IdY, MapId, MonitorSize, Size, X, Y, DrawContext)
 import Emo8.Excepiton (providedMap)
+import Emo8.FFI.TextBaseline (TextBaseline(..), setTextBaseline)
+import Emo8.Types (Deg, IdX, IdY, MapId, MonitorSize, Size, X, Y, DrawContext)
+import Graphics.Canvas (Context2D, fillRect, fillText, restore, rotate, save, scale, setFillStyle, setFont, translate)
+import Math (pi)
 
 type RenderOp = DrawContext -> Effect Unit
 

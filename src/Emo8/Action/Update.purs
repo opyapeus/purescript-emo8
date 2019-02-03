@@ -1,4 +1,4 @@
-module Emo8.Update.Action where
+module Emo8.Action.Update where
 
 import Prelude
 

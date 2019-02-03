@@ -1,4 +1,4 @@
-module Emo8.Sound.Interpreter where
+module Emo8.Interpreter.Sound where
 
 import Prelude
 
@@ -14,13 +14,13 @@ import Data.Maybe (Maybe(..))
 import Data.Traversable (for_)
 import Data.Tuple (Tuple(..))
 import Effect (Effect)
+import Emo8.Action.Sound (Sound, SoundF(..))
 import Emo8.Constants (maxNoteSize)
 import Emo8.Data.Audio (Efct, Vol, efctToDetune, noteToFreq, octaveToMult, volToGain)
 import Emo8.Data.Channel (Channel, getChannelSet)
 import Emo8.Data.Tick (Scale, emptyTick)
 import Emo8.Data.Tone (Tone, setTone)
 import Emo8.Excepiton (providedSound)
-import Emo8.Sound.Action (Sound, SoundF(..))
 import Emo8.Types (Bpm, SoundContext, SoundId)
 
 type AudioOp = SoundContext -> Effect Unit

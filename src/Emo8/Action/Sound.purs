@@ -1,4 +1,4 @@
-module Emo8.Sound.Action where
+module Emo8.Action.Sound where
 
 import Prelude
 

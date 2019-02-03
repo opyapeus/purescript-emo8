@@ -11,8 +11,8 @@ import Data.Array ((:))
 import Data.Unfoldable (replicateA)
 import Effect (Effect)
 import Effect.Random (randomRange)
+import Emo8.FFI.OscillatorCustom (FFTComponent, createPeriodicWave, setPeriodicWave)
 import Math (cos, pi, sin)
-import Emo8.Patch.OscillatorCustom (FFTComponent, createPeriodicWave, setPeriodicWave)
 
 data Tone
   = Sin

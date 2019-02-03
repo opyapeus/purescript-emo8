@@ -18,7 +18,7 @@ import Emo8 (emo8)
 import Emo8.Class.Game (class Game)
 import Emo8.Data.Color (Color(..))
 import Emo8.Data.Emoji as E
-import Emo8.Draw.Action (cls, emo, emor, emor')
+import Emo8.Action.Draw (cls, emo, emor, emor')
 import Emo8.Utils (defaultMonitorSize, isCatchAny, mkAsset)
 import Helper (beInMonitor, drawScrollMap, isCollideScrollMap)
 

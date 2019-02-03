@@ -1,4 +1,4 @@
-module Emo8.Draw.Action where
+module Emo8.Action.Draw where
 
 import Prelude
 

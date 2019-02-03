@@ -1,4 +1,4 @@
-module Emo8.Patch.OscillatorCustom
+module Emo8.FFI.OscillatorCustom
     ( PeriodicWave
     , FFTComponent
     , createPeriodicWave

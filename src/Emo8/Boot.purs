@@ -8,6 +8,9 @@ import Prelude
 
 import Data.Int (floor, toNumber)
 import Data.Maybe (fromMaybe)
+import Emo8.Action.Draw (cls, emo)
+import Emo8.Action.Sound (play)
+import Emo8.Action.Update (randomElement, randomInt)
 import Emo8.Class.Game (class Game)
 import Emo8.Class.GameBoot (class GameBoot)
 import Emo8.Data.Channel (Channel(..))
@@ -15,11 +18,8 @@ import Emo8.Data.Color (Color(..), colors)
 import Emo8.Data.Emoji (Emoji)
 import Emo8.Data.Emoji as E
 import Emo8.Data.Tone (Tone(..))
-import Emo8.Draw.Action (cls, emo)
 import Emo8.Parse (RawSound(..))
-import Emo8.Sound.Action (play)
 import Emo8.Types (MonitorSize, Position)
-import Emo8.Update.Action (randomElement, randomInt)
 import Emo8.Utils (isCatchAny)
 
 data State = State

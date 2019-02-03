@@ -2,10 +2,10 @@ module Emo8.Class.Game where
 
 import Prelude
 
-import Emo8.Draw.Action (Draw)
+import Emo8.Action.Draw (Draw)
+import Emo8.Action.Sound (Sound)
+import Emo8.Action.Update (Update)
 import Emo8.Input (Input)
-import Emo8.Sound.Action (Sound)
-import Emo8.Update.Action (Update)
 
 -- | Game class.
 -- | Methods are called in order update, draw, sound every frame.

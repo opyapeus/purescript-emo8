@@ -1,4 +1,4 @@
-module Emo8.Patch.TextBaseline where
+module Emo8.FFI.TextBaseline where
 
 
 -- | Enumerates types of text alignment.

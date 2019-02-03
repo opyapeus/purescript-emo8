@@ -4,10 +4,10 @@ import Prelude
 
 import Effect (Effect)
 import Emo8 (emo8)
+import Emo8.Action.Draw (cls, emo)
 import Emo8.Class.Game (class Game)
 import Emo8.Data.Color (Color(..))
 import Emo8.Data.Emoji as E
-import Emo8.Draw.Action (cls, emo)
 import Emo8.Utils (defaultMonitorSize, emptyAsset)
 
 

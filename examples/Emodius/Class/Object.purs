@@ -2,7 +2,7 @@ module Class.Object where
   
 import Prelude
 
-import Emo8.Draw.Action (Draw)
+import Emo8.Action.Draw (Draw)
 import Types (Pos)
   
 class Object s where

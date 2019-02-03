@@ -4,8 +4,8 @@ import Prelude
 
 import Class.Object (class ObjectDraw, class Object, position, size)
 import Constants (emoSize)
+import Emo8.Action.Draw (emor)
 import Emo8.Data.Emoji as E
-import Emo8.Draw.Action (emor)
 import Types (Pos)
 
 
