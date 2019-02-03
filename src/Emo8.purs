@@ -12,7 +12,7 @@ import Data.Maybe (Maybe(..))
 import Data.String (joinWith)
 import Effect (Effect)
 import Effect.Exception (throw)
-import Emo8.Boot (initialState)
+import Emo8.Boot (bootRawSound, initialState)
 import Emo8.Class.Game (class Game, draw, sound, update)
 import Emo8.Class.GameDev (class GameDev, saveState)
 import Emo8.Class.Input (poll)
@@ -23,7 +23,7 @@ import Emo8.Input (mkInputSig)
 import Emo8.Sound.Interpreter (runSound)
 import Emo8.Types (Asset, MonitorSize)
 import Emo8.Update.Interpreter (runUpdate)
-import Emo8.Utils (emptyAsset)
+import Emo8.Utils (mkAsset)
 import Graphics.Canvas (CanvasElement, getCanvasElementById, getContext2D, setCanvasHeight, setCanvasWidth)
 import Signal (runSignal, sampleOn)
 import Signal.DOM (animationFrame)
@@ -35,10 +35,10 @@ emo8 state asset ms = withCanvas \canvas -> do
   setDim canvas ms
   context <- getContext2D canvas
   audCtx <- newAudioContext
+  bootAsset <- mkAsset [] [bootRawSound]
   let drawCtx = { ctx: context, mapData: asset.mapData, monitorSize: ms }
       soundCtx = { ctx: audCtx, soundData: asset.soundData }
       bootState = initialState ms
-      bootAsset = emptyAsset
       bootDrawCtx = { ctx: context, mapData: bootAsset.mapData, monitorSize: ms }
       bootSoundCtx = { ctx: audCtx, soundData: bootAsset.soundData }
 

@@ -10,6 +10,11 @@ type MonitorSize =
   , height :: Int
   }
 
+type Position =
+  { x :: X
+  , y :: Y
+  }
+
 -- | Asset type.
 -- | It contains map data and sound data.
 type Asset =

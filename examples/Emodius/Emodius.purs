@@ -14,13 +14,13 @@ import Data.Foldable (traverse_)
 import Data.Particle (Particle, initParticle, updateParticle)
 import Data.Player (Player, addBullet, initialPlayer, updatePlayer)
 import Effect (Effect)
-import Helper (beInMonitor, drawScrollMap, isCollideScrollMap, isInputCatchAny)
 import Emo8 (emo8)
 import Emo8.Class.Game (class Game)
 import Emo8.Data.Color (Color(..))
 import Emo8.Data.Emoji as E
 import Emo8.Draw.Action (cls, emo, emor, emor')
-import Emo8.Utils (defaultMonitorSize, mkAsset)
+import Emo8.Utils (defaultMonitorSize, isCatchAny, mkAsset)
+import Helper (beInMonitor, drawScrollMap, isCollideScrollMap)
 
 data State
     = TitleState
@@ -37,11 +37,11 @@ data State
 
 instance gameState :: Game State where
     update input TitleState =
-        pure $ if isInputCatchAny input then initialPlayState else TitleState
+        pure $ if isCatchAny input then initialPlayState else TitleState
     update input OverState =
-        pure $ if isInputCatchAny input then initialState else OverState
+        pure $ if isCatchAny input then initialState else OverState
     update input ClearState =
-        pure $ if isInputCatchAny input then initialState else ClearState
+        pure $ if isCatchAny input then initialState else ClearState
     update input (PlayState s) = do
         -- update pos
         let np = updatePlayer input s.player

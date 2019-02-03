@@ -4,6 +4,8 @@ import Prelude
 
 import Control.Monad.Free (Free, liftF)
 import Control.Monad.Gen (Size)
+import Data.Array (index, length)
+import Data.Maybe (Maybe)
 import Emo8.Data.Emoji (Emoji)
 import Emo8.Types (X, Y, MapId)
 
@@ -17,6 +19,11 @@ data UpdateF n
 -- | Get random int.
 randomInt :: Int -> Int -> Update Int
 randomInt min max = liftF $ RandomInt min max identity
+
+-- | Get random element.
+randomElement :: forall a. Array a -> Update (Maybe a)
+randomElement xs = index xs <$> randomInt 0 max
+    where max = length xs - 1
 
 -- | Get random number.
 randomNumber :: Number -> Number -> Update Number

@@ -7,7 +7,6 @@ import Collision (isCollMap, isCollWorld)
 import Constants (mapSize)
 import Data.Player (Player(..))
 import Emo8.Draw.Action (Draw, emap)
-import Emo8.Input (Input)
 import Emo8.Types (MapId, X)
 import Emo8.Update.Action (Update)
 import Emo8.Utils (defaultMonitorSize)
@@ -67,8 +66,3 @@ isCollideScrollMap distance o =
                 else pure false
             where
                 base = num * mapWidth
-
-isInputCatchAny :: Input -> Boolean
-isInputCatchAny i
-    = i.catched.isW || i.catched.isS || i.catched.isA || i.catched.isD
-   || i.catched.isUp || i.catched.isDown || i.catched.isLeft || i.catched.isRight
