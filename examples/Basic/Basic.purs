@@ -10,6 +10,7 @@ import Emo.FFI.LocalStorage (LocalKey(..))
 import Emo8 (emo8Dev)
 import Emo8.Class.Game (class Game)
 import Emo8.Class.GameDev (class GameDev, loadStateWithDefault)
+import Emo8.Data.Channel (Channel(..))
 import Emo8.Data.Color (Color(..))
 import Emo8.Data.Emoji as E
 import Emo8.Data.Tone (Tone(..))
@@ -104,7 +105,7 @@ instance gameState :: Game State where
 
   sound (State state) = do
     when state.isJump $
-      play 0 Saw 4096
+      play CH1 0 Saw 4096
 
 derive instance genericAppear :: Generic Appear _
 instance encodeAppear :: Encode Appear where

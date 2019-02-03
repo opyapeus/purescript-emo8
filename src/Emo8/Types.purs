@@ -1,9 +1,10 @@
 module Emo8.Types where
 
 import Audio.WebAudio.Types (AudioContext)
-import Graphics.Canvas (Context2D)
-import Emo8.Data.Audio (Efct, Note, Octave, Vol)
+import Emo8.Data.Channel (ChannelSets)
 import Emo8.Data.Emoji (Emoji)
+import Emo8.Data.Tick (Tick)
+import Graphics.Canvas (Context2D)
 
 type MonitorSize =
   { width :: Int
@@ -25,17 +26,6 @@ type Asset =
 type EmojiMap = Array (Array Emoji)
 type Sound = Array Tick
 
-type Tick =
-  { scales :: Array Scale
-  , vol :: Vol
-  , efct :: Efct
-  }
-
-type Scale =
-  { octave :: Octave
-  , note :: Note
-  }
-
 type DrawContext =
   { ctx :: Context2D
   , mapData :: Array EmojiMap
@@ -45,6 +35,7 @@ type DrawContext =
 type SoundContext =
   { ctx :: AudioContext
   , soundData :: Array Sound
+  , channelSets :: ChannelSets
   }
 
 type X = Int

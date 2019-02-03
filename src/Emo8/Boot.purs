@@ -10,6 +10,7 @@ import Data.Int (floor, toNumber)
 import Data.Maybe (fromMaybe)
 import Emo8.Class.Game (class Game)
 import Emo8.Class.GameBoot (class GameBoot)
+import Emo8.Data.Channel (Channel(..))
 import Emo8.Data.Color (Color(..), colors)
 import Emo8.Data.Emoji (Emoji)
 import Emo8.Data.Emoji as E
@@ -52,7 +53,7 @@ instance gameState :: Game State where
     cls s.bgColor
     emo (toEmoji s.titleEmojiType) s.titleSize s.titlePos.x s.titlePos.y
 
-  sound (State s) = when (s.wait == initialWait - 1) $ play 0 Saw 1024
+  sound (State s) = when (s.wait == initialWait - 1) $ play CH1 0 Saw 1024
 
 instance gameBootState :: GameBoot State where
   finished = isFinish

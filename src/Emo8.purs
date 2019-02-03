@@ -16,6 +16,7 @@ import Emo8.Class.Game (class Game, draw, sound, update)
 import Emo8.Class.GameDev (class GameDev, saveState)
 import Emo8.Class.Input (poll)
 import Emo8.Constants (canvasId)
+import Emo8.Data.Channel (mkChannelSets, setSoundNodes, startSoundNodes)
 import Emo8.Data.GameWithBoot (GameWithBoot(..), switchFoldOp, switchOp)
 import Emo8.Draw.Interpreter (runDraw)
 import Emo8.Input (mkInputSig)
@@ -34,12 +35,13 @@ emo8 state asset ms = withCanvas \canvas -> do
   setDim canvas ms
   context <- getContext2D canvas
   audCtx <- newAudioContext
+  chSets <- mkChannelSets audCtx
   bootAsset <- mkAsset [] [bootRawSound]
   let drawCtx = { ctx: context, mapData: asset.mapData, monitorSize: ms }
-      soundCtx = { ctx: audCtx, soundData: asset.soundData }
+      soundCtx = { ctx: audCtx, soundData: asset.soundData, channelSets: chSets }
       bootState = initialState ms
       bootDrawCtx = { ctx: context, mapData: bootAsset.mapData, monitorSize: ms }
-      bootSoundCtx = { ctx: audCtx, soundData: bootAsset.soundData }
+      bootSoundCtx = { ctx: audCtx, soundData: bootAsset.soundData, channelSets: chSets }
 
   frameSig <- animationFrame
   keyTouchInputSig <- poll
@@ -62,13 +64,17 @@ emo8 state asset ms = withCanvas \canvas -> do
     (runSound bootSoundCtx <<< sound)
     biStateSig
 
+  setSoundNodes chSets audCtx
+  startSoundNodes chSets audCtx
+
 emo8Dev :: forall s. GameDev s => s -> Asset -> MonitorSize -> Effect Unit
 emo8Dev state asset ms = withCanvas \canvas -> do
   setDim canvas ms
   context <- getContext2D canvas
   audCtx <- newAudioContext
+  chSets <- mkChannelSets audCtx
   let drawCtx = { ctx: context, mapData: asset.mapData, monitorSize: ms }
-      soundCtx = { ctx: audCtx, soundData: asset.soundData }
+      soundCtx = { ctx: audCtx, soundData: asset.soundData, channelSets: chSets }
 
   frameSig <- animationFrame
   keyTouchInputSig <- poll
@@ -78,6 +84,9 @@ emo8Dev state asset ms = withCanvas \canvas -> do
   runSignal $ runDraw drawCtx <<< draw <$> stateSig
   runSignal $ runSound soundCtx <<< sound <$> stateSig
   runSignal $ saveState <$> stateSig
+
+  setSoundNodes chSets audCtx
+  startSoundNodes chSets audCtx
 
 withCanvas :: (CanvasElement -> Effect Unit) -> Effect Unit
 withCanvas op = do

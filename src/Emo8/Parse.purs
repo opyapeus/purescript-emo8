@@ -6,19 +6,22 @@ module Emo8.Parse
   ) where
 
 import Prelude
+
 import Data.Array (concat, slice, zip)
 import Data.Either (Either(..))
 import Data.Foldable (length)
+import Data.String (Pattern(..), Replacement(..), replace)
 import Data.String.EmojiSplitter (splitEmoji)
 import Data.String.Utils (lines)
-import Data.String (Pattern(..), Replacement(..), replace)
 import Data.Traversable (traverse)
 import Data.Tuple (Tuple(..), uncurry)
 import Emo8.Class.Read (read)
 import Emo8.Constants (maxNoteSize)
-import Emo8.Data.Audio (Note, Octave, nextOctave, notes)
+import Emo8.Data.Audio (Note, nextOctave, notes)
 import Emo8.Data.Emoji (Emoji(..))
-import Emo8.Types (EmojiMap, Sound, Tick, Scale)
+import Emo8.Data.Emoji as E
+import Emo8.Data.Tick (Tick, mkScale)
+import Emo8.Types (EmojiMap, Sound)
 
 newtype RawMap = RawMap String
 
@@ -74,18 +77,15 @@ parseNotes :: EmojiStringArray -> Either String NoteArray
 parseNotes = map concat <<< traverse (uncurry matchNote) <<< zip notes        
 
 matchNote :: Note -> EmojiString -> Either String NoteArray
-matchNote n "🎹" = Right [n]
-matchNote _ "🈳" = Right []
-matchNote _ s = Left $ s <> " can not be parsed."
+matchNote n s
+  | Emoji s == E.musicalKeyboard = Right [n]
+  | Emoji s == E.japaneseVacancyButton = Right []
+  | otherwise = Left $ s <> " can not be parsed."
 
 satisfyNoteLen :: NoteArray -> NoteArray -> Either String (Tuple NoteArray NoteArray)
 satisfyNoteLen xs ys = if length (xs <> ys) <= maxNoteSize
   then Right $ Tuple xs ys
   else Left $ "exceeded max note count " <> show maxNoteSize <> "."
-
-mkScale :: Octave -> Note -> Scale
-mkScale o n = { octave: o, note: n }
-
 
 rawStringToSingletonArray :: String -> Either String EmojiStringMatrix
 rawStringToSingletonArray s = traverse splitEmoji rows'
