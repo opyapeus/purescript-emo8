@@ -17,6 +17,9 @@
     "example:emodius:endpoint": "cpx 'endpoint/*' dist/emodius",
     "example:emodius:build": "pulp build --main Emodius -I examples/Emodius --to dist/emodius/app.js",
     "example:emodius": "npm-run-all example:emodius:*",
+    "example:nekof:endpoint": "cpx 'endpoint/*' dist/nekof",
+    "example:nekof:build": "pulp build --main Nekof -I examples/Nekof --to dist/nekof/app.js",
+    "example:nekof": "npm-run-all example:nekof:*",
     "example": "npm-run-all -s example:*",
     "doc": "pulp docs -- --format html"
   },
