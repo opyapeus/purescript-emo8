@@ -1,9 +1,9 @@
 module Emo8.Types where
 
 import Audio.WebAudio.Types (AudioContext)
-import Emo8.Data.Channel (ChannelSets)
 import Emo8.Data.Emoji (Emoji)
 import Emo8.Data.Tick (Tick)
+import Emo8.SoundUtil (ChannelSets)
 import Graphics.Canvas (Context2D)
 
 type MonitorSize =
