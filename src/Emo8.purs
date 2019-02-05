@@ -21,7 +21,7 @@ import Emo8.Input (mkInputSig)
 import Emo8.Interpreter.Draw (runDraw)
 import Emo8.Interpreter.Sound (runSound)
 import Emo8.Interpreter.Update (runUpdate)
-import Emo8.SoundUtil (mkChannelSets, prepareSound)
+import Emo8.SoundUtil (mkChannelSets, prepareSound, resumeByUserGestureOnce)
 import Emo8.Types (Asset, MonitorSize)
 import Emo8.Utils (mkAsset)
 import Graphics.Canvas (CanvasElement, getCanvasElementById, getContext2D, setCanvasHeight, setCanvasWidth)
@@ -64,6 +64,7 @@ emo8 state asset ms = withCanvas \canvas -> do
     (runSound bootSoundCtx <<< sound)
     biStateSig
 
+  runSignal $ resumeByUserGestureOnce audCtx keyTouchInputSig
   prepareSound chSets audCtx
 
 emo8Dev :: forall s. GameDev s => s -> Asset -> MonitorSize -> Effect Unit
@@ -84,6 +85,7 @@ emo8Dev state asset ms = withCanvas \canvas -> do
   runSignal $ runSound soundCtx <<< sound <$> stateSig
   runSignal $ saveState <$> stateSig
 
+  runSignal $ resumeByUserGestureOnce audCtx keyTouchInputSig
   prepareSound chSets audCtx
 
 withCanvas :: (CanvasElement -> Effect Unit) -> Effect Unit

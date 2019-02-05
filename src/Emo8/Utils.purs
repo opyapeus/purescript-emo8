@@ -5,8 +5,6 @@ module Emo8.Utils
     , isMonitorCollide
     , isOutOfMonitor
     , isCollide
-    , isCatchAny
-    , isReleaseAny
     ) where
 
 import Prelude
@@ -14,7 +12,6 @@ import Prelude
 import Data.Traversable (traverse)
 import Effect (Effect)
 import Emo8.Excepiton (orErrMsg)
-import Emo8.Input (Input)
 import Emo8.Parse (RawMap, RawSound, parseEmojiMap, parseSound)
 import Emo8.Types (Asset, MonitorSize, Size, X, Y)
 
@@ -50,16 +47,6 @@ isCollide sizeA xA yA sizeB xB yB
         pBrx = xB + sizeB - 1
         pBby = yB
         pBty = yB + sizeB - 1 
-
-isCatchAny :: Input -> Boolean
-isCatchAny i
-  = i.catched.isW || i.catched.isS || i.catched.isA || i.catched.isD
-  || i.catched.isUp || i.catched.isDown || i.catched.isLeft || i.catched.isRight
-
-isReleaseAny :: Input -> Boolean
-isReleaseAny i
-  = i.released.isW || i.released.isS || i.released.isA || i.released.isD
-  || i.released.isUp || i.released.isDown || i.released.isLeft || i.released.isRight
 
 -- | Make asset data from raw maps and raw sounds.
 -- | If there are unparsable strings, exception raised when executing javascript.

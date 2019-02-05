@@ -20,9 +20,9 @@ import Emo8.Data.Color (Color(..), colors)
 import Emo8.Data.Emoji (Emoji)
 import Emo8.Data.Emoji as E
 import Emo8.Data.Tone (Tone(..))
+import Emo8.Input (isCatchAny)
 import Emo8.Parse (RawSound(..))
 import Emo8.Types (MonitorSize, Position)
-import Emo8.Utils (isCatchAny)
 import Math (cos, pi, sin)
 
 data State = State

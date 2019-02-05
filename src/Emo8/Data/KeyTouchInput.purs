@@ -1,5 +1,6 @@
 module Emo8.Data.KeyTouchInput
   ( KeyTouchInput(..)
+  , anyKeyTouch
   ) where
 
 import Prelude
@@ -36,3 +37,8 @@ mergeInput (KeyInput k) (TouchInput t) = KeyTouchInput
   , isS : k.isS || t.isS
   , isD : k.isD || t.isD
   }
+
+anyKeyTouch :: KeyTouchInput -> Boolean
+anyKeyTouch (KeyTouchInput i)
+  = i.isW || i.isS || i.isA || i.isD
+  || i.isUp || i.isDown || i.isLeft || i.isRight

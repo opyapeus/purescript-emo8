@@ -2,7 +2,7 @@ module Emo8.Interpreter.Sound where
 
 import Prelude
 
-import Audio.WebAudio.BaseAudioContext (currentTime, resume)
+import Audio.WebAudio.BaseAudioContext (currentTime)
 import Control.Monad.Free (foldFree)
 import Data.Array (length, zip, (!!), (..))
 import Data.Int (toNumber)
@@ -34,8 +34,6 @@ play :: Channel -> SoundId -> Tone -> Bpm -> AudioOp
 play ch sId tone tempo sctx = do
     -- NOTE: clear present schedule
     halt ch sctx
-    -- NOTE: maybe needed for first user interaction
-    resume sctx.ctx
     providedSound sctx.soundData sId $
         \ticks' -> do
             let ticks = ticks' <> [emptyTick] -- NOTE: emptyTick for cutting last tick

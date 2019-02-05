@@ -15,11 +15,12 @@ import Data.Particle (Particle, initParticle, updateParticle)
 import Data.Player (Player, addBullet, initialPlayer, updatePlayer)
 import Effect (Effect)
 import Emo8 (emo8)
+import Emo8.Action.Draw (cls, emo, emor, emor')
 import Emo8.Class.Game (class Game)
 import Emo8.Data.Color (Color(..))
 import Emo8.Data.Emoji as E
-import Emo8.Action.Draw (cls, emo, emor, emor')
-import Emo8.Utils (defaultMonitorSize, isCatchAny, mkAsset)
+import Emo8.Input (isCatchAny)
+import Emo8.Utils (defaultMonitorSize, mkAsset)
 import Helper (beInMonitor, drawScrollMap, isCollideScrollMap)
 
 data State
