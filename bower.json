@@ -1,10 +1,10 @@
 {
-  "name": "purescript-nemo",
+  "name": "purescript-emo8",
   "license": "MIT",
   "description": "A functional game engine for creating emoji games.",
   "repository": {
     "type": "git",
-    "url": "git://github.com/opyapeus/purescript-nemo.git"
+    "url": "git://github.com/opyapeus/purescript-emo8.git"
   },
   "ignore": [
     "**/.*",

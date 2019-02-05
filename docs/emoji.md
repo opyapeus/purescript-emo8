@@ -3,12 +3,11 @@
 Source:
 [Emoji Keyboard/Display Test Data for UTS #51 Version: 11.0](https://unicode.org/Public/emoji/11.0/emoji-test.txt)
 
-※ The appearance depends on the browser.
-(interesting!)
+※ The appearance depends on the browser. (interesting!)
 
 ## Defined Emojis
 
-1388 unicode emojis are already defined.
+1388 unicode emojis are defined.
 
 \+ (all fully-qualified emojis)
 \- (skin toned emojis)
@@ -18,14 +17,6 @@ Source:
 grinningFace :: Emoji -- 😀
 beamingFaceWithSmilingEyes :: Emoji -- 😁
 faceWithTearsOfJoy :: Emoji -- 😂
-...
-```
-
-If you want to use undefined emojis, define it yourself.
-
-```PureScript
-ascensionIsland :: Emoji
-ascensionIsland = Emoji "🇦🇨"
 ...
 ```
 
