@@ -11,26 +11,22 @@ module Emo8.SoundUtil
   , setScale
   , unsetScale
   , cancelScale
-  , resumeByUserGestureOnce
   ) where
 
 import Prelude
 
 import Audio.WebAudio.AudioParam (cancelScheduledValues, setTargetAtTime, setValue, setValueAtTime)
-import Audio.WebAudio.BaseAudioContext (createGain, createOscillator, currentTime, destination, resume)
+import Audio.WebAudio.BaseAudioContext (createGain, createOscillator, currentTime, destination)
 import Audio.WebAudio.GainNode (gain)
 import Audio.WebAudio.Oscillator (detune, frequency, startOscillator)
 import Audio.WebAudio.Types (AudioContext, GainNode, OscillatorNode, Seconds, connect)
 import Data.Foldable (for_)
-import Data.Maybe (Maybe(..))
 import Data.Unfoldable (replicateA)
 import Effect (Effect)
 import Emo8.Constants (maxNoteSize)
 import Emo8.Data.Audio (Efct, Vol, efctToDetune, noteToFreq, octaveToMult, volToGain)
 import Emo8.Data.Channel (Channel(..), channels)
-import Emo8.Data.KeyTouchInput (KeyTouchInput, anyKeyTouch)
 import Emo8.Data.Tick (Scale)
-import Signal (Signal, foldp)
 
 type Frequency = Number
 
@@ -145,16 +141,3 @@ cancelScale now on ctx = do
   freqParam <- frequency on
   void $ cancelScheduledValues now freqParam
   setValue 0.0 freqParam
-
--- NOTE: it must be resumed after a user gesture on the page
--- REVIEW: refactor
-resumeByUserGestureOnce :: AudioContext -> Signal KeyTouchInput -> Signal (Effect Unit)
-resumeByUserGestureOnce ctx sig =
-  (\s -> case s of
-    Just false -> pure unit
-    _ -> resume ctx -- NOTE: resume Nothing case also for reliable activation
-  ) <$> foldp upd Nothing sig
-  where
-    upd i Nothing = if anyKeyTouch i then Just true else Nothing
-    upd _ (Just true) = Just false
-    upd _ (Just false) = Just false
