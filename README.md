@@ -1,121 +1,139 @@
-# NEMO
+# EMO8
 
-[![Build status](https://travis-ci.org/opyapeus/purescript-nemo.svg?branch=master)](https://travis-ci.org/opyapeus/purescript-nemo)
+[![Build status](https://travis-ci.org/opyapeus/purescript-emo8.svg?branch=master)](https://travis-ci.org/opyapeus/purescript-emo8)
 
-A functional game engine for creating emoji games.
+A functional 2D game engine that can create emoji games.
 
-※ it's beta for now
+※ It's still a beta version.
 
 [ [日本語](README.ja.md) ]
 
-![nemo](nemo.png)
-![emodius](https://opyapeus.github.io/nemo/img/emodius-half.gif)
+![emo8](emo8.jpg)
+![emodius](https://opyapeus.github.io/emo8/img/emodius-half.gif)
 
-## Major Features
+## Recommended For The Person 
 
-- You can write game logic well in a functional language (PureScript).
-- You can express various ideas by combining emojis.
-- Easy to distribute to any browser.
+- Who want to make simple games in functional language
+- Who thinks it is troublesome to prepare game materials
+- Who want to distribute the game easily
+- *Who want a start to learn purescript*
 
-### Why PureScript
+### Why PureScript?
 
-It is a functional language that can guarantee both descriptive power and distributability.
+Because it is a functional language that can write programs with good expression and good readabilities.
+It is also compiled into JavaScript and easy to distribute.
 
-|            | descriptive power | distributability |
-| ---------- | ----------------- | ---------------- |
-| Haskell    | ○                 | △                |
-| Elm        | △                 | ○                |
-| PureScript | ○                 | ○                |
+|            | Expressive power  | Ease of distribution                |
+| ---------- | ----------------- | ----------------------------------- |
+| Haskell    | ○                 | △ (Hard to convert into JavaScript) |
+| Elm        | △ (No type class) | ○                                   |
+| PureScript | ○                 | ○                                   |
 
-### Why Emoji
+### Why Emoji?
 
-Because there is room for creation if there is constraint.
+Because it is the materials that everyone can use easily on the Web.
+In addition, I think that the limited materials stimulate your imagination like playing with the LEGO block.
 
-I am a fan of [PICO-8](https://www.lexaloffle.com/pico-8.php).
-PICO-8 has strict restrictions such as dot picture and capacity, but I think that these make creating game more fun.
+This library is made with inspiration form [PICO-8](https://www.lexaloffle.com/pico-8.php).
+PICO-8 also has severe restrictions, but I think that it will make the game making fun.
 
-In the same way, if there are restrictions that only emojis can be used, there is a different enjoyment of game making.
+## Play Now!
+
+You can play sample programs on the web.
+
+- [EMO8 GAMES](https://opyapeus.github.io/emo8/index.html)
 
 ## Specification
 
-- Language: PureScript
-- Monitor Size: 1024x1024
-- Emoji: unicode emojis ※[Supported Emojis](docs/emoji.md)
-- Color: 16 html base colors
-- Input Interface: Keyboard (PC), Swipe (SP, Tablet)
-- Frame Rate: About 60 FPS
-- Working Environment: Any brower
+- Display: variable size (recommended 256px~1024px)
+- Background Color: HTML Named Color 140 colors
+- Emoji: Unicode Emoji - [Supported Emojis](docs/emoji.md)
+- Input: 8 buttons（up down left right 4 buttons x 2）
+- Map: No limit Emoji map - [Map Edit](docs/usage.md#map-edit)
+- Sound: 4 channels Emoji score - [Sound Edit](docs/usage.md#sound-edit)
+- Language: [PureScript](http://www.purescript.org/)
+- Compiled File Volume: about 500KB~1MB
+- Frame Rate: about 60 FPS
+- Operating Environment: web browser
+
+## Controller
+
+- Keyboard
+
+```
+ /¯¯¯\_/¯¯¯\
+|  W  |  ↑  |
+| A D | ← → |
+|  S  |  ↓  |
+ \___/¯\___/
+```
+
+- Touch Screen (Swipe)
+
+```
+|¯¯¯¯¯¯¯¯|¯¯¯¯¯¯¯¯|
+|   👆    |   👆   |
+| 👈   👉 | 👈   👉 |
+|   👇    |   👇   |
+|________|________|
+```
+
+## Sample Programs
+
+Clone this repository first.
+`yarn` is required.
+
+### Install
+
+```sh
+yarn
+yarn postinstall
+```
+
+### Build
+
+```sh
+yarn build
+yarn example
+```
+
+### Start (Open html in browser)
+
+```sh
+open dist/hello/index.html
+open dist/basic/index.html
+open dist/emodius/index.html
+open dist/nekof/index.html
+```
 
 ## Simple Manual
 
 - [Usage](docs/usage.md)
 
-## Examples
+## Useful Game Development Template
 
-clone this repository first.
-
-install
-
-```sh
-npm i
-bower i
-```
-
-build
-
-※ if you can not build with warning, please `pulp build` once.
-
-```sh
-npm run build
-npm run build:examples
-```
-
-open html (public folder) on browser
-
-```sh
-npm run open
-```
-
-access with tag (it may need reload)
-
-```url
-public/index.html#hello
-public/index.html#basic
-public/index.html#emodius
-```
-
-## Play Online
-
-You can play "Emodius" of the sample program online.
-
-- [NEMO GAMES](https://opyapeus.github.io/nemo/index.html)
-
-You can also add games you made with NEMO here.
-If you want, please make issue or PR at Github Pages [Repository](https://github.com/opyapeus/nemo)
-
-## Under Developing List
-
-- [ ] interpreter which executes code on the web
-- [ ] performance tuning
-- [ ] iOS sound support
-
-## Wait And See
-
-- emoji rotate (45°, 135°, 225°, 315°) problem on canvas
-- default emoji presentation [CSS Fonts Module Level 4 - Editor’s Draft, 17 August 2018](https://drafts.csswg.org/css-fonts-4/#font-variant-emoji-prop)
+- [EMO8 Builder](https://github.com/opyapeus/emo8-builder)
 
 ## API Documentation
 
-- [Module documentation on Pursuit](https://pursuit.purescript.org/packages/purescript-nemo/)
+- [Module documentation on Pursuit](https://pursuit.purescript.org/packages/purescript-emo8/)
+
+## Under Developing
+
+- [ ] Interpreter which executes code on the web
+- [ ] Improve performance
+
+## Wait And See
+
+- emoji rotate (45°, 135°, 225°, 315°) problem on canvas [Why won't emojis render when rotated to 45 (or 315) degrees?](https://stackoverflow.com/questions/39749540/why-wont-emojis-render-when-rotated-to-45-or-315-degrees)
+- default emoji presentation [CSS Fonts Module Level 4 - Editor’s Draft, 17 August 2018](https://drafts.csswg.org/css-fonts-4/#font-variant-emoji-prop)
 
 ## Contribution
 
-Since it is beta version, wait for a while.
-If you find an improvement point, please give me an issue.
+Please wait as it is still a beta version.
+If you find improvements please give me an issue.
 Thank you.
 
 ## License
 
 [MIT](LICENSE)
-
-※ License of emojis' graphics are owned by each vendor.

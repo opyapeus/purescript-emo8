@@ -3,9 +3,9 @@ module Collision where
 import Asset (walls)
 import Class.Object (class Object, position, size)
 import Control.Monad.Gen (Size)
-import Nemo.Types (MapId)
-import Nemo.Update.Action (Update, isMapCollide)
-import Nemo.Utils (isCollide, isMonitorCollide, isOutOfMonitor)
+import Emo8.Action.Update (Update, isMapCollide)
+import Emo8.Types (MapId)
+import Emo8.Utils (defaultMonitorSize, isCollide, isMonitorCollide, isOutOfMonitor)
 import Types (Pos)
 
 
@@ -19,13 +19,13 @@ isCollideWorld :: forall a. Object a => a -> Boolean
 isCollideWorld o = isCollWorld (size o) (position o)
 
 isCollWorld :: Size -> Pos -> Boolean
-isCollWorld size {x, y} = isMonitorCollide size x y
+isCollWorld size {x, y} = isMonitorCollide defaultMonitorSize size x y
 
 isOutOfWorld :: forall a. Object a => a -> Boolean
 isOutOfWorld o = isOut (size o) (position o)
 
 isOut :: Size -> Pos -> Boolean
-isOut size {x, y} = isOutOfMonitor size x y
+isOut size {x, y} = isOutOfMonitor defaultMonitorSize size x y
 
 isCollideObjects :: forall a b. Object a => Object b => a -> b -> Boolean
 isCollideObjects a b = isColl (size a) (position a) (size b) (position b)

@@ -1,10 +1,10 @@
 module Constants where
   
 speed :: Int
-speed = 4
+speed = 2
 
 emoSize :: Int
-emoSize = 64
+emoSize = 32
 
 mapSize :: Int
-mapSize = 64
+mapSize = 32

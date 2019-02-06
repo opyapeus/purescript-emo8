@@ -4,8 +4,8 @@ import Prelude
 
 import Constants (emoSize)
 import Class.Object (class ObjectDraw, class Object, position, size)
-import Nemo.Data.Emoji as E
-import Nemo.Draw.Action (emo, emor)
+import Emo8.Action.Draw (emo, emor)
+import Emo8.Data.Emoji as E
 import Types (Pos)
 
 
@@ -31,7 +31,7 @@ instance objectDrawBullet :: ObjectDraw Bullet where
 
 
 updateBullet :: Bullet -> Bullet
-updateBullet (Normal s) = Normal $ s { pos { x = s.pos.x + 10 } }
-updateBullet (Upper s) = Upper $ s { pos { x = s.pos.x + 10, y = s.pos.y + 10 } }
-updateBullet (Downer s) = Downer $ s { pos { x = s.pos.x + 10, y = s.pos.y - 10 } }
+updateBullet (Normal s) = Normal $ s { pos { x = s.pos.x + 5 } }
+updateBullet (Upper s) = Upper $ s { pos { x = s.pos.x + 5, y = s.pos.y + 5 } }
+updateBullet (Downer s) = Downer $ s { pos { x = s.pos.x + 5, y = s.pos.y - 5 } }
 

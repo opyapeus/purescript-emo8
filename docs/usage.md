@@ -1,6 +1,6 @@
 # Usage
 
-For concrete implementation, see [examples](../examples) and [public folder](../public)
+For concrete implementation, see [examples](../examples) and [endpoint folder](../endpoint)
 
 ## Game Class
 
@@ -11,11 +11,11 @@ class Game s where
   sound :: s -> Sound Unit
 ```
 
-`s` is game state data which you can flexibly define.
+`s` is a game state data type which you can flexibly define.
 
-Each methods are called in order update, draw, sound at every frame.
+Each functions are executed in order update, draw, sound at every frame.
 
-## Update
+## Update Action
 
 ### Input
 
@@ -33,7 +33,7 @@ type Input =
   }
 ```
 
-### Get Random Value
+### Get Random Value (An example)
 
 ```PureScript
 randomInt :: Int -> Int -> Update Int
@@ -44,11 +44,11 @@ Arguments
 - First Int: min value
 - Second Int: max value
 
-After describing actions and some calculations, return `s` at the end of update function.
+After describing some actions, return next `s` at the end of update function.
 
-## Draw
+## Draw Action
 
-### Draw Emoji
+### Draw Emoji (An example)
 
 ```PureScript
 emo :: Emoji -> Size -> X -> Y -> Draw Unit
@@ -66,7 +66,7 @@ Arguments
 ※ All emojis are treated as square.
 Because these appearances depend on running device or browser.
 
-### Draw Map
+### Draw Map (An example)
 
 ```PureScript
 emap :: MapId -> Size -> X -> Y -> Draw Unit
@@ -74,22 +74,23 @@ emap :: MapId -> Size -> X -> Y -> Draw Unit
 
 Arguments
 
-- MapId: index of map data that you edit.
+- MapId: index of map data that you edited.
 - Size: map element (emoji) size. (not whole map size)
 - X: map's left position
 - Y: map's bottom position
 
-## Sound
+## Sound Action
 
-### Play Sound
+### Play Sound (An example)
 
 ```PureScript
-play :: SoundId -> Tone -> Bpm -> Sound Unit
+play :: Channel -> SoundId -> Tone -> Bpm -> Sound Unit
 ```
 
 Arguments
 
-- SoundId: index of sound data that you edit.
+- Channel: channel type (select one of [CH1, CH2, CH3, CH4])
+- SoundId: index of sound data that you edited.
 - Tone: oscillation type (select one of [Sin, Sq, Tri, Saw, Noise])
 - Bpm: tempo (beat per minute)
 
@@ -117,7 +118,7 @@ map0 = RawMap """
 """
 ```
 
-🈳 is special emoji that represents vacant space.
+※ 🈳 is the special emoji that represents vacant space.
 
 ## Sound Edit
 
@@ -177,42 +178,47 @@ type Asset =
 
 It contains map data and sound data.
 
-Use `mkAsset` function for loading map and sound data that you edit.
+Use `mkAsset` function for loading map and sound data that you edited.
 
 ```PureScript
 mkAsset :: Array RawMap -> Array RawSound -> Effect Asset
 ```
 
-## Startup
+## Development And Production
 
 ### Production
 
-```PureScript
-nemo :: forall s. Game s => s -> Asset -> Effect Unit
-```
-
 Main game loop function.
 
-To run this function, you need to define game state s which is instance of Game class.
-
-And give asset.
+```PureScript
+emo8 :: forall s. Game s => s -> Asset -> MonitorSize -> Effect Unit
+```
 
 ### Development
 
-```PureScript
-nemoDev :: forall s. Show s => Game s => s -> Asset -> DebugConfig -> Effect Unit
-```
-
 Main game loop function for development.
 
-State s should be instance of Show class for saving state.
+```PureScript
+emo8Dev :: forall s. GameDev s => s -> Asset -> MonitorSize -> Effect Unit
+```
 
-Give DebugConfig. (ex: `defaultDebugConfig`)
+### GameDev Class
 
-For convenience, special key signal below.
+```PureScript
+class (Game s, Encode s, Decode s) <= GameDev s where
+    saveLocal :: s -> Array LocalKey
+```
 
-- Alt + 1: Resume game cycle
-- Alt + 2: Suspend game cycle
-- Alt + 3: Forward one frame
-- Alt + 4: Load game state (default is initial state)
-- Alt + 5: Save game state (output current state in browser console and update state which will be loaded)
+saveLocal function is executed after Game class's functions at every frame.
+It saves state json text to localstorage with the given LocalKey array(for multiple savepoints).
+
+### Load Saved State
+
+```PureScript
+loadStateWithDefault :: forall s. GameDev s => s -> LocalKey -> Effect s
+```
+
+Arguments
+
+- s: fallback state which is used when localstorage key is not found.
+- LocalKey: localstorage key which you saved with saveLocal function.

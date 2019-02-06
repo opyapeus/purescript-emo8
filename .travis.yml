@@ -2,11 +2,10 @@ node_js:
   - "node"
 language: node_js
 install:
-  - npm install -g purescript pulp bower
-  - npm install
-  - bower install
+  - yarn
+  - yarn postinstall
 script:
-  - pulp build # npm run build
-  - npm run build:examples
-  - npm run test
-  - npm run doc
+  - yarn build
+  - yarn test
+  - yarn example
+  - yarn doc

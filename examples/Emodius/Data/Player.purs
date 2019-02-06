@@ -5,10 +5,10 @@ import Prelude
 import Class.Object (class Object, class ObjectDraw, position, size)
 import Constants (emoSize)
 import Data.Bullet (Bullet(..))
-import Nemo.Constants (scene)
-import Nemo.Data.Emoji as E
-import Nemo.Input (Input)
-import Nemo.Draw.Action (emo', emor')
+import Emo8.Action.Draw (emo', emor')
+import Emo8.Data.Emoji as E
+import Emo8.Input (Input)
+import Emo8.Utils (defaultMonitorSize)
 import Types (Pos)
 
 
@@ -55,12 +55,12 @@ updatePos :: Input -> Pos -> Pos
 updatePos i p = { x: nx, y: ny }
     where
         nx = case i.isLeft, i.isRight of
-                true, false -> p.x - 5
-                false, true -> p.x + 5
+                true, false -> p.x - 4
+                false, true -> p.x + 4
                 _, _ -> p.x
         ny = case i.isUp, i.isDown of
-                true, false -> p.y + 5
-                false, true -> p.y - 5
+                true, false -> p.y + 4
+                false, true -> p.y - 4
                 _, _ -> p.y
 
 addBullet :: Input -> Player -> Array Bullet
@@ -75,7 +75,7 @@ initialPlayer :: Player
 initialPlayer = Player
     { pos:
         { x: 0
-        , y: scene.height / 2
+        , y: defaultMonitorSize.height / 2
         }
     , energy: 30
     , appear: Stable

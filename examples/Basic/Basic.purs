@@ -2,27 +2,32 @@ module Basic where
 
 import Prelude
 
+import Data.Array (catMaybes)
 import Data.Generic.Rep (class Generic)
-import Data.Generic.Rep.Show (genericShow)
+import Data.Maybe (Maybe(..))
 import Effect (Effect)
-import Nemo (nemoDev)
-import Nemo.Class.Game (class Game)
-import Nemo.Constants (scene)
-import Nemo.Data.Color (Color(..))
-import Nemo.Data.Emoji as E
-import Nemo.Data.Tone (Tone(..))
-import Nemo.Draw.Action (cls, emap, emo, emo')
-import Nemo.Parse (RawMap(..), RawSound(..))
-import Nemo.Sound.Action (play)
-import Nemo.Types (Size, X, Y)
-import Nemo.Update.Action (Update, isMapCollide)
-import Nemo.Utils (isMonitorCollide, mkAsset, defaultDebugConfig)
+import Emo.FFI.LocalStorage (LocalKey(..))
+import Emo8 (emo8Dev)
+import Emo8.Action.Draw (cls, emap, emo, emo')
+import Emo8.Action.Sound (play)
+import Emo8.Action.Update (Update, isMapCollide)
+import Emo8.Class.Game (class Game)
+import Emo8.Class.GameDev (class GameDev, loadStateWithDefault)
+import Emo8.Data.Channel (Channel(..))
+import Emo8.Data.Color (Color(..))
+import Emo8.Data.Emoji as E
+import Emo8.Data.Tone (Tone(..))
+import Emo8.Parse (RawMap(..), RawSound(..))
+import Emo8.Types (Size, X, Y)
+import Emo8.Utils (defaultMonitorSize, isMonitorCollide, mkAsset)
+import Foreign.Class (class Decode, class Encode)
+import Foreign.Generic (defaultOptions, genericDecode, genericEncode)
 
 emoSize :: Size
-emoSize = 64
+emoSize = 32
 
 mapSize :: Size
-mapSize = 64
+mapSize = 32
 
 gravity :: Int
 gravity = 2
@@ -35,27 +40,21 @@ data State = State
   , appear :: Appear
   , frame :: Int
   }
-derive instance genericState :: Generic State _
-instance showState :: Show State where
-  show = genericShow
 
 data Appear = LeftWalk | RightWalk | LeftRun | RightRun
-derive instance genericAppear :: Generic Appear _
-instance showAppear :: Show Appear where
-  show = genericShow
 
 instance gameState :: Game State where
   update input (State state) = do
     -- next x
     let nx = case input.isLeft, input.isRight of
-          true, false -> state.x - 10
-          false, true-> state.x + 10
+          true, false -> state.x - 5
+          false, true-> state.x + 5
           _, _ -> state.x
 
     -- next y, dy
     canJump <- isCollide state.x (state.y - gravity)
-    let isJump = canJump && input.isUpCat
-        ddy = if isJump then 40 else 0
+    let isJump = canJump && input.catched.isUp
+        ddy = if isJump then 25 else 0
         ndy = state.dy - gravity + ddy
         ny = state.y + ndy
 
@@ -90,7 +89,7 @@ instance gameState :: Game State where
       isCollide :: X -> Y -> Update Boolean
       isCollide x y = do
         isMapColl <- isMapCollide 0 mapSize walls emoSize x y
-        let isMonitorColl = isMonitorCollide emoSize x y
+        let isMonitorColl = isMonitorCollide defaultMonitorSize emoSize x y
         pure $ isMapColl || isMonitorColl
 
   draw (State state) = do
@@ -106,16 +105,44 @@ instance gameState :: Game State where
 
   sound (State state) = do
     when state.isJump $
-      play 0 Saw 4096
+      play CH1 0 Saw 4096
+
+derive instance genericAppear :: Generic Appear _
+instance encodeAppear :: Encode Appear where
+  encode = genericEncode defaultOptions
+instance decodeAppear :: Decode Appear where
+  decode = genericDecode defaultOptions
+
+derive instance genericState :: Generic State _
+instance decodeState :: Decode State where
+  decode = genericDecode defaultOptions
+instance encodeState :: Encode State where
+  encode = genericEncode defaultOptions
+
+instance gameDevState :: GameDev State where
+  saveLocal (State s) = catMaybes
+    [ if mod s.frame 60 == 0 then Just localKeys.per60frame else Nothing
+    , if s.isJump then Just localKeys.jumped else Nothing
+    ]
+
+localKeys ::
+  { jumped :: LocalKey
+  , per60frame :: LocalKey
+  }
+localKeys =
+  { jumped: LocalKey "jumped"
+  , per60frame: LocalKey "per60frame"
+  }
 
 main :: Effect Unit
 main = do
+  s <- loadStateWithDefault initialState localKeys.jumped
   asset <- mkAsset [map0] [snd0]
-  nemoDev initialState asset defaultDebugConfig
+  emo8Dev s asset defaultMonitorSize
 
 initialState :: State 
 initialState = State
-  { x: scene.width / 2
+  { x: defaultMonitorSize.width / 2
   , y: mapSize
   , dy: 0
   , isJump: false

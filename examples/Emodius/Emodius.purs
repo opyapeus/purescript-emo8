@@ -14,13 +14,14 @@ import Data.Foldable (traverse_)
 import Data.Particle (Particle, initParticle, updateParticle)
 import Data.Player (Player, addBullet, initialPlayer, updatePlayer)
 import Effect (Effect)
-import Helper (beInMonitor, drawScrollMap, isCollideScrollMap, isInputCatchAny)
-import Nemo (nemo)
-import Nemo.Class.Game (class Game)
-import Nemo.Data.Color (Color(..))
-import Nemo.Data.Emoji as E
-import Nemo.Draw.Action (cls, emo, emor, emor')
-import Nemo.Utils (mkAsset)
+import Emo8 (emo8)
+import Emo8.Action.Draw (cls, emo, emor, emor')
+import Emo8.Class.Game (class Game)
+import Emo8.Data.Color (Color(..))
+import Emo8.Data.Emoji as E
+import Emo8.Input (isCatchAny)
+import Emo8.Utils (defaultMonitorSize, mkAsset)
+import Helper (beInMonitor, drawScrollMap, isCollideScrollMap)
 
 data State
     = TitleState
@@ -37,11 +38,11 @@ data State
 
 instance gameState :: Game State where
     update input TitleState =
-        pure $ if isInputCatchAny input then initialPlayState else TitleState
+        pure $ if isCatchAny input then initialPlayState else TitleState
     update input OverState =
-        pure $ if isInputCatchAny input then initialState else OverState
+        pure $ if isCatchAny input then initialState else OverState
     update input ClearState =
-        pure $ if isInputCatchAny input then initialState else ClearState
+        pure $ if isCatchAny input then initialState else ClearState
     update input (PlayState s) = do
         -- update pos
         let np = updatePlayer input s.player
@@ -94,23 +95,23 @@ instance gameState :: Game State where
 
     draw TitleState = do
         cls Aqua
-        emor' 30 E.helicopter 384 100 100
-        emo E.spiderWeb 512 400 400
-        emor (-15) E.octopus 256 600 600
-        emo E.pill 128 250 800
-        emor 75 E.pill 128 200 600
-        emo E.fastForwardButton 128 700 200
+        emor' 30 E.helicopter 192 50 50
+        emo E.spiderWeb 256 200 200
+        emor (-15) E.octopus 128 300 300
+        emo E.pill 64 150 400
+        emor 75 E.pill 64 100 300
+        emo E.fastForwardButton 64 350 100
     draw OverState = do
         cls Maroon
-        emo E.hole 512 250 300
-        emor 160 E.helicopter 256 350 400
-        emo E.recyclingSymbol 256 375 700
+        emo E.hole 256 125 150
+        emor 160 E.helicopter 128 175 200
+        emo E.recyclingSymbol 128 185 350
     draw ClearState = do
         cls Lime
-        emor 15 E.helicopter 128 700 800
-        emor (-15) E.octopus 256 350 350
-        emo E.globeWithMeridians 512 150 150
-        emo E.thumbsUp 128 200 800
+        emor 15 E.helicopter 64 350 400
+        emor (-15) E.octopus 128 175 175
+        emo E.globeWithMeridians 256 75 75
+        emo E.thumbsUp 64 100 400
     draw (PlayState s) = do
         cls Aqua
         drawScrollMap s.distance
@@ -140,4 +141,4 @@ main = do
     asset <- mkAsset
         [map0, map1, map2, map3]
         []
-    nemo initialState asset
+    emo8 initialState asset defaultMonitorSize

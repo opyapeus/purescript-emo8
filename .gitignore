@@ -7,6 +7,5 @@
 /.psc*
 /.purs*
 /.psa*
-/public/js/*
-/package-lock.json
-!.gitkeep
+/dist/
+*.lock

@@ -1,8 +1,8 @@
 module Asset where
 
 
-import Nemo.Data.Emoji as E
-import Nemo.Parse (RawMap(..))
+import Emo8.Data.Emoji as E
+import Emo8.Parse (RawMap(..))
 
 walls :: Array E.Emoji
 walls =
