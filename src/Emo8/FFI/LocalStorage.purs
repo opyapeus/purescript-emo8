@@ -1,4 +1,4 @@
-module Emo.FFI.LocalStorage
+module Emo8.FFI.LocalStorage
     ( LocalKey(..)
     , setItem
     , removeItem
