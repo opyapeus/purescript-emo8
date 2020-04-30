@@ -1,19 +1,21 @@
 module Emo8.FFI.LocalStorage
-    ( LocalKey(..)
-    , setItem
-    , removeItem
-    , getItem
-    ) where
+  ( LocalKey(..)
+  , setItem
+  , removeItem
+  , getItem
+  ) where
 
 import Prelude
-
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 
-newtype LocalKey = LocalKey String
+newtype LocalKey
+  = LocalKey String
 
 foreign import setItemImpl :: String -> String -> Effect Unit
+
 foreign import removeItemImpl :: String -> Effect Unit
+
 -- HACK: return Maybe type
 foreign import getItemImpl :: Maybe String -> (String -> Maybe String) -> String -> Effect (Maybe String)
 

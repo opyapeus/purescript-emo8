@@ -1,36 +1,24 @@
 {
   "private": true,
+  "name": "purescript-emo8",
+  "license": "MIT",
   "scripts": {
-    "postinstall": "bower install",
-    "clean:output": "rimraf output",
-    "clean:dist": "rimraf dist",
-    "clean:doc": "rimraf generated-docs",
-    "clean": "npm-run-all clean:*",
-    "build": "pulp build -- --censor-lib --strict",
-    "test": "pulp test",
-    "example:hello:endpoint": "cpx 'endpoint/*' dist/hello",
-    "example:hello:build": "pulp build --main Hello -I examples/Hello --to dist/hello/app.js",
-    "example:hello": "npm-run-all example:hello:*",
-    "example:basic:endpoint": "cpx 'endpoint/*' dist/basic",
-    "example:basic:build": "pulp build --main Basic -I examples/Basic --to dist/basic/app.js",
-    "example:basic": "npm-run-all example:basic:*",
-    "example:emodius:endpoint": "cpx 'endpoint/*' dist/emodius",
-    "example:emodius:build": "pulp build --main Emodius -I examples/Emodius --to dist/emodius/app.js",
-    "example:emodius": "npm-run-all example:emodius:*",
-    "example:nekof:endpoint": "cpx 'endpoint/*' dist/nekof",
-    "example:nekof:build": "pulp build --main Nekof -I examples/Nekof --to dist/nekof/app.js",
-    "example:nekof": "npm-run-all example:nekof:*",
-    "example": "npm-run-all -s example:*",
-    "doc": "pulp docs -- --format html"
+    "clean": "rimraf dist output .spago .cache .psci_modules",
+    "build": "spago build",
+    "example:bundle:hello:js": "spago bundle-app --path example/hello/Main.purs --to dist/example/hello/index.js",
+    "example:bundle:hello:css": "cpx asset/index.css dist/example/hello",
+    "example:bundle:hello:html": "cpx asset/index.html dist/example/hello",
+    "example:bundle:hello": "run-s example:bundle:hello:*",
+    "example:build:hello": "spago build --path example/hello/Main.purs",
+    "example:build:basic": "spago build --path example/basic/Main.purs",
+    "dev": "parcel serve asset/index.html"
   },
   "devDependencies": {
-    "bower": "^1.8.8",
     "cpx": "^1.5.0",
-    "npm-run-all": "^4.1.3",
-    "pulp": "^12.2.0",
-    "purescript": "^0.12.0",
-    "purescript-psa": "^0.6.0",
-    "rimraf": "^2.6.2"
-  },
-  "dependencies": {}
+    "npm-run-all": "^4.1.5",
+    "parcel": "^1.12.4",
+    "purescript": "^0.13.6",
+    "rimraf": "^3.0.2",
+    "spago": "^0.15.2"
+  }
 }

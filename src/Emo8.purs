@@ -4,99 +4,149 @@ module Emo8
   ) where
 
 import Prelude
-
 import Audio.WebAudio.BaseAudioContext (newAudioContext)
+import Audio.WebAudio.Types (AudioContext, OscillatorNode)
 import Data.Int (toNumber)
+import Data.List as L
+import Data.Map as Map
 import Data.Maybe (Maybe(..))
-import Data.String (joinWith)
+import Data.Tuple (Tuple(..))
 import Effect (Effect)
-import Effect.Exception (throw)
-import Emo8.Boot (bootRawSound, initialState)
-import Emo8.Class.Game (class Game, draw, sound, update)
-import Emo8.Class.GameDev (class GameDev, saveState)
-import Emo8.Class.Input (poll)
-import Emo8.Constants (canvasId)
+import Effect.Class.Console (error)
+import Effect.Ref (Ref)
+import Effect.Ref as Ref
+import Emo8.Data.Draw (runDraw)
 import Emo8.Data.GameWithBoot (GameWithBoot(..), switchFoldOp, switchOp)
-import Emo8.Input (mkInputSig)
-import Emo8.Interpreter.Draw (runDraw)
-import Emo8.Interpreter.Sound (runSound)
-import Emo8.Interpreter.Update (runUpdate)
-import Emo8.SoundByUserGesture (resumeByUserGestureOnce)
-import Emo8.SoundUtil (mkChannelSets, prepareSound)
-import Emo8.Types (Asset, MonitorSize)
-import Emo8.Utils (mkAsset)
-import Graphics.Canvas (CanvasElement, getCanvasElementById, getContext2D, setCanvasHeight, setCanvasWidth)
-import Signal (runSignal, sampleOn)
+import Emo8.Data.Input (Input)
+import Emo8.Data.Sound (runSound)
+import Emo8.Data.Update (Resource(..), runUpdate)
+import Emo8.Game (class Game, draw, sound, update)
+import Emo8.GameBoot as B
+import Emo8.GameDev (class GameDev, saveState)
+import Emo8.Input (poll)
+import Emo8.Input.Merged (mkInput)
+import Emo8.Parser.Type (Score)
+import Emo8.Type (Config)
+import Emo8.Util.Resource (emptyMap)
+import Emo8.Util.Type (StateRes)
+import Graphics.Canvas (CanvasElement, Context2D, getCanvasElementById, getContext2D, setCanvasHeight, setCanvasWidth)
+import Signal (foldp, runSignal, sampleOn)
 import Signal.DOM (animationFrame)
-import Signal.Effect (foldEffect)
 
--- | Run game function.
-emo8 :: forall s. Game s => s -> Asset -> MonitorSize -> Effect Unit
-emo8 state asset ms = withCanvas \canvas -> do
-  setDim canvas ms
-  context <- getContext2D canvas
-  audCtx <- newAudioContext
-  chSets <- mkChannelSets audCtx
-  bootAsset <- mkAsset [] [bootRawSound]
-  let drawCtx = { ctx: context, mapData: asset.mapData, monitorSize: ms }
-      soundCtx = { ctx: audCtx, soundData: asset.soundData, channelSets: chSets }
-      bootState = initialState ms
-      bootDrawCtx = { ctx: context, mapData: bootAsset.mapData, monitorSize: ms }
-      bootSoundCtx = { ctx: audCtx, soundData: bootAsset.soundData, channelSets: chSets }
+emo8 ::
+  forall s dr sr.
+  Game s dr sr =>
+  s -> dr -> sr -> Config -> Effect Unit
+emo8 = emo8F run
 
-  frameSig <- animationFrame
-  keyTouchInputSig <- poll
-  let keyTouchInputSampleSig = sampleOn frameSig keyTouchInputSig
-      inputSampleSig = mkInputSig keyTouchInputSampleSig
-      biState = GameWithBoot state bootState 
-  biStateSig <- foldEffect
-    ( switchFoldOp
-      (\i -> runUpdate asset <<< update i)
-      (\i -> runUpdate bootAsset <<< update i)
-    )
-    biState
-    inputSampleSig
-  runSignal $ switchOp
-    (runDraw drawCtx <<< draw)
-    (runDraw bootDrawCtx <<< draw)
-    biStateSig
-  runSignal $ switchOp
-    (runSound soundCtx <<< sound)
-    (runSound bootSoundCtx <<< sound)
-    biStateSig
+emo8Dev ::
+  forall s dr sr.
+  GameDev s dr sr =>
+  s -> dr -> sr -> Config -> Effect Unit
+emo8Dev = emo8F runDev
 
-  runSignal $ resumeByUserGestureOnce audCtx keyTouchInputSig
-  prepareSound chSets audCtx
+emo8F ::
+  forall s dr sr.
+  Game s dr sr =>
+  (CanvasElement -> s -> dr -> sr -> Config -> Effect Unit) ->
+  s -> dr -> sr -> Config -> Effect Unit
+emo8F f s r sr conf = do
+  mc <- getCanvasElementById canvasId
+  case mc of
+    Nothing -> error "no canvas"
+    Just c -> do
+      setCanvasWidth c (toNumber conf.canvasSize.width)
+      setCanvasHeight c (toNumber conf.canvasSize.height)
+      f c s r sr conf
+  where
+  canvasId = "emo8"
 
-emo8Dev :: forall s. GameDev s => s -> Asset -> MonitorSize -> Effect Unit
-emo8Dev state asset ms = withCanvas \canvas -> do
-  setDim canvas ms
-  context <- getContext2D canvas
-  audCtx <- newAudioContext
-  chSets <- mkChannelSets audCtx
-  let drawCtx = { ctx: context, mapData: asset.mapData, monitorSize: ms }
-      soundCtx = { ctx: audCtx, soundData: asset.soundData, channelSets: chSets }
+run ::
+  forall s dr sr.
+  Game s dr sr =>
+  CanvasElement -> s -> dr -> sr -> Config -> Effect Unit
+run c state dr sr conf = do
+  dctx <- getContext2D c
+  sctx <- newAudioContext
+  ref <- Ref.new Map.empty
+  frame <- animationFrame
+  keySig <- poll
+  dirSig <- poll
+  let
+    inSig = mkInput <$> keySig <*> dirSig
 
-  frameSig <- animationFrame
-  keyTouchInputSig <- poll
-  let keyTouchInputSampleSig = sampleOn frameSig keyTouchInputSig
-      inputSampleSig = mkInputSig keyTouchInputSampleSig
-  stateSig <- foldEffect (\i -> runUpdate asset <<< update i) state inputSampleSig
-  runSignal $ runDraw drawCtx <<< draw <$> stateSig
-  runSignal $ runSound soundCtx <<< sound <$> stateSig
-  runSignal $ saveState <$> stateSig
+    sig = sampleOn frame inSig
 
-  runSignal $ resumeByUserGestureOnce audCtx keyTouchInputSig
-  prepareSound chSets audCtx
+    resource = Resource { draw: dr, sound: sr, config: conf }
 
-withCanvas :: (CanvasElement -> Effect Unit) -> Effect Unit
-withCanvas op = do
-  mCanvas <- getCanvasElementById canvasId
-  case mCanvas of
-    Just c -> op c
-    Nothing -> throw $ joinWith " " ["canvas id:", canvasId, "was not found."]
+    bootResource = Resource { draw: emptyMap, sound: B.sr, config: conf }
 
-setDim :: CanvasElement -> MonitorSize -> Effect Unit
-setDim canvas ms = do
-  setCanvasWidth canvas $ toNumber ms.width
-  setCanvasHeight canvas $ toNumber ms.height
+    init = Tuple state resource
+
+    bootInit = Tuple (B.initialState conf.canvasSize) bootResource
+
+    biState = GameWithBoot init bootInit
+
+    biStateSig =
+      foldp
+        ( switchFoldOp
+            updateF
+            updateF
+        )
+        biState
+        sig
+  runSignal
+    $ switchOp
+        (drawF dctx conf)
+        (drawF dctx conf)
+        biStateSig
+  runSignal
+    $ switchOp
+        (soundF sctx ref)
+        (soundF sctx ref)
+        biStateSig
+
+runDev ::
+  forall s dr sr.
+  GameDev s dr sr =>
+  CanvasElement -> s -> dr -> sr -> Config -> Effect Unit
+runDev c state dr sr conf = do
+  dctx <- getContext2D c
+  sctx <- newAudioContext
+  ref <- Ref.new Map.empty
+  frame <- animationFrame
+  keySig <- poll
+  dirSig <- poll
+  let
+    inSig = mkInput <$> keySig <*> dirSig
+
+    sig = sampleOn frame inSig
+
+    resource = Resource { draw: dr, sound: sr, config: conf }
+
+    init = Tuple state resource
+
+    stSig = foldp updateF init sig
+  runSignal $ drawF dctx conf <$> stSig
+  runSignal $ soundF sctx ref <$> stSig
+  runSignal $ devF <$> stSig
+  where
+  devF (Tuple s _) = saveState s
+
+updateF ::
+  forall s dr sr.
+  Game s dr sr =>
+  Input -> StateRes s dr sr -> StateRes s dr sr
+updateF i (Tuple s r) = runUpdate (update i s) r
+
+drawF ::
+  forall s dr sr.
+  Game s dr sr =>
+  Context2D -> Config -> StateRes s dr sr -> Effect Unit
+drawF ctx conf (Tuple s (Resource r)) = runDraw (draw s) { ctx: ctx, resource: r.draw, canvasSize: conf.canvasSize }
+
+soundF ::
+  forall s dr sr.
+  Game s dr sr =>
+  AudioContext -> Ref (Map.Map Score (L.List OscillatorNode)) -> StateRes s dr sr -> Effect Unit
+soundF ctx ref (Tuple s (Resource r)) = runSound (sound s) { ctx: ctx, resource: r.sound, ref: ref }

@@ -1,454 +1,575 @@
-module Emo8.Data.Color where
+module Emo8.Data.Color
+  ( Color
+  , aliceBlue
+  , antiqueWhite
+  , aqua
+  , aquamarine
+  , azure
+  , beige
+  , bisque
+  , black
+  , blanchedAlmond
+  , blue
+  , blueViolet
+  , brown
+  , burlyWood
+  , cadetBlue
+  , chartreuse
+  , chocolate
+  , coral
+  , cornflowerBlue
+  , cornsilk
+  , crimson
+  , cyan
+  , darkBlue
+  , darkCyan
+  , darkGoldenRod
+  , darkGray
+  , darkGreen
+  , darkKhaki
+  , darkMagenta
+  , darkOliveGreen
+  , darkOrange
+  , darkOrchid
+  , darkRed
+  , darkSalmon
+  , darkSeaGreen
+  , darkSlateBlue
+  , darkSlateGray
+  , darkTurquoise
+  , darkViolet
+  , deepPink
+  , deepSkyBlue
+  , dimGray
+  , dodgerBlue
+  , fireBrick
+  , floralWhite
+  , forestGreen
+  , fuchsia
+  , gainsboro
+  , ghostWhite
+  , gold
+  , goldenRod
+  , gray
+  , green
+  , greenYellow
+  , honeyDew
+  , hotPink
+  , indianRed
+  , indigo
+  , ivory
+  , khaki
+  , lavender
+  , lavenderBlush
+  , lawnGreen
+  , lemonChiffon
+  , lightBlue
+  , lightCoral
+  , lightCyan
+  , lightGoldenRodYellow
+  , lightGray
+  , lightGreen
+  , lightPink
+  , lightSalmon
+  , lightSeaGreen
+  , lightSkyBlue
+  , lightSlateGray
+  , lightSteelBlue
+  , lightYellow
+  , lime
+  , limeGreen
+  , linen
+  , magenta
+  , maroon
+  , mediumAquaMarine
+  , mediumBlue
+  , mediumOrchid
+  , mediumPurple
+  , mediumSeaGreen
+  , mediumSlateBlue
+  , mediumSpringGreen
+  , mediumTurquoise
+  , mediumVioletRed
+  , midnightBlue
+  , mintCream
+  , mistyRose
+  , moccasin
+  , navajoWhite
+  , navy
+  , oldLace
+  , olive
+  , oliveDrab
+  , orange
+  , orangeRed
+  , orchid
+  , paleGoldenRod
+  , paleGreen
+  , paleTurquoise
+  , paleVioletRed
+  , papayaWhip
+  , peachPuff
+  , peru
+  , pink
+  , plum
+  , powderBlue
+  , purple
+  , rebeccaPurple
+  , red
+  , rosyBrown
+  , royalBlue
+  , saddleBrown
+  , salmon
+  , sandyBrown
+  , seaGreen
+  , seaShell
+  , sienna
+  , silver
+  , skyBlue
+  , slateBlue
+  , slateGray
+  , snow
+  , springGreen
+  , steelBlue
+  , tan
+  , teal
+  , thistle
+  , tomato
+  , turquoise
+  , violet
+  , wheat
+  , white
+  , whiteSmoke
+  , yellow
+  , yellowGreen
+  ) where
 
-data Color
-  = AliceBlue
-  | AntiqueWhite
-  | Aqua
-  | Aquamarine
-  | Azure
-  | Beige
-  | Bisque
-  | Black
-  | BlanchedAlmond
-  | Blue
-  | BlueViolet
-  | Brown
-  | BurlyWood
-  | CadetBlue
-  | Chartreuse
-  | Chocolate
-  | Coral
-  | CornflowerBlue
-  | Cornsilk
-  | Crimson
-  | Cyan
-  | DarkBlue
-  | DarkCyan
-  | DarkGoldenRod
-  | DarkGray
-  | DarkGrey
-  | DarkGreen
-  | DarkKhaki
-  | DarkMagenta
-  | DarkOliveGreen
-  | DarkOrange
-  | DarkOrchid
-  | DarkRed
-  | DarkSalmon
-  | DarkSeaGreen
-  | DarkSlateBlue
-  | DarkSlateGray
-  | DarkSlateGrey
-  | DarkTurquoise
-  | DarkViolet
-  | DeepPink
-  | DeepSkyBlue
-  | DimGray
-  | DimGrey
-  | DodgerBlue
-  | FireBrick
-  | FloralWhite
-  | ForestGreen
-  | Fuchsia
-  | Gainsboro
-  | GhostWhite
-  | Gold
-  | GoldenRod
-  | Gray
-  | Grey
-  | Green
-  | GreenYellow
-  | HoneyDew
-  | HotPink
-  | IndianRed 
-  | Indigo
-  | Ivory
-  | Khaki
-  | Lavender
-  | LavenderBlush
-  | LawnGreen
-  | LemonChiffon
-  | LightBlue
-  | LightCoral
-  | LightCyan
-  | LightGoldenRodYellow
-  | LightGray
-  | LightGrey
-  | LightGreen
-  | LightPink
-  | LightSalmon
-  | LightSeaGreen
-  | LightSkyBlue
-  | LightSlateGray
-  | LightSlateGrey
-  | LightSteelBlue
-  | LightYellow
-  | Lime
-  | LimeGreen
-  | Linen
-  | Magenta
-  | Maroon
-  | MediumAquaMarine
-  | MediumBlue
-  | MediumOrchid
-  | MediumPurple
-  | MediumSeaGreen
-  | MediumSlateBlue
-  | MediumSpringGreen
-  | MediumTurquoise
-  | MediumVioletRed
-  | MidnightBlue
-  | MintCream
-  | MistyRose
-  | Moccasin
-  | NavajoWhite
-  | Navy
-  | OldLace
-  | Olive
-  | OliveDrab
-  | Orange
-  | OrangeRed
-  | Orchid
-  | PaleGoldenRod
-  | PaleGreen
-  | PaleTurquoise
-  | PaleVioletRed
-  | PapayaWhip
-  | PeachPuff
-  | Peru
-  | Pink
-  | Plum
-  | PowderBlue
-  | Purple
-  | RebeccaPurple
-  | Red
-  | RosyBrown
-  | RoyalBlue
-  | SaddleBrown
-  | Salmon
-  | SandyBrown
-  | SeaGreen
-  | SeaShell
-  | Sienna
-  | Silver
-  | SkyBlue
-  | SlateBlue
-  | SlateGray
-  | SlateGrey
-  | Snow
-  | SpringGreen
-  | SteelBlue
-  | Tan
-  | Teal
-  | Thistle
-  | Tomato
-  | Turquoise
-  | Violet
-  | Wheat
-  | White
-  | WhiteSmoke
-  | Yellow
-  | YellowGreen
+import Prelude
 
-colorToCode :: Color -> String
-colorToCode AliceBlue = "#F0F8FF"
-colorToCode AntiqueWhite = "#FAEBD7"
-colorToCode Aqua = "#00FFFF"
-colorToCode Aquamarine = "#7FFFD4"
-colorToCode Azure = "#F0FFFF"
-colorToCode Beige = "#F5F5DC"
-colorToCode Bisque = "#FFE4C4"
-colorToCode Black = "#000000"
-colorToCode BlanchedAlmond = "#FFEBCD"
-colorToCode Blue = "#0000FF"
-colorToCode BlueViolet = "#8A2BE2"
-colorToCode Brown = "#A52A2A"
-colorToCode BurlyWood = "#DEB887"
-colorToCode CadetBlue = "#5F9EA0"
-colorToCode Chartreuse = "#7FFF00"
-colorToCode Chocolate = "#D2691E"
-colorToCode Coral = "#FF7F50"
-colorToCode CornflowerBlue = "#6495ED"
-colorToCode Cornsilk = "#FFF8DC"
-colorToCode Crimson = "#DC143C"
-colorToCode Cyan = "#00FFFF"
-colorToCode DarkBlue = "#00008B"
-colorToCode DarkCyan = "#008B8B"
-colorToCode DarkGoldenRod = "#B8860B"
-colorToCode DarkGray = "#A9A9A9"
-colorToCode DarkGrey = "#A9A9A9"
-colorToCode DarkGreen = "#006400"
-colorToCode DarkKhaki = "#BDB76B"
-colorToCode DarkMagenta = "#8B008B"
-colorToCode DarkOliveGreen = "#556B2F"
-colorToCode DarkOrange = "#FF8C00"
-colorToCode DarkOrchid = "#9932CC"
-colorToCode DarkRed = "#8B0000"
-colorToCode DarkSalmon = "#E9967A"
-colorToCode DarkSeaGreen = "#8FBC8F"
-colorToCode DarkSlateBlue = "#483D8B"
-colorToCode DarkSlateGray = "#2F4F4F"
-colorToCode DarkSlateGrey = "#2F4F4F"
-colorToCode DarkTurquoise = "#00CED1"
-colorToCode DarkViolet = "#9400D3"
-colorToCode DeepPink = "#FF1493"
-colorToCode DeepSkyBlue = "#00BFFF"
-colorToCode DimGray = "#696969"
-colorToCode DimGrey = "#696969"
-colorToCode DodgerBlue = "#1E90FF"
-colorToCode FireBrick = "#B22222"
-colorToCode FloralWhite = "#FFFAF0"
-colorToCode ForestGreen = "#228B22"
-colorToCode Fuchsia = "#FF00FF"
-colorToCode Gainsboro = "#DCDCDC"
-colorToCode GhostWhite = "#F8F8FF"
-colorToCode Gold = "#FFD700"
-colorToCode GoldenRod = "#DAA520"
-colorToCode Gray = "#808080"
-colorToCode Grey = "#808080"
-colorToCode Green = "#008000"
-colorToCode GreenYellow = "#ADFF2F"
-colorToCode HoneyDew = "#F0FFF0"
-colorToCode HotPink = "#FF69B4"
-colorToCode IndianRed  = "#CD5C5C"
-colorToCode Indigo = "#4B0082"
-colorToCode Ivory = "#FFFFF0"
-colorToCode Khaki = "#F0E68C"
-colorToCode Lavender = "#E6E6FA"
-colorToCode LavenderBlush = "#FFF0F5"
-colorToCode LawnGreen = "#7CFC00"
-colorToCode LemonChiffon = "#FFFACD"
-colorToCode LightBlue = "#ADD8E6"
-colorToCode LightCoral = "#F08080"
-colorToCode LightCyan = "#E0FFFF"
-colorToCode LightGoldenRodYellow = "#FAFAD2"
-colorToCode LightGray = "#D3D3D3"
-colorToCode LightGrey = "#D3D3D3"
-colorToCode LightGreen = "#90EE90"
-colorToCode LightPink = "#FFB6C1"
-colorToCode LightSalmon = "#FFA07A"
-colorToCode LightSeaGreen = "#20B2AA"
-colorToCode LightSkyBlue = "#87CEFA"
-colorToCode LightSlateGray = "#778899"
-colorToCode LightSlateGrey = "#778899"
-colorToCode LightSteelBlue = "#B0C4DE"
-colorToCode LightYellow = "#FFFFE0"
-colorToCode Lime = "#00FF00"
-colorToCode LimeGreen = "#32CD32"
-colorToCode Linen = "#FAF0E6"
-colorToCode Magenta = "#FF00FF"
-colorToCode Maroon = "#800000"
-colorToCode MediumAquaMarine = "#66CDAA"
-colorToCode MediumBlue = "#0000CD"
-colorToCode MediumOrchid = "#BA55D3"
-colorToCode MediumPurple = "#9370DB"
-colorToCode MediumSeaGreen = "#3CB371"
-colorToCode MediumSlateBlue = "#7B68EE"
-colorToCode MediumSpringGreen = "#00FA9A"
-colorToCode MediumTurquoise = "#48D1CC"
-colorToCode MediumVioletRed = "#C71585"
-colorToCode MidnightBlue = "#191970"
-colorToCode MintCream = "#F5FFFA"
-colorToCode MistyRose = "#FFE4E1"
-colorToCode Moccasin = "#FFE4B5"
-colorToCode NavajoWhite = "#FFDEAD"
-colorToCode Navy = "#000080"
-colorToCode OldLace = "#FDF5E6"
-colorToCode Olive = "#808000"
-colorToCode OliveDrab = "#6B8E23"
-colorToCode Orange = "#FFA500"
-colorToCode OrangeRed = "#FF4500"
-colorToCode Orchid = "#DA70D6"
-colorToCode PaleGoldenRod = "#EEE8AA"
-colorToCode PaleGreen = "#98FB98"
-colorToCode PaleTurquoise = "#AFEEEE"
-colorToCode PaleVioletRed = "#DB7093"
-colorToCode PapayaWhip = "#FFEFD5"
-colorToCode PeachPuff = "#FFDAB9"
-colorToCode Peru = "#CD853F"
-colorToCode Pink = "#FFC0CB"
-colorToCode Plum = "#DDA0DD"
-colorToCode PowderBlue = "#B0E0E6"
-colorToCode Purple = "#800080"
-colorToCode RebeccaPurple = "#663399"
-colorToCode Red = "#FF0000"
-colorToCode RosyBrown = "#BC8F8F"
-colorToCode RoyalBlue = "#4169E1"
-colorToCode SaddleBrown = "#8B4513"
-colorToCode Salmon = "#FA8072"
-colorToCode SandyBrown = "#F4A460"
-colorToCode SeaGreen = "#2E8B57"
-colorToCode SeaShell = "#FFF5EE"
-colorToCode Sienna = "#A0522D"
-colorToCode Silver = "#C0C0C0"
-colorToCode SkyBlue = "#87CEEB"
-colorToCode SlateBlue = "#6A5ACD"
-colorToCode SlateGray = "#708090"
-colorToCode SlateGrey = "#708090"
-colorToCode Snow = "#FFFAFA"
-colorToCode SpringGreen = "#00FF7F"
-colorToCode SteelBlue = "#4682B4"
-colorToCode Tan = "#D2B48C"
-colorToCode Teal = "#008080"
-colorToCode Thistle = "#D8BFD8"
-colorToCode Tomato = "#FF6347"
-colorToCode Turquoise = "#40E0D0"
-colorToCode Violet = "#EE82EE"
-colorToCode Wheat = "#F5DEB3"
-colorToCode White = "#FFFFFF"
-colorToCode WhiteSmoke = "#F5F5F5"
-colorToCode Yellow = "#FFFF00"
-colorToCode YellowGreen = "#9ACD32"
+newtype Color
+  = Color String
 
--- REVIEW: DRY
-colors :: Array Color
-colors =
-  [ AliceBlue
-  , AntiqueWhite
-  , Aqua
-  , Aquamarine
-  , Azure
-  , Beige
-  , Bisque
-  , Black
-  , BlanchedAlmond
-  , Blue
-  , BlueViolet
-  , Brown
-  , BurlyWood
-  , CadetBlue
-  , Chartreuse
-  , Chocolate
-  , Coral
-  , CornflowerBlue
-  , Cornsilk
-  , Crimson
-  , Cyan
-  , DarkBlue
-  , DarkCyan
-  , DarkGoldenRod
-  , DarkGray
-  , DarkGrey
-  , DarkGreen
-  , DarkKhaki
-  , DarkMagenta
-  , DarkOliveGreen
-  , DarkOrange
-  , DarkOrchid
-  , DarkRed
-  , DarkSalmon
-  , DarkSeaGreen
-  , DarkSlateBlue
-  , DarkSlateGray
-  , DarkSlateGrey
-  , DarkTurquoise
-  , DarkViolet
-  , DeepPink
-  , DeepSkyBlue
-  , DimGray
-  , DimGrey
-  , DodgerBlue
-  , FireBrick
-  , FloralWhite
-  , ForestGreen
-  , Fuchsia
-  , Gainsboro
-  , GhostWhite
-  , Gold
-  , GoldenRod
-  , Gray
-  , Grey
-  , Green
-  , GreenYellow
-  , HoneyDew
-  , HotPink
-  , IndianRed 
-  , Indigo
-  , Ivory
-  , Khaki
-  , Lavender
-  , LavenderBlush
-  , LawnGreen
-  , LemonChiffon
-  , LightBlue
-  , LightCoral
-  , LightCyan
-  , LightGoldenRodYellow
-  , LightGray
-  , LightGrey
-  , LightGreen
-  , LightPink
-  , LightSalmon
-  , LightSeaGreen
-  , LightSkyBlue
-  , LightSlateGray
-  , LightSlateGrey
-  , LightSteelBlue
-  , LightYellow
-  , Lime
-  , LimeGreen
-  , Linen
-  , Magenta
-  , Maroon
-  , MediumAquaMarine
-  , MediumBlue
-  , MediumOrchid
-  , MediumPurple
-  , MediumSeaGreen
-  , MediumSlateBlue
-  , MediumSpringGreen
-  , MediumTurquoise
-  , MediumVioletRed
-  , MidnightBlue
-  , MintCream
-  , MistyRose
-  , Moccasin
-  , NavajoWhite
-  , Navy
-  , OldLace
-  , Olive
-  , OliveDrab
-  , Orange
-  , OrangeRed
-  , Orchid
-  , PaleGoldenRod
-  , PaleGreen
-  , PaleTurquoise
-  , PaleVioletRed
-  , PapayaWhip
-  , PeachPuff
-  , Peru
-  , Pink
-  , Plum
-  , PowderBlue
-  , Purple
-  , RebeccaPurple
-  , Red
-  , RosyBrown
-  , RoyalBlue
-  , SaddleBrown
-  , Salmon
-  , SandyBrown
-  , SeaGreen
-  , SeaShell
-  , Sienna
-  , Silver
-  , SkyBlue
-  , SlateBlue
-  , SlateGray
-  , SlateGrey
-  , Snow
-  , SpringGreen
-  , SteelBlue
-  , Tan
-  , Teal
-  , Thistle
-  , Tomato
-  , Turquoise
-  , Violet
-  , Wheat
-  , White
-  , WhiteSmoke
-  , Yellow
-  , YellowGreen
-  ]
+instance showColor :: Show Color where
+  show (Color s) = s
+
+aliceBlue :: Color
+aliceBlue = Color "#F0F8FF"
+
+antiqueWhite :: Color
+antiqueWhite = Color "#FAEBD7"
+
+aqua :: Color
+aqua = Color "#00FFFF"
+
+aquamarine :: Color
+aquamarine = Color "#7FFFD4"
+
+azure :: Color
+azure = Color "#F0FFFF"
+
+beige :: Color
+beige = Color "#F5F5DC"
+
+bisque :: Color
+bisque = Color "#FFE4C4"
+
+black :: Color
+black = Color "#000000"
+
+blanchedAlmond :: Color
+blanchedAlmond = Color "#FFEBCD"
+
+blue :: Color
+blue = Color "#0000FF"
+
+blueViolet :: Color
+blueViolet = Color "#8A2BE2"
+
+brown :: Color
+brown = Color "#A52A2A"
+
+burlyWood :: Color
+burlyWood = Color "#DEB887"
+
+cadetBlue :: Color
+cadetBlue = Color "#5F9EA0"
+
+chartreuse :: Color
+chartreuse = Color "#7FFF00"
+
+chocolate :: Color
+chocolate = Color "#D2691E"
+
+coral :: Color
+coral = Color "#FF7F50"
+
+cornflowerBlue :: Color
+cornflowerBlue = Color "#6495ED"
+
+cornsilk :: Color
+cornsilk = Color "#FFF8DC"
+
+crimson :: Color
+crimson = Color "#DC143C"
+
+cyan :: Color
+cyan = Color "#00FFFF"
+
+darkBlue :: Color
+darkBlue = Color "#00008B"
+
+darkCyan :: Color
+darkCyan = Color "#008B8B"
+
+darkGoldenRod :: Color
+darkGoldenRod = Color "#B8860B"
+
+darkGray :: Color
+darkGray = Color "#A9A9A9"
+
+darkGreen :: Color
+darkGreen = Color "#006400"
+
+darkKhaki :: Color
+darkKhaki = Color "#BDB76B"
+
+darkMagenta :: Color
+darkMagenta = Color "#8B008B"
+
+darkOliveGreen :: Color
+darkOliveGreen = Color "#556B2F"
+
+darkOrange :: Color
+darkOrange = Color "#FF8C00"
+
+darkOrchid :: Color
+darkOrchid = Color "#9932CC"
+
+darkRed :: Color
+darkRed = Color "#8B0000"
+
+darkSalmon :: Color
+darkSalmon = Color "#E9967A"
+
+darkSeaGreen :: Color
+darkSeaGreen = Color "#8FBC8F"
+
+darkSlateBlue :: Color
+darkSlateBlue = Color "#483D8B"
+
+darkSlateGray :: Color
+darkSlateGray = Color "#2F4F4F"
+
+darkTurquoise :: Color
+darkTurquoise = Color "#00CED1"
+
+darkViolet :: Color
+darkViolet = Color "#9400D3"
+
+deepPink :: Color
+deepPink = Color "#FF1493"
+
+deepSkyBlue :: Color
+deepSkyBlue = Color "#00BFFF"
+
+dimGray :: Color
+dimGray = Color "#696969"
+
+dodgerBlue :: Color
+dodgerBlue = Color "#1E90FF"
+
+fireBrick :: Color
+fireBrick = Color "#B22222"
+
+floralWhite :: Color
+floralWhite = Color "#FFFAF0"
+
+forestGreen :: Color
+forestGreen = Color "#228B22"
+
+fuchsia :: Color
+fuchsia = Color "#FF00FF"
+
+gainsboro :: Color
+gainsboro = Color "#DCDCDC"
+
+ghostWhite :: Color
+ghostWhite = Color "#F8F8FF"
+
+gold :: Color
+gold = Color "#FFD700"
+
+goldenRod :: Color
+goldenRod = Color "#DAA520"
+
+gray :: Color
+gray = Color "#808080"
+
+green :: Color
+green = Color "#008000"
+
+greenYellow :: Color
+greenYellow = Color "#ADFF2F"
+
+honeyDew :: Color
+honeyDew = Color "#F0FFF0"
+
+hotPink :: Color
+hotPink = Color "#FF69B4"
+
+indianRed :: Color
+indianRed = Color "#CD5C5C"
+
+indigo :: Color
+indigo = Color "#4B0082"
+
+ivory :: Color
+ivory = Color "#FFFFF0"
+
+khaki :: Color
+khaki = Color "#F0E68C"
+
+lavender :: Color
+lavender = Color "#E6E6FA"
+
+lavenderBlush :: Color
+lavenderBlush = Color "#FFF0F5"
+
+lawnGreen :: Color
+lawnGreen = Color "#7CFC00"
+
+lemonChiffon :: Color
+lemonChiffon = Color "#FFFACD"
+
+lightBlue :: Color
+lightBlue = Color "#ADD8E6"
+
+lightCoral :: Color
+lightCoral = Color "#F08080"
+
+lightCyan :: Color
+lightCyan = Color "#E0FFFF"
+
+lightGoldenRodYellow :: Color
+lightGoldenRodYellow = Color "#FAFAD2"
+
+lightGray :: Color
+lightGray = Color "#D3D3D3"
+
+lightGreen :: Color
+lightGreen = Color "#90EE90"
+
+lightPink :: Color
+lightPink = Color "#FFB6C1"
+
+lightSalmon :: Color
+lightSalmon = Color "#FFA07A"
+
+lightSeaGreen :: Color
+lightSeaGreen = Color "#20B2AA"
+
+lightSkyBlue :: Color
+lightSkyBlue = Color "#87CEFA"
+
+lightSlateGray :: Color
+lightSlateGray = Color "#778899"
+
+lightSteelBlue :: Color
+lightSteelBlue = Color "#B0C4DE"
+
+lightYellow :: Color
+lightYellow = Color "#FFFFE0"
+
+lime :: Color
+lime = Color "#00FF00"
+
+limeGreen :: Color
+limeGreen = Color "#32CD32"
+
+linen :: Color
+linen = Color "#FAF0E6"
+
+magenta :: Color
+magenta = Color "#FF00FF"
+
+maroon :: Color
+maroon = Color "#800000"
+
+mediumAquaMarine :: Color
+mediumAquaMarine = Color "#66CDAA"
+
+mediumBlue :: Color
+mediumBlue = Color "#0000CD"
+
+mediumOrchid :: Color
+mediumOrchid = Color "#BA55D3"
+
+mediumPurple :: Color
+mediumPurple = Color "#9370DB"
+
+mediumSeaGreen :: Color
+mediumSeaGreen = Color "#3CB371"
+
+mediumSlateBlue :: Color
+mediumSlateBlue = Color "#7B68EE"
+
+mediumSpringGreen :: Color
+mediumSpringGreen = Color "#00FA9A"
+
+mediumTurquoise :: Color
+mediumTurquoise = Color "#48D1CC"
+
+mediumVioletRed :: Color
+mediumVioletRed = Color "#C71585"
+
+midnightBlue :: Color
+midnightBlue = Color "#191970"
+
+mintCream :: Color
+mintCream = Color "#F5FFFA"
+
+mistyRose :: Color
+mistyRose = Color "#FFE4E1"
+
+moccasin :: Color
+moccasin = Color "#FFE4B5"
+
+navajoWhite :: Color
+navajoWhite = Color "#FFDEAD"
+
+navy :: Color
+navy = Color "#000080"
+
+oldLace :: Color
+oldLace = Color "#FDF5E6"
+
+olive :: Color
+olive = Color "#808000"
+
+oliveDrab :: Color
+oliveDrab = Color "#6B8E23"
+
+orange :: Color
+orange = Color "#FFA500"
+
+orangeRed :: Color
+orangeRed = Color "#FF4500"
+
+orchid :: Color
+orchid = Color "#DA70D6"
+
+paleGoldenRod :: Color
+paleGoldenRod = Color "#EEE8AA"
+
+paleGreen :: Color
+paleGreen = Color "#98FB98"
+
+paleTurquoise :: Color
+paleTurquoise = Color "#AFEEEE"
+
+paleVioletRed :: Color
+paleVioletRed = Color "#DB7093"
+
+papayaWhip :: Color
+papayaWhip = Color "#FFEFD5"
+
+peachPuff :: Color
+peachPuff = Color "#FFDAB9"
+
+peru :: Color
+peru = Color "#CD853F"
+
+pink :: Color
+pink = Color "#FFC0CB"
+
+plum :: Color
+plum = Color "#DDA0DD"
+
+powderBlue :: Color
+powderBlue = Color "#B0E0E6"
+
+purple :: Color
+purple = Color "#800080"
+
+rebeccaPurple :: Color
+rebeccaPurple = Color "#663399"
+
+red :: Color
+red = Color "#FF0000"
+
+rosyBrown :: Color
+rosyBrown = Color "#BC8F8F"
+
+royalBlue :: Color
+royalBlue = Color "#4169E1"
+
+saddleBrown :: Color
+saddleBrown = Color "#8B4513"
+
+salmon :: Color
+salmon = Color "#FA8072"
+
+sandyBrown :: Color
+sandyBrown = Color "#F4A460"
+
+seaGreen :: Color
+seaGreen = Color "#2E8B57"
+
+seaShell :: Color
+seaShell = Color "#FFF5EE"
+
+sienna :: Color
+sienna = Color "#A0522D"
+
+silver :: Color
+silver = Color "#C0C0C0"
+
+skyBlue :: Color
+skyBlue = Color "#87CEEB"
+
+slateBlue :: Color
+slateBlue = Color "#6A5ACD"
+
+slateGray :: Color
+slateGray = Color "#708090"
+
+snow :: Color
+snow = Color "#FFFAFA"
+
+springGreen :: Color
+springGreen = Color "#00FF7F"
+
+steelBlue :: Color
+steelBlue = Color "#4682B4"
+
+tan :: Color
+tan = Color "#D2B48C"
+
+teal :: Color
+teal = Color "#008080"
+
+thistle :: Color
+thistle = Color "#D8BFD8"
+
+tomato :: Color
+tomato = Color "#FF6347"
+
+turquoise :: Color
+turquoise = Color "#40E0D0"
+
+violet :: Color
+violet = Color "#EE82EE"
+
+wheat :: Color
+wheat = Color "#F5DEB3"
+
+white :: Color
+white = Color "#FFFFFF"
+
+whiteSmoke :: Color
+whiteSmoke = Color "#F5F5F5"
+
+yellow :: Color
+yellow = Color "#FFFF00"
+
+yellowGreen :: Color
+yellowGreen = Color "#9ACD32"
