@@ -6,13 +6,11 @@ module Emo8.Parser
 import Prelude
 import Data.Either (Either(..))
 import Data.List as L
-import Data.Symbol (SProxy)
+import Data.Symbol (SProxy(..))
 import Data.Tuple (Tuple(..), fst)
 import Emo8.Data.Emoji as E
 import Emo8.Data.Note as N
-import Emo8.Parser.EConvert (class EConvert)
-import Emo8.Parser.EList (ELProxy(..))
-import Emo8.Parser.ETo (class ETo, eto)
+import Emo8.Parser.EConvert (class EConvert, econvert)
 import Emo8.Parser.NConstraint (class ExtractNR, class UpToFiveNote)
 import Emo8.Parser.NConvert (class NConvert)
 import Emo8.Parser.NList (NLProxy(..))
@@ -23,16 +21,14 @@ class Parser (s :: Symbol) a where
   parse :: SProxy s -> a
 
 instance parseEmojiMap ::
-  ( EConvert e el
-  , ETo el
-  ) =>
-  Parser e (L.List (L.List E.Emoji)) where
+  EConvert s =>
+  Parser s (L.List (L.List E.Emoji)) where
   parse _ =
     map L.reverse
       <<< L.filter (notEq L.Nil)
       $ go res L.Nil
     where
-    res = eto (ELProxy :: ELProxy el)
+    res = econvert (SProxy :: SProxy s)
 
 instance parseScore ::
   ( NConvert s nl

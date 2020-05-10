@@ -1,2683 +1,4027 @@
 module Emo8.Parser.EConvert
   ( class EConvert
-  , class Match
+  , econvert
+  , class EMatch
+  , ematch
   ) where
 
-import Emo8.Parser.SpecChar
-import Emo8.Parser.EList as EL
-import Emo8.Parser.Emoji as E
+import Prelude
+import Data.Either (Either(..))
+import Data.List as L
+import Data.Symbol (SProxy(..))
+import Emo8.Data.Emoji as E
+import Emo8.Parser.Type (NoEmoji(..), Result)
 import Prim.Symbol as S
 
-class EConvert (s :: Symbol) (el :: EL.EList) | s -> el
+class EConvert (s :: Symbol) where
+  econvert :: SProxy s -> L.List (Result E.Emoji)
 
-instance eConvertNil :: EConvert "" EL.ENil
+instance eConvertNil :: EConvert "" where
+  econvert _ = L.Nil
 else instance eConvertCons ::
   ( S.Cons head tail union
-  , EConvert tail el
-  , Match head out
+  , EConvert tail
+  , EMatch head
   ) =>
-  EConvert union (EL.ECons out el)
+  EConvert union where
+  econvert _ = L.Cons (ematch headP) $ econvert tailP
+    where
+    headP = SProxy :: SProxy head
 
-class Match (i :: Symbol) (o :: E.Emoji) | i -> o
+    tailP = SProxy :: SProxy tail
 
-instance matchSpace :: Match " " (E.Rest Space)
+class EMatch (s :: Symbol) where
+  ematch :: SProxy s -> Result E.Emoji
 
-instance matchReturn :: Match "\n" (E.Rest Return)
+instance ematchSpace :: EMatch " " where
+  ematch _ = Left Space
 
-instance matchGrinningFace :: Match "😀" E.GrinningFace
+instance ematchReturn :: EMatch "\n" where
+  ematch _ = Left Return
 
-instance matchGrinningFaceWithBigEyes :: Match "😃" E.GrinningFaceWithBigEyes
+instance ematchGrinningFace :: EMatch "😀" where
+  ematch _ = Right E.grinningFace
 
-instance matchGrinningFaceWithSmilingEyes :: Match "😄" E.GrinningFaceWithSmilingEyes
+instance ematchGrinningFaceWithBigEyes :: EMatch "😃" where
+  ematch _ = Right E.grinningFaceWithBigEyes
 
-instance matchBeamingFaceWithSmilingEyes :: Match "😁" E.BeamingFaceWithSmilingEyes
+instance ematchGrinningFaceWithSmilingEyes :: EMatch "😄" where
+  ematch _ = Right E.grinningFaceWithSmilingEyes
 
-instance matchGrinningSquintingFace :: Match "😆" E.GrinningSquintingFace
+instance ematchBeamingFaceWithSmilingEyes :: EMatch "😁" where
+  ematch _ = Right E.beamingFaceWithSmilingEyes
 
-instance matchGrinningFaceWithSweat :: Match "😅" E.GrinningFaceWithSweat
+instance ematchGrinningSquintingFace :: EMatch "😆" where
+  ematch _ = Right E.grinningSquintingFace
 
-instance matchRollingOnTheFloorLaughing :: Match "🤣" E.RollingOnTheFloorLaughing
+instance ematchGrinningFaceWithSweat :: EMatch "😅" where
+  ematch _ = Right E.grinningFaceWithSweat
 
-instance matchFaceWithTearsOfJoy :: Match "😂" E.FaceWithTearsOfJoy
+instance ematchRollingOnTheFloorLaughing :: EMatch "🤣" where
+  ematch _ = Right E.rollingOnTheFloorLaughing
 
-instance matchSlightlySmilingFace :: Match "🙂" E.SlightlySmilingFace
+instance ematchFaceWithTearsOfJoy :: EMatch "😂" where
+  ematch _ = Right E.faceWithTearsOfJoy
 
-instance matchUpsideDownFace :: Match "🙃" E.UpsideDownFace
+instance ematchSlightlySmilingFace :: EMatch "🙂" where
+  ematch _ = Right E.slightlySmilingFace
 
-instance matchWinkingFace :: Match "😉" E.WinkingFace
+instance ematchUpsideDownFace :: EMatch "🙃" where
+  ematch _ = Right E.upsideDownFace
 
-instance matchSmilingFaceWithSmilingEyes :: Match "😊" E.SmilingFaceWithSmilingEyes
+instance ematchWinkingFace :: EMatch "😉" where
+  ematch _ = Right E.winkingFace
 
-instance matchSmilingFaceWithHalo :: Match "😇" E.SmilingFaceWithHalo
+instance ematchSmilingFaceWithSmilingEyes :: EMatch "😊" where
+  ematch _ = Right E.smilingFaceWithSmilingEyes
 
-instance matchSmilingFaceWithHearts :: Match "🥰" E.SmilingFaceWithHearts
+instance ematchSmilingFaceWithHalo :: EMatch "😇" where
+  ematch _ = Right E.smilingFaceWithHalo
 
-instance matchSmilingFaceWithHeartEyes :: Match "😍" E.SmilingFaceWithHeartEyes
+instance ematchSmilingFaceWithHearts :: EMatch "🥰" where
+  ematch _ = Right E.smilingFaceWithHearts
 
-instance matchStarStruck :: Match "🤩" E.StarStruck
+instance ematchSmilingFaceWithHeartEyes :: EMatch "😍" where
+  ematch _ = Right E.smilingFaceWithHeartEyes
 
-instance matchFaceBlowingAKiss :: Match "😘" E.FaceBlowingAKiss
+instance ematchStarStruck :: EMatch "🤩" where
+  ematch _ = Right E.starStruck
 
-instance matchKissingFace :: Match "😗" E.KissingFace
+instance ematchFaceBlowingAKiss :: EMatch "😘" where
+  ematch _ = Right E.faceBlowingAKiss
 
-instance matchSmilingFace :: Match "☺" E.SmilingFace
+instance ematchKissingFace :: EMatch "😗" where
+  ematch _ = Right E.kissingFace
 
-instance matchKissingFaceWithClosedEyes :: Match "😚" E.KissingFaceWithClosedEyes
+instance ematchSmilingFace :: EMatch "☺" where
+  ematch _ = Right E.smilingFace
 
-instance matchKissingFaceWithSmilingEyes :: Match "😙" E.KissingFaceWithSmilingEyes
+instance ematchKissingFaceWithClosedEyes :: EMatch "😚" where
+  ematch _ = Right E.kissingFaceWithClosedEyes
 
-instance matchSmilingFaceWithTear :: Match "🥲" E.SmilingFaceWithTear
+instance ematchKissingFaceWithSmilingEyes :: EMatch "😙" where
+  ematch _ = Right E.kissingFaceWithSmilingEyes
 
-instance matchFaceSavoringFood :: Match "😋" E.FaceSavoringFood
+instance ematchSmilingFaceWithTear :: EMatch "🥲" where
+  ematch _ = Right E.smilingFaceWithTear
 
-instance matchFaceWithTongue :: Match "😛" E.FaceWithTongue
+instance ematchFaceSavoringFood :: EMatch "😋" where
+  ematch _ = Right E.faceSavoringFood
 
-instance matchWinkingFaceWithTongue :: Match "😜" E.WinkingFaceWithTongue
+instance ematchFaceWithTongue :: EMatch "😛" where
+  ematch _ = Right E.faceWithTongue
 
-instance matchZanyFace :: Match "🤪" E.ZanyFace
+instance ematchWinkingFaceWithTongue :: EMatch "😜" where
+  ematch _ = Right E.winkingFaceWithTongue
 
-instance matchSquintingFaceWithTongue :: Match "😝" E.SquintingFaceWithTongue
+instance ematchZanyFace :: EMatch "🤪" where
+  ematch _ = Right E.zanyFace
 
-instance matchMoneyMouthFace :: Match "🤑" E.MoneyMouthFace
+instance ematchSquintingFaceWithTongue :: EMatch "😝" where
+  ematch _ = Right E.squintingFaceWithTongue
 
-instance matchHuggingFace :: Match "🤗" E.HuggingFace
+instance ematchMoneyMouthFace :: EMatch "🤑" where
+  ematch _ = Right E.moneyMouthFace
 
-instance matchFaceWithHandOverMouth :: Match "🤭" E.FaceWithHandOverMouth
+instance ematchHuggingFace :: EMatch "🤗" where
+  ematch _ = Right E.huggingFace
 
-instance matchShushingFace :: Match "🤫" E.ShushingFace
+instance ematchFaceWithHandOverMouth :: EMatch "🤭" where
+  ematch _ = Right E.faceWithHandOverMouth
 
-instance matchThinkingFace :: Match "🤔" E.ThinkingFace
+instance ematchShushingFace :: EMatch "🤫" where
+  ematch _ = Right E.shushingFace
 
-instance matchZipperMouthFace :: Match "🤐" E.ZipperMouthFace
+instance ematchThinkingFace :: EMatch "🤔" where
+  ematch _ = Right E.thinkingFace
 
-instance matchFaceWithRaisedEyebrow :: Match "🤨" E.FaceWithRaisedEyebrow
+instance ematchZipperMouthFace :: EMatch "🤐" where
+  ematch _ = Right E.zipperMouthFace
 
-instance matchNeutralFace :: Match "😐" E.NeutralFace
+instance ematchFaceWithRaisedEyebrow :: EMatch "🤨" where
+  ematch _ = Right E.faceWithRaisedEyebrow
 
-instance matchExpressionlessFace :: Match "😑" E.ExpressionlessFace
+instance ematchNeutralFace :: EMatch "😐" where
+  ematch _ = Right E.neutralFace
 
-instance matchFaceWithoutMouth :: Match "😶" E.FaceWithoutMouth
+instance ematchExpressionlessFace :: EMatch "😑" where
+  ematch _ = Right E.expressionlessFace
 
-instance matchSmirkingFace :: Match "😏" E.SmirkingFace
+instance ematchFaceWithoutMouth :: EMatch "😶" where
+  ematch _ = Right E.faceWithoutMouth
 
-instance matchUnamusedFace :: Match "😒" E.UnamusedFace
+instance ematchSmirkingFace :: EMatch "😏" where
+  ematch _ = Right E.smirkingFace
 
-instance matchFaceWithRollingEyes :: Match "🙄" E.FaceWithRollingEyes
+instance ematchUnamusedFace :: EMatch "😒" where
+  ematch _ = Right E.unamusedFace
 
-instance matchGrimacingFace :: Match "😬" E.GrimacingFace
+instance ematchFaceWithRollingEyes :: EMatch "🙄" where
+  ematch _ = Right E.faceWithRollingEyes
 
-instance matchLyingFace :: Match "🤥" E.LyingFace
+instance ematchGrimacingFace :: EMatch "😬" where
+  ematch _ = Right E.grimacingFace
 
-instance matchRelievedFace :: Match "😌" E.RelievedFace
+instance ematchLyingFace :: EMatch "🤥" where
+  ematch _ = Right E.lyingFace
 
-instance matchPensiveFace :: Match "😔" E.PensiveFace
+instance ematchRelievedFace :: EMatch "😌" where
+  ematch _ = Right E.relievedFace
 
-instance matchSleepyFace :: Match "😪" E.SleepyFace
+instance ematchPensiveFace :: EMatch "😔" where
+  ematch _ = Right E.pensiveFace
 
-instance matchDroolingFace :: Match "🤤" E.DroolingFace
+instance ematchSleepyFace :: EMatch "😪" where
+  ematch _ = Right E.sleepyFace
 
-instance matchSleepingFace :: Match "😴" E.SleepingFace
+instance ematchDroolingFace :: EMatch "🤤" where
+  ematch _ = Right E.droolingFace
 
-instance matchFaceWithMedicalMask :: Match "😷" E.FaceWithMedicalMask
+instance ematchSleepingFace :: EMatch "😴" where
+  ematch _ = Right E.sleepingFace
 
-instance matchFaceWithThermometer :: Match "🤒" E.FaceWithThermometer
+instance ematchFaceWithMedicalMask :: EMatch "😷" where
+  ematch _ = Right E.faceWithMedicalMask
 
-instance matchFaceWithHeadBandage :: Match "🤕" E.FaceWithHeadBandage
+instance ematchFaceWithThermometer :: EMatch "🤒" where
+  ematch _ = Right E.faceWithThermometer
 
-instance matchNauseatedFace :: Match "🤢" E.NauseatedFace
+instance ematchFaceWithHeadBandage :: EMatch "🤕" where
+  ematch _ = Right E.faceWithHeadBandage
 
-instance matchFaceVomiting :: Match "🤮" E.FaceVomiting
+instance ematchNauseatedFace :: EMatch "🤢" where
+  ematch _ = Right E.nauseatedFace
 
-instance matchSneezingFace :: Match "🤧" E.SneezingFace
+instance ematchFaceVomiting :: EMatch "🤮" where
+  ematch _ = Right E.faceVomiting
 
-instance matchHotFace :: Match "🥵" E.HotFace
+instance ematchSneezingFace :: EMatch "🤧" where
+  ematch _ = Right E.sneezingFace
 
-instance matchColdFace :: Match "🥶" E.ColdFace
+instance ematchHotFace :: EMatch "🥵" where
+  ematch _ = Right E.hotFace
 
-instance matchWoozyFace :: Match "🥴" E.WoozyFace
+instance ematchColdFace :: EMatch "🥶" where
+  ematch _ = Right E.coldFace
 
-instance matchDizzyFace :: Match "😵" E.DizzyFace
+instance ematchWoozyFace :: EMatch "🥴" where
+  ematch _ = Right E.woozyFace
 
-instance matchExplodingHead :: Match "🤯" E.ExplodingHead
+instance ematchDizzyFace :: EMatch "😵" where
+  ematch _ = Right E.dizzyFace
 
-instance matchCowboyHatFace :: Match "🤠" E.CowboyHatFace
+instance ematchExplodingHead :: EMatch "🤯" where
+  ematch _ = Right E.explodingHead
 
-instance matchPartyingFace :: Match "🥳" E.PartyingFace
+instance ematchCowboyHatFace :: EMatch "🤠" where
+  ematch _ = Right E.cowboyHatFace
 
-instance matchDisguisedFace :: Match "🥸" E.DisguisedFace
+instance ematchPartyingFace :: EMatch "🥳" where
+  ematch _ = Right E.partyingFace
 
-instance matchSmilingFaceWithSunglasses :: Match "😎" E.SmilingFaceWithSunglasses
+instance ematchDisguisedFace :: EMatch "🥸" where
+  ematch _ = Right E.disguisedFace
 
-instance matchNerdFace :: Match "🤓" E.NerdFace
+instance ematchSmilingFaceWithSunglasses :: EMatch "😎" where
+  ematch _ = Right E.smilingFaceWithSunglasses
 
-instance matchFaceWithMonocle :: Match "🧐" E.FaceWithMonocle
+instance ematchNerdFace :: EMatch "🤓" where
+  ematch _ = Right E.nerdFace
 
-instance matchConfusedFace :: Match "😕" E.ConfusedFace
+instance ematchFaceWithMonocle :: EMatch "🧐" where
+  ematch _ = Right E.faceWithMonocle
 
-instance matchWorriedFace :: Match "😟" E.WorriedFace
+instance ematchConfusedFace :: EMatch "😕" where
+  ematch _ = Right E.confusedFace
 
-instance matchSlightlyFrowningFace :: Match "🙁" E.SlightlyFrowningFace
+instance ematchWorriedFace :: EMatch "😟" where
+  ematch _ = Right E.worriedFace
 
-instance matchFrowningFace :: Match "☹" E.FrowningFace
+instance ematchSlightlyFrowningFace :: EMatch "🙁" where
+  ematch _ = Right E.slightlyFrowningFace
 
-instance matchFaceWithOpenMouth :: Match "😮" E.FaceWithOpenMouth
+instance ematchFrowningFace :: EMatch "☹" where
+  ematch _ = Right E.frowningFace
 
-instance matchHushedFace :: Match "😯" E.HushedFace
+instance ematchFaceWithOpenMouth :: EMatch "😮" where
+  ematch _ = Right E.faceWithOpenMouth
 
-instance matchAstonishedFace :: Match "😲" E.AstonishedFace
+instance ematchHushedFace :: EMatch "😯" where
+  ematch _ = Right E.hushedFace
 
-instance matchFlushedFace :: Match "😳" E.FlushedFace
+instance ematchAstonishedFace :: EMatch "😲" where
+  ematch _ = Right E.astonishedFace
 
-instance matchPleadingFace :: Match "🥺" E.PleadingFace
+instance ematchFlushedFace :: EMatch "😳" where
+  ematch _ = Right E.flushedFace
 
-instance matchFrowningFaceWithOpenMouth :: Match "😦" E.FrowningFaceWithOpenMouth
+instance ematchPleadingFace :: EMatch "🥺" where
+  ematch _ = Right E.pleadingFace
 
-instance matchAnguishedFace :: Match "😧" E.AnguishedFace
+instance ematchFrowningFaceWithOpenMouth :: EMatch "😦" where
+  ematch _ = Right E.frowningFaceWithOpenMouth
 
-instance matchFearfulFace :: Match "😨" E.FearfulFace
+instance ematchAnguishedFace :: EMatch "😧" where
+  ematch _ = Right E.anguishedFace
 
-instance matchAnxiousFaceWithSweat :: Match "😰" E.AnxiousFaceWithSweat
+instance ematchFearfulFace :: EMatch "😨" where
+  ematch _ = Right E.fearfulFace
 
-instance matchSadButRelievedFace :: Match "😥" E.SadButRelievedFace
+instance ematchAnxiousFaceWithSweat :: EMatch "😰" where
+  ematch _ = Right E.anxiousFaceWithSweat
 
-instance matchCryingFace :: Match "😢" E.CryingFace
+instance ematchSadButRelievedFace :: EMatch "😥" where
+  ematch _ = Right E.sadButRelievedFace
 
-instance matchLoudlyCryingFace :: Match "😭" E.LoudlyCryingFace
+instance ematchCryingFace :: EMatch "😢" where
+  ematch _ = Right E.cryingFace
 
-instance matchFaceScreamingInFear :: Match "😱" E.FaceScreamingInFear
+instance ematchLoudlyCryingFace :: EMatch "😭" where
+  ematch _ = Right E.loudlyCryingFace
 
-instance matchConfoundedFace :: Match "😖" E.ConfoundedFace
+instance ematchFaceScreamingInFear :: EMatch "😱" where
+  ematch _ = Right E.faceScreamingInFear
 
-instance matchPerseveringFace :: Match "😣" E.PerseveringFace
+instance ematchConfoundedFace :: EMatch "😖" where
+  ematch _ = Right E.confoundedFace
 
-instance matchDisappointedFace :: Match "😞" E.DisappointedFace
+instance ematchPerseveringFace :: EMatch "😣" where
+  ematch _ = Right E.perseveringFace
 
-instance matchDowncastFaceWithSweat :: Match "😓" E.DowncastFaceWithSweat
+instance ematchDisappointedFace :: EMatch "😞" where
+  ematch _ = Right E.disappointedFace
 
-instance matchWearyFace :: Match "😩" E.WearyFace
+instance ematchDowncastFaceWithSweat :: EMatch "😓" where
+  ematch _ = Right E.downcastFaceWithSweat
 
-instance matchTiredFace :: Match "😫" E.TiredFace
+instance ematchWearyFace :: EMatch "😩" where
+  ematch _ = Right E.wearyFace
 
-instance matchYawningFace :: Match "🥱" E.YawningFace
+instance ematchTiredFace :: EMatch "😫" where
+  ematch _ = Right E.tiredFace
 
-instance matchFaceWithSteamFromNose :: Match "😤" E.FaceWithSteamFromNose
+instance ematchYawningFace :: EMatch "🥱" where
+  ematch _ = Right E.yawningFace
 
-instance matchPoutingFace :: Match "😡" E.PoutingFace
+instance ematchFaceWithSteamFromNose :: EMatch "😤" where
+  ematch _ = Right E.faceWithSteamFromNose
 
-instance matchAngryFace :: Match "😠" E.AngryFace
+instance ematchPoutingFace :: EMatch "😡" where
+  ematch _ = Right E.poutingFace
 
-instance matchFaceWithSymbolsOnMouth :: Match "🤬" E.FaceWithSymbolsOnMouth
+instance ematchAngryFace :: EMatch "😠" where
+  ematch _ = Right E.angryFace
 
-instance matchSmilingFaceWithHorns :: Match "😈" E.SmilingFaceWithHorns
+instance ematchFaceWithSymbolsOnMouth :: EMatch "🤬" where
+  ematch _ = Right E.faceWithSymbolsOnMouth
 
-instance matchAngryFaceWithHorns :: Match "👿" E.AngryFaceWithHorns
+instance ematchSmilingFaceWithHorns :: EMatch "😈" where
+  ematch _ = Right E.smilingFaceWithHorns
 
-instance matchSkull :: Match "💀" E.Skull
+instance ematchAngryFaceWithHorns :: EMatch "👿" where
+  ematch _ = Right E.angryFaceWithHorns
 
-instance matchSkullAndCrossbones :: Match "☠" E.SkullAndCrossbones
+instance ematchSkull :: EMatch "💀" where
+  ematch _ = Right E.skull
 
-instance matchPileOfPoo :: Match "💩" E.PileOfPoo
+instance ematchSkullAndCrossbones :: EMatch "☠" where
+  ematch _ = Right E.skullAndCrossbones
 
-instance matchClownFace :: Match "🤡" E.ClownFace
+instance ematchPileOfPoo :: EMatch "💩" where
+  ematch _ = Right E.pileOfPoo
 
-instance matchOgre :: Match "👹" E.Ogre
+instance ematchClownFace :: EMatch "🤡" where
+  ematch _ = Right E.clownFace
 
-instance matchGoblin :: Match "👺" E.Goblin
+instance ematchOgre :: EMatch "👹" where
+  ematch _ = Right E.ogre
 
-instance matchGhost :: Match "👻" E.Ghost
+instance ematchGoblin :: EMatch "👺" where
+  ematch _ = Right E.goblin
 
-instance matchAlien :: Match "👽" E.Alien
+instance ematchGhost :: EMatch "👻" where
+  ematch _ = Right E.ghost
 
-instance matchAlienMonster :: Match "👾" E.AlienMonster
+instance ematchAlien :: EMatch "👽" where
+  ematch _ = Right E.alien
 
-instance matchRobot :: Match "🤖" E.Robot
+instance ematchAlienMonster :: EMatch "👾" where
+  ematch _ = Right E.alienMonster
 
-instance matchGrinningCat :: Match "😺" E.GrinningCat
+instance ematchRobot :: EMatch "🤖" where
+  ematch _ = Right E.robot
 
-instance matchGrinningCatWithSmilingEyes :: Match "😸" E.GrinningCatWithSmilingEyes
+instance ematchGrinningCat :: EMatch "😺" where
+  ematch _ = Right E.grinningCat
 
-instance matchCatWithTearsOfJoy :: Match "😹" E.CatWithTearsOfJoy
+instance ematchGrinningCatWithSmilingEyes :: EMatch "😸" where
+  ematch _ = Right E.grinningCatWithSmilingEyes
 
-instance matchSmilingCatWithHeartEyes :: Match "😻" E.SmilingCatWithHeartEyes
+instance ematchCatWithTearsOfJoy :: EMatch "😹" where
+  ematch _ = Right E.catWithTearsOfJoy
 
-instance matchCatWithWrySmile :: Match "😼" E.CatWithWrySmile
+instance ematchSmilingCatWithHeartEyes :: EMatch "😻" where
+  ematch _ = Right E.smilingCatWithHeartEyes
 
-instance matchKissingCat :: Match "😽" E.KissingCat
+instance ematchCatWithWrySmile :: EMatch "😼" where
+  ematch _ = Right E.catWithWrySmile
 
-instance matchWearyCat :: Match "🙀" E.WearyCat
+instance ematchKissingCat :: EMatch "😽" where
+  ematch _ = Right E.kissingCat
 
-instance matchCryingCat :: Match "😿" E.CryingCat
+instance ematchWearyCat :: EMatch "🙀" where
+  ematch _ = Right E.wearyCat
 
-instance matchPoutingCat :: Match "😾" E.PoutingCat
+instance ematchCryingCat :: EMatch "😿" where
+  ematch _ = Right E.cryingCat
 
-instance matchSeeNoEvilMonkey :: Match "🙈" E.SeeNoEvilMonkey
+instance ematchPoutingCat :: EMatch "😾" where
+  ematch _ = Right E.poutingCat
 
-instance matchHearNoEvilMonkey :: Match "🙉" E.HearNoEvilMonkey
+instance ematchSeeNoEvilMonkey :: EMatch "🙈" where
+  ematch _ = Right E.seeNoEvilMonkey
 
-instance matchSpeakNoEvilMonkey :: Match "🙊" E.SpeakNoEvilMonkey
+instance ematchHearNoEvilMonkey :: EMatch "🙉" where
+  ematch _ = Right E.hearNoEvilMonkey
 
-instance matchKissMark :: Match "💋" E.KissMark
+instance ematchSpeakNoEvilMonkey :: EMatch "🙊" where
+  ematch _ = Right E.speakNoEvilMonkey
 
-instance matchLoveLetter :: Match "💌" E.LoveLetter
+instance ematchKissMark :: EMatch "💋" where
+  ematch _ = Right E.kissMark
 
-instance matchHeartWithArrow :: Match "💘" E.HeartWithArrow
+instance ematchLoveLetter :: EMatch "💌" where
+  ematch _ = Right E.loveLetter
 
-instance matchHeartWithRibbon :: Match "💝" E.HeartWithRibbon
+instance ematchHeartWithArrow :: EMatch "💘" where
+  ematch _ = Right E.heartWithArrow
 
-instance matchSparklingHeart :: Match "💖" E.SparklingHeart
+instance ematchHeartWithRibbon :: EMatch "💝" where
+  ematch _ = Right E.heartWithRibbon
 
-instance matchGrowingHeart :: Match "💗" E.GrowingHeart
+instance ematchSparklingHeart :: EMatch "💖" where
+  ematch _ = Right E.sparklingHeart
 
-instance matchBeatingHeart :: Match "💓" E.BeatingHeart
+instance ematchGrowingHeart :: EMatch "💗" where
+  ematch _ = Right E.growingHeart
 
-instance matchRevolvingHearts :: Match "💞" E.RevolvingHearts
+instance ematchBeatingHeart :: EMatch "💓" where
+  ematch _ = Right E.beatingHeart
 
-instance matchTwoHearts :: Match "💕" E.TwoHearts
+instance ematchRevolvingHearts :: EMatch "💞" where
+  ematch _ = Right E.revolvingHearts
 
-instance matchHeartDecoration :: Match "💟" E.HeartDecoration
+instance ematchTwoHearts :: EMatch "💕" where
+  ematch _ = Right E.twoHearts
 
-instance matchHeartExclamation :: Match "❣" E.HeartExclamation
+instance ematchHeartDecoration :: EMatch "💟" where
+  ematch _ = Right E.heartDecoration
 
-instance matchBrokenHeart :: Match "💔" E.BrokenHeart
+instance ematchHeartExclamation :: EMatch "❣" where
+  ematch _ = Right E.heartExclamation
 
-instance matchRedHeart :: Match "❤" E.RedHeart
+instance ematchBrokenHeart :: EMatch "💔" where
+  ematch _ = Right E.brokenHeart
 
-instance matchOrangeHeart :: Match "🧡" E.OrangeHeart
+instance ematchRedHeart :: EMatch "❤" where
+  ematch _ = Right E.redHeart
 
-instance matchYellowHeart :: Match "💛" E.YellowHeart
+instance ematchOrangeHeart :: EMatch "🧡" where
+  ematch _ = Right E.orangeHeart
 
-instance matchGreenHeart :: Match "💚" E.GreenHeart
+instance ematchYellowHeart :: EMatch "💛" where
+  ematch _ = Right E.yellowHeart
 
-instance matchBlueHeart :: Match "💙" E.BlueHeart
+instance ematchGreenHeart :: EMatch "💚" where
+  ematch _ = Right E.greenHeart
 
-instance matchPurpleHeart :: Match "💜" E.PurpleHeart
+instance ematchBlueHeart :: EMatch "💙" where
+  ematch _ = Right E.blueHeart
 
-instance matchBrownHeart :: Match "🤎" E.BrownHeart
+instance ematchPurpleHeart :: EMatch "💜" where
+  ematch _ = Right E.purpleHeart
 
-instance matchBlackHeart :: Match "🖤" E.BlackHeart
+instance ematchBrownHeart :: EMatch "🤎" where
+  ematch _ = Right E.brownHeart
 
-instance matchWhiteHeart :: Match "🤍" E.WhiteHeart
+instance ematchBlackHeart :: EMatch "🖤" where
+  ematch _ = Right E.blackHeart
 
-instance matchHundredPoints :: Match "💯" E.HundredPoints
+instance ematchWhiteHeart :: EMatch "🤍" where
+  ematch _ = Right E.whiteHeart
 
-instance matchAngerSymbol :: Match "💢" E.AngerSymbol
+instance ematchHundredPoints :: EMatch "💯" where
+  ematch _ = Right E.hundredPoints
 
-instance matchCollision :: Match "💥" E.Collision
+instance ematchAngerSymbol :: EMatch "💢" where
+  ematch _ = Right E.angerSymbol
 
-instance matchDizzy :: Match "💫" E.Dizzy
+instance ematchCollision :: EMatch "💥" where
+  ematch _ = Right E.collision
 
-instance matchSweatDroplets :: Match "💦" E.SweatDroplets
+instance ematchDizzy :: EMatch "💫" where
+  ematch _ = Right E.dizzy
 
-instance matchDashingAway :: Match "💨" E.DashingAway
+instance ematchSweatDroplets :: EMatch "💦" where
+  ematch _ = Right E.sweatDroplets
 
-instance matchHole :: Match "🕳" E.Hole
+instance ematchDashingAway :: EMatch "💨" where
+  ematch _ = Right E.dashingAway
 
-instance matchBomb :: Match "💣" E.Bomb
+instance ematchHole :: EMatch "🕳" where
+  ematch _ = Right E.hole
 
-instance matchSpeechBalloon :: Match "💬" E.SpeechBalloon
+instance ematchBomb :: EMatch "💣" where
+  ematch _ = Right E.bomb
 
-instance matchLeftSpeechBubble :: Match "🗨" E.LeftSpeechBubble
+instance ematchSpeechBalloon :: EMatch "💬" where
+  ematch _ = Right E.speechBalloon
 
-instance matchRightAngerBubble :: Match "🗯" E.RightAngerBubble
+instance ematchLeftSpeechBubble :: EMatch "🗨" where
+  ematch _ = Right E.leftSpeechBubble
 
-instance matchThoughtBalloon :: Match "💭" E.ThoughtBalloon
+instance ematchRightAngerBubble :: EMatch "🗯" where
+  ematch _ = Right E.rightAngerBubble
 
-instance matchZzz :: Match "💤" E.Zzz
+instance ematchThoughtBalloon :: EMatch "💭" where
+  ematch _ = Right E.thoughtBalloon
 
-instance matchWavingHand :: Match "👋" E.WavingHand
+instance ematchZzz :: EMatch "💤" where
+  ematch _ = Right E.zzz
 
-instance matchRaisedBackOfHand :: Match "🤚" E.RaisedBackOfHand
+instance ematchWavingHand :: EMatch "👋" where
+  ematch _ = Right E.wavingHand
 
-instance matchHandWithFingersSplayed :: Match "🖐" E.HandWithFingersSplayed
+instance ematchRaisedBackOfHand :: EMatch "🤚" where
+  ematch _ = Right E.raisedBackOfHand
 
-instance matchRaisedHand :: Match "✋" E.RaisedHand
+instance ematchHandWithFingersSplayed :: EMatch "🖐" where
+  ematch _ = Right E.handWithFingersSplayed
 
-instance matchVulcanSalute :: Match "🖖" E.VulcanSalute
+instance ematchRaisedHand :: EMatch "✋" where
+  ematch _ = Right E.raisedHand
 
-instance matchOkHand :: Match "👌" E.OkHand
+instance ematchVulcanSalute :: EMatch "🖖" where
+  ematch _ = Right E.vulcanSalute
 
-instance matchPinchedFingers :: Match "🤌" E.PinchedFingers
+instance ematchOkHand :: EMatch "👌" where
+  ematch _ = Right E.okHand
 
-instance matchPinchingHand :: Match "🤏" E.PinchingHand
+instance ematchPinchedFingers :: EMatch "🤌" where
+  ematch _ = Right E.pinchedFingers
 
-instance matchVictoryHand :: Match "✌" E.VictoryHand
+instance ematchPinchingHand :: EMatch "🤏" where
+  ematch _ = Right E.pinchingHand
 
-instance matchCrossedFingers :: Match "🤞" E.CrossedFingers
+instance ematchVictoryHand :: EMatch "✌" where
+  ematch _ = Right E.victoryHand
 
-instance matchLoveYouGesture :: Match "🤟" E.LoveYouGesture
+instance ematchCrossedFingers :: EMatch "🤞" where
+  ematch _ = Right E.crossedFingers
 
-instance matchSignOfTheHorns :: Match "🤘" E.SignOfTheHorns
+instance ematchLoveYouGesture :: EMatch "🤟" where
+  ematch _ = Right E.loveYouGesture
 
-instance matchCallMeHand :: Match "🤙" E.CallMeHand
+instance ematchSignOfTheHorns :: EMatch "🤘" where
+  ematch _ = Right E.signOfTheHorns
 
-instance matchBackhandIndexPointingLeft :: Match "👈" E.BackhandIndexPointingLeft
+instance ematchCallMeHand :: EMatch "🤙" where
+  ematch _ = Right E.callMeHand
 
-instance matchBackhandIndexPointingRight :: Match "👉" E.BackhandIndexPointingRight
+instance ematchBackhandIndexPointingLeft :: EMatch "👈" where
+  ematch _ = Right E.backhandIndexPointingLeft
 
-instance matchBackhandIndexPointingUp :: Match "👆" E.BackhandIndexPointingUp
+instance ematchBackhandIndexPointingRight :: EMatch "👉" where
+  ematch _ = Right E.backhandIndexPointingRight
 
-instance matchMiddleFinger :: Match "🖕" E.MiddleFinger
+instance ematchBackhandIndexPointingUp :: EMatch "👆" where
+  ematch _ = Right E.backhandIndexPointingUp
 
-instance matchBackhandIndexPointingDown :: Match "👇" E.BackhandIndexPointingDown
+instance ematchMiddleFinger :: EMatch "🖕" where
+  ematch _ = Right E.middleFinger
 
-instance matchIndexPointingUp :: Match "☝" E.IndexPointingUp
+instance ematchBackhandIndexPointingDown :: EMatch "👇" where
+  ematch _ = Right E.backhandIndexPointingDown
 
-instance matchThumbsUp :: Match "👍" E.ThumbsUp
+instance ematchIndexPointingUp :: EMatch "☝" where
+  ematch _ = Right E.indexPointingUp
 
-instance matchThumbsDown :: Match "👎" E.ThumbsDown
+instance ematchThumbsUp :: EMatch "👍" where
+  ematch _ = Right E.thumbsUp
 
-instance matchRaisedFist :: Match "✊" E.RaisedFist
+instance ematchThumbsDown :: EMatch "👎" where
+  ematch _ = Right E.thumbsDown
 
-instance matchOncomingFist :: Match "👊" E.OncomingFist
+instance ematchRaisedFist :: EMatch "✊" where
+  ematch _ = Right E.raisedFist
 
-instance matchLeftFacingFist :: Match "🤛" E.LeftFacingFist
+instance ematchOncomingFist :: EMatch "👊" where
+  ematch _ = Right E.oncomingFist
 
-instance matchRightFacingFist :: Match "🤜" E.RightFacingFist
+instance ematchLeftFacingFist :: EMatch "🤛" where
+  ematch _ = Right E.leftFacingFist
 
-instance matchClappingHands :: Match "👏" E.ClappingHands
+instance ematchRightFacingFist :: EMatch "🤜" where
+  ematch _ = Right E.rightFacingFist
 
-instance matchRaisingHands :: Match "🙌" E.RaisingHands
+instance ematchClappingHands :: EMatch "👏" where
+  ematch _ = Right E.clappingHands
 
-instance matchOpenHands :: Match "👐" E.OpenHands
+instance ematchRaisingHands :: EMatch "🙌" where
+  ematch _ = Right E.raisingHands
 
-instance matchPalmsUpTogether :: Match "🤲" E.PalmsUpTogether
+instance ematchOpenHands :: EMatch "👐" where
+  ematch _ = Right E.openHands
 
-instance matchHandshake :: Match "🤝" E.Handshake
+instance ematchPalmsUpTogether :: EMatch "🤲" where
+  ematch _ = Right E.palmsUpTogether
 
-instance matchFoldedHands :: Match "🙏" E.FoldedHands
+instance ematchHandshake :: EMatch "🤝" where
+  ematch _ = Right E.handshake
 
-instance matchWritingHand :: Match "✍" E.WritingHand
+instance ematchFoldedHands :: EMatch "🙏" where
+  ematch _ = Right E.foldedHands
 
-instance matchNailPolish :: Match "💅" E.NailPolish
+instance ematchWritingHand :: EMatch "✍" where
+  ematch _ = Right E.writingHand
 
-instance matchSelfie :: Match "🤳" E.Selfie
+instance ematchNailPolish :: EMatch "💅" where
+  ematch _ = Right E.nailPolish
 
-instance matchFlexedBiceps :: Match "💪" E.FlexedBiceps
+instance ematchSelfie :: EMatch "🤳" where
+  ematch _ = Right E.selfie
 
-instance matchMechanicalArm :: Match "🦾" E.MechanicalArm
+instance ematchFlexedBiceps :: EMatch "💪" where
+  ematch _ = Right E.flexedBiceps
 
-instance matchMechanicalLeg :: Match "🦿" E.MechanicalLeg
+instance ematchMechanicalArm :: EMatch "🦾" where
+  ematch _ = Right E.mechanicalArm
 
-instance matchLeg :: Match "🦵" E.Leg
+instance ematchMechanicalLeg :: EMatch "🦿" where
+  ematch _ = Right E.mechanicalLeg
 
-instance matchFoot :: Match "🦶" E.Foot
+instance ematchLeg :: EMatch "🦵" where
+  ematch _ = Right E.leg
 
-instance matchEar :: Match "👂" E.Ear
+instance ematchFoot :: EMatch "🦶" where
+  ematch _ = Right E.foot
 
-instance matchEarWithHearingAid :: Match "🦻" E.EarWithHearingAid
+instance ematchEar :: EMatch "👂" where
+  ematch _ = Right E.ear
 
-instance matchNose :: Match "👃" E.Nose
+instance ematchEarWithHearingAid :: EMatch "🦻" where
+  ematch _ = Right E.earWithHearingAid
 
-instance matchBrain :: Match "🧠" E.Brain
+instance ematchNose :: EMatch "👃" where
+  ematch _ = Right E.nose
 
-instance matchAnatomicalHeart :: Match "🫀" E.AnatomicalHeart
+instance ematchBrain :: EMatch "🧠" where
+  ematch _ = Right E.brain
 
-instance matchLungs :: Match "🫁" E.Lungs
+instance ematchAnatomicalHeart :: EMatch "🫀" where
+  ematch _ = Right E.anatomicalHeart
 
-instance matchTooth :: Match "🦷" E.Tooth
+instance ematchLungs :: EMatch "🫁" where
+  ematch _ = Right E.lungs
 
-instance matchBone :: Match "🦴" E.Bone
+instance ematchTooth :: EMatch "🦷" where
+  ematch _ = Right E.tooth
 
-instance matchEyes :: Match "👀" E.Eyes
+instance ematchBone :: EMatch "🦴" where
+  ematch _ = Right E.bone
 
-instance matchEye :: Match "👁" E.Eye
+instance ematchEyes :: EMatch "👀" where
+  ematch _ = Right E.eyes
 
-instance matchTongue :: Match "👅" E.Tongue
+instance ematchEye :: EMatch "👁" where
+  ematch _ = Right E.eye
 
-instance matchMouth :: Match "👄" E.Mouth
+instance ematchTongue :: EMatch "👅" where
+  ematch _ = Right E.tongue
 
-instance matchBaby :: Match "👶" E.Baby
+instance ematchMouth :: EMatch "👄" where
+  ematch _ = Right E.mouth
 
-instance matchChild :: Match "🧒" E.Child
+instance ematchBaby :: EMatch "👶" where
+  ematch _ = Right E.baby
 
-instance matchBoy :: Match "👦" E.Boy
+instance ematchChild :: EMatch "🧒" where
+  ematch _ = Right E.child
 
-instance matchGirl :: Match "👧" E.Girl
+instance ematchBoy :: EMatch "👦" where
+  ematch _ = Right E.boy
 
-instance matchPerson :: Match "🧑" E.Person
+instance ematchGirl :: EMatch "👧" where
+  ematch _ = Right E.girl
 
-instance matchPersonBlondHair :: Match "👱" E.PersonBlondHair
+instance ematchPerson :: EMatch "🧑" where
+  ematch _ = Right E.person
 
-instance matchMan :: Match "👨" E.Man
+instance ematchPersonBlondHair :: EMatch "👱" where
+  ematch _ = Right E.personBlondHair
 
-instance matchManBeard :: Match "🧔" E.ManBeard
+instance ematchMan :: EMatch "👨" where
+  ematch _ = Right E.man
 
-instance matchWoman :: Match "👩" E.Woman
+instance ematchManBeard :: EMatch "🧔" where
+  ematch _ = Right E.manBeard
 
-instance matchOlderPerson :: Match "🧓" E.OlderPerson
+instance ematchWoman :: EMatch "👩" where
+  ematch _ = Right E.woman
 
-instance matchOldMan :: Match "👴" E.OldMan
+instance ematchOlderPerson :: EMatch "🧓" where
+  ematch _ = Right E.olderPerson
 
-instance matchOldWoman :: Match "👵" E.OldWoman
+instance ematchOldMan :: EMatch "👴" where
+  ematch _ = Right E.oldMan
 
-instance matchPersonFrowning :: Match "🙍" E.PersonFrowning
+instance ematchOldWoman :: EMatch "👵" where
+  ematch _ = Right E.oldWoman
 
-instance matchPersonPouting :: Match "🙎" E.PersonPouting
+instance ematchPersonFrowning :: EMatch "🙍" where
+  ematch _ = Right E.personFrowning
 
-instance matchPersonGesturingNo :: Match "🙅" E.PersonGesturingNo
+instance ematchPersonPouting :: EMatch "🙎" where
+  ematch _ = Right E.personPouting
 
-instance matchPersonGesturingOk :: Match "🙆" E.PersonGesturingOk
+instance ematchPersonGesturingNo :: EMatch "🙅" where
+  ematch _ = Right E.personGesturingNo
 
-instance matchPersonTippingHand :: Match "💁" E.PersonTippingHand
+instance ematchPersonGesturingOk :: EMatch "🙆" where
+  ematch _ = Right E.personGesturingOk
 
-instance matchPersonRaisingHand :: Match "🙋" E.PersonRaisingHand
+instance ematchPersonTippingHand :: EMatch "💁" where
+  ematch _ = Right E.personTippingHand
 
-instance matchDeafPerson :: Match "🧏" E.DeafPerson
+instance ematchPersonRaisingHand :: EMatch "🙋" where
+  ematch _ = Right E.personRaisingHand
 
-instance matchPersonBowing :: Match "🙇" E.PersonBowing
+instance ematchDeafPerson :: EMatch "🧏" where
+  ematch _ = Right E.deafPerson
 
-instance matchPersonFacepalming :: Match "🤦" E.PersonFacepalming
+instance ematchPersonBowing :: EMatch "🙇" where
+  ematch _ = Right E.personBowing
 
-instance matchPersonShrugging :: Match "🤷" E.PersonShrugging
+instance ematchPersonFacepalming :: EMatch "🤦" where
+  ematch _ = Right E.personFacepalming
 
-instance matchPoliceOfficer :: Match "👮" E.PoliceOfficer
+instance ematchPersonShrugging :: EMatch "🤷" where
+  ematch _ = Right E.personShrugging
 
-instance matchDetective :: Match "🕵" E.Detective
+instance ematchPoliceOfficer :: EMatch "👮" where
+  ematch _ = Right E.policeOfficer
 
-instance matchGuard :: Match "💂" E.Guard
+instance ematchDetective :: EMatch "🕵" where
+  ematch _ = Right E.detective
 
-instance matchNinja :: Match "🥷" E.Ninja
+instance ematchGuard :: EMatch "💂" where
+  ematch _ = Right E.guard
 
-instance matchConstructionWorker :: Match "👷" E.ConstructionWorker
+instance ematchNinja :: EMatch "🥷" where
+  ematch _ = Right E.ninja
 
-instance matchPrince :: Match "🤴" E.Prince
+instance ematchConstructionWorker :: EMatch "👷" where
+  ematch _ = Right E.constructionWorker
 
-instance matchPrincess :: Match "👸" E.Princess
+instance ematchPrince :: EMatch "🤴" where
+  ematch _ = Right E.prince
 
-instance matchPersonWearingTurban :: Match "👳" E.PersonWearingTurban
+instance ematchPrincess :: EMatch "👸" where
+  ematch _ = Right E.princess
 
-instance matchPersonWithSkullcap :: Match "👲" E.PersonWithSkullcap
+instance ematchPersonWearingTurban :: EMatch "👳" where
+  ematch _ = Right E.personWearingTurban
 
-instance matchWomanWithHeadscarf :: Match "🧕" E.WomanWithHeadscarf
+instance ematchPersonWithSkullcap :: EMatch "👲" where
+  ematch _ = Right E.personWithSkullcap
 
-instance matchPersonInTuxedo :: Match "🤵" E.PersonInTuxedo
+instance ematchWomanWithHeadscarf :: EMatch "🧕" where
+  ematch _ = Right E.womanWithHeadscarf
 
-instance matchPersonWithVeil :: Match "👰" E.PersonWithVeil
+instance ematchPersonInTuxedo :: EMatch "🤵" where
+  ematch _ = Right E.personInTuxedo
 
-instance matchPregnantWoman :: Match "🤰" E.PregnantWoman
+instance ematchPersonWithVeil :: EMatch "👰" where
+  ematch _ = Right E.personWithVeil
 
-instance matchBreastFeeding :: Match "🤱" E.BreastFeeding
+instance ematchPregnantWoman :: EMatch "🤰" where
+  ematch _ = Right E.pregnantWoman
 
-instance matchBabyAngel :: Match "👼" E.BabyAngel
+instance ematchBreastFeeding :: EMatch "🤱" where
+  ematch _ = Right E.breastFeeding
 
-instance matchSantaClaus :: Match "🎅" E.SantaClaus
+instance ematchBabyAngel :: EMatch "👼" where
+  ematch _ = Right E.babyAngel
 
-instance matchMrsClaus :: Match "🤶" E.MrsClaus
+instance ematchSantaClaus :: EMatch "🎅" where
+  ematch _ = Right E.santaClaus
 
-instance matchSuperhero :: Match "🦸" E.Superhero
+instance ematchMrsClaus :: EMatch "🤶" where
+  ematch _ = Right E.mrsClaus
 
-instance matchSupervillain :: Match "🦹" E.Supervillain
+instance ematchSuperhero :: EMatch "🦸" where
+  ematch _ = Right E.superhero
 
-instance matchMage :: Match "🧙" E.Mage
+instance ematchSupervillain :: EMatch "🦹" where
+  ematch _ = Right E.supervillain
 
-instance matchFairy :: Match "🧚" E.Fairy
+instance ematchMage :: EMatch "🧙" where
+  ematch _ = Right E.mage
 
-instance matchVampire :: Match "🧛" E.Vampire
+instance ematchFairy :: EMatch "🧚" where
+  ematch _ = Right E.fairy
 
-instance matchMerperson :: Match "🧜" E.Merperson
+instance ematchVampire :: EMatch "🧛" where
+  ematch _ = Right E.vampire
 
-instance matchElf :: Match "🧝" E.Elf
+instance ematchMerperson :: EMatch "🧜" where
+  ematch _ = Right E.merperson
 
-instance matchGenie :: Match "🧞" E.Genie
+instance ematchElf :: EMatch "🧝" where
+  ematch _ = Right E.elf
 
-instance matchZombie :: Match "🧟" E.Zombie
+instance ematchGenie :: EMatch "🧞" where
+  ematch _ = Right E.genie
 
-instance matchPersonGettingMassage :: Match "💆" E.PersonGettingMassage
+instance ematchZombie :: EMatch "🧟" where
+  ematch _ = Right E.zombie
 
-instance matchPersonGettingHaircut :: Match "💇" E.PersonGettingHaircut
+instance ematchPersonGettingMassage :: EMatch "💆" where
+  ematch _ = Right E.personGettingMassage
 
-instance matchPersonWalking :: Match "🚶" E.PersonWalking
+instance ematchPersonGettingHaircut :: EMatch "💇" where
+  ematch _ = Right E.personGettingHaircut
 
-instance matchPersonStanding :: Match "🧍" E.PersonStanding
+instance ematchPersonWalking :: EMatch "🚶" where
+  ematch _ = Right E.personWalking
 
-instance matchPersonKneeling :: Match "🧎" E.PersonKneeling
+instance ematchPersonStanding :: EMatch "🧍" where
+  ematch _ = Right E.personStanding
 
-instance matchPersonRunning :: Match "🏃" E.PersonRunning
+instance ematchPersonKneeling :: EMatch "🧎" where
+  ematch _ = Right E.personKneeling
 
-instance matchWomanDancing :: Match "💃" E.WomanDancing
+instance ematchPersonRunning :: EMatch "🏃" where
+  ematch _ = Right E.personRunning
 
-instance matchManDancing :: Match "🕺" E.ManDancing
+instance ematchWomanDancing :: EMatch "💃" where
+  ematch _ = Right E.womanDancing
 
-instance matchPersonInSuitLevitating :: Match "🕴" E.PersonInSuitLevitating
+instance ematchManDancing :: EMatch "🕺" where
+  ematch _ = Right E.manDancing
 
-instance matchPeopleWithBunnyEars :: Match "👯" E.PeopleWithBunnyEars
+instance ematchPersonInSuitLevitating :: EMatch "🕴" where
+  ematch _ = Right E.personInSuitLevitating
 
-instance matchPersonInSteamyRoom :: Match "🧖" E.PersonInSteamyRoom
+instance ematchPeopleWithBunnyEars :: EMatch "👯" where
+  ematch _ = Right E.peopleWithBunnyEars
 
-instance matchPersonClimbing :: Match "🧗" E.PersonClimbing
+instance ematchPersonInSteamyRoom :: EMatch "🧖" where
+  ematch _ = Right E.personInSteamyRoom
 
-instance matchPersonFencing :: Match "🤺" E.PersonFencing
+instance ematchPersonClimbing :: EMatch "🧗" where
+  ematch _ = Right E.personClimbing
 
-instance matchHorseRacing :: Match "🏇" E.HorseRacing
+instance ematchPersonFencing :: EMatch "🤺" where
+  ematch _ = Right E.personFencing
 
-instance matchSkier :: Match "⛷" E.Skier
+instance ematchHorseRacing :: EMatch "🏇" where
+  ematch _ = Right E.horseRacing
 
-instance matchSnowboarder :: Match "🏂" E.Snowboarder
+instance ematchSkier :: EMatch "⛷" where
+  ematch _ = Right E.skier
 
-instance matchPersonGolfing :: Match "🏌" E.PersonGolfing
+instance ematchSnowboarder :: EMatch "🏂" where
+  ematch _ = Right E.snowboarder
 
-instance matchPersonSurfing :: Match "🏄" E.PersonSurfing
+instance ematchPersonGolfing :: EMatch "🏌" where
+  ematch _ = Right E.personGolfing
 
-instance matchPersonRowingBoat :: Match "🚣" E.PersonRowingBoat
+instance ematchPersonSurfing :: EMatch "🏄" where
+  ematch _ = Right E.personSurfing
 
-instance matchPersonSwimming :: Match "🏊" E.PersonSwimming
+instance ematchPersonRowingBoat :: EMatch "🚣" where
+  ematch _ = Right E.personRowingBoat
 
-instance matchPersonBouncingBall :: Match "⛹" E.PersonBouncingBall
+instance ematchPersonSwimming :: EMatch "🏊" where
+  ematch _ = Right E.personSwimming
 
-instance matchPersonLiftingWeights :: Match "🏋" E.PersonLiftingWeights
+instance ematchPersonBouncingBall :: EMatch "⛹" where
+  ematch _ = Right E.personBouncingBall
 
-instance matchPersonBiking :: Match "🚴" E.PersonBiking
+instance ematchPersonLiftingWeights :: EMatch "🏋" where
+  ematch _ = Right E.personLiftingWeights
 
-instance matchPersonMountainBiking :: Match "🚵" E.PersonMountainBiking
+instance ematchPersonBiking :: EMatch "🚴" where
+  ematch _ = Right E.personBiking
 
-instance matchPersonCartwheeling :: Match "🤸" E.PersonCartwheeling
+instance ematchPersonMountainBiking :: EMatch "🚵" where
+  ematch _ = Right E.personMountainBiking
 
-instance matchPeopleWrestling :: Match "🤼" E.PeopleWrestling
+instance ematchPersonCartwheeling :: EMatch "🤸" where
+  ematch _ = Right E.personCartwheeling
 
-instance matchPersonPlayingWaterPolo :: Match "🤽" E.PersonPlayingWaterPolo
+instance ematchPeopleWrestling :: EMatch "🤼" where
+  ematch _ = Right E.peopleWrestling
 
-instance matchPersonPlayingHandball :: Match "🤾" E.PersonPlayingHandball
+instance ematchPersonPlayingWaterPolo :: EMatch "🤽" where
+  ematch _ = Right E.personPlayingWaterPolo
 
-instance matchPersonJuggling :: Match "🤹" E.PersonJuggling
+instance ematchPersonPlayingHandball :: EMatch "🤾" where
+  ematch _ = Right E.personPlayingHandball
 
-instance matchPersonInLotusPosition :: Match "🧘" E.PersonInLotusPosition
+instance ematchPersonJuggling :: EMatch "🤹" where
+  ematch _ = Right E.personJuggling
 
-instance matchPersonTakingBath :: Match "🛀" E.PersonTakingBath
+instance ematchPersonInLotusPosition :: EMatch "🧘" where
+  ematch _ = Right E.personInLotusPosition
 
-instance matchPersonInBed :: Match "🛌" E.PersonInBed
+instance ematchPersonTakingBath :: EMatch "🛀" where
+  ematch _ = Right E.personTakingBath
 
-instance matchWomenHoldingHands :: Match "👭" E.WomenHoldingHands
+instance ematchPersonInBed :: EMatch "🛌" where
+  ematch _ = Right E.personInBed
 
-instance matchWomanAndManHoldingHands :: Match "👫" E.WomanAndManHoldingHands
+instance ematchWomenHoldingHands :: EMatch "👭" where
+  ematch _ = Right E.womenHoldingHands
 
-instance matchMenHoldingHands :: Match "👬" E.MenHoldingHands
+instance ematchWomanAndManHoldingHands :: EMatch "👫" where
+  ematch _ = Right E.womanAndManHoldingHands
 
-instance matchKiss :: Match "💏" E.Kiss
+instance ematchMenHoldingHands :: EMatch "👬" where
+  ematch _ = Right E.menHoldingHands
 
-instance matchCoupleWithHeart :: Match "💑" E.CoupleWithHeart
+instance ematchKiss :: EMatch "💏" where
+  ematch _ = Right E.kiss
 
-instance matchFamily :: Match "👪" E.Family
+instance ematchCoupleWithHeart :: EMatch "💑" where
+  ematch _ = Right E.coupleWithHeart
 
-instance matchSpeakingHead :: Match "🗣" E.SpeakingHead
+instance ematchFamily :: EMatch "👪" where
+  ematch _ = Right E.family
 
-instance matchBustInSilhouette :: Match "👤" E.BustInSilhouette
+instance ematchSpeakingHead :: EMatch "🗣" where
+  ematch _ = Right E.speakingHead
 
-instance matchBustsInSilhouette :: Match "👥" E.BustsInSilhouette
+instance ematchBustInSilhouette :: EMatch "👤" where
+  ematch _ = Right E.bustInSilhouette
 
-instance matchPeopleHugging :: Match "🫂" E.PeopleHugging
+instance ematchBustsInSilhouette :: EMatch "👥" where
+  ematch _ = Right E.bustsInSilhouette
 
-instance matchFootprints :: Match "👣" E.Footprints
+instance ematchPeopleHugging :: EMatch "🫂" where
+  ematch _ = Right E.peopleHugging
 
-instance matchLightSkinTone :: Match "🏻" E.LightSkinTone
+instance ematchFootprints :: EMatch "👣" where
+  ematch _ = Right E.footprints
 
-instance matchMediumLightSkinTone :: Match "🏼" E.MediumLightSkinTone
+instance ematchLightSkinTone :: EMatch "🏻" where
+  ematch _ = Right E.lightSkinTone
 
-instance matchMediumSkinTone :: Match "🏽" E.MediumSkinTone
+instance ematchMediumLightSkinTone :: EMatch "🏼" where
+  ematch _ = Right E.mediumLightSkinTone
 
-instance matchMediumDarkSkinTone :: Match "🏾" E.MediumDarkSkinTone
+instance ematchMediumSkinTone :: EMatch "🏽" where
+  ematch _ = Right E.mediumSkinTone
 
-instance matchDarkSkinTone :: Match "🏿" E.DarkSkinTone
+instance ematchMediumDarkSkinTone :: EMatch "🏾" where
+  ematch _ = Right E.mediumDarkSkinTone
 
-instance matchRedHair :: Match "🦰" E.RedHair
+instance ematchDarkSkinTone :: EMatch "🏿" where
+  ematch _ = Right E.darkSkinTone
 
-instance matchCurlyHair :: Match "🦱" E.CurlyHair
+instance ematchRedHair :: EMatch "🦰" where
+  ematch _ = Right E.redHair
 
-instance matchWhiteHair :: Match "🦳" E.WhiteHair
+instance ematchCurlyHair :: EMatch "🦱" where
+  ematch _ = Right E.curlyHair
 
-instance matchBald :: Match "🦲" E.Bald
+instance ematchWhiteHair :: EMatch "🦳" where
+  ematch _ = Right E.whiteHair
 
-instance matchMonkeyFace :: Match "🐵" E.MonkeyFace
+instance ematchBald :: EMatch "🦲" where
+  ematch _ = Right E.bald
 
-instance matchMonkey :: Match "🐒" E.Monkey
+instance ematchMonkeyFace :: EMatch "🐵" where
+  ematch _ = Right E.monkeyFace
 
-instance matchGorilla :: Match "🦍" E.Gorilla
+instance ematchMonkey :: EMatch "🐒" where
+  ematch _ = Right E.monkey
 
-instance matchOrangutan :: Match "🦧" E.Orangutan
+instance ematchGorilla :: EMatch "🦍" where
+  ematch _ = Right E.gorilla
 
-instance matchDogFace :: Match "🐶" E.DogFace
+instance ematchOrangutan :: EMatch "🦧" where
+  ematch _ = Right E.orangutan
 
-instance matchDog :: Match "🐕" E.Dog
+instance ematchDogFace :: EMatch "🐶" where
+  ematch _ = Right E.dogFace
 
-instance matchGuideDog :: Match "🦮" E.GuideDog
+instance ematchDog :: EMatch "🐕" where
+  ematch _ = Right E.dog
 
-instance matchPoodle :: Match "🐩" E.Poodle
+instance ematchGuideDog :: EMatch "🦮" where
+  ematch _ = Right E.guideDog
 
-instance matchWolf :: Match "🐺" E.Wolf
+instance ematchPoodle :: EMatch "🐩" where
+  ematch _ = Right E.poodle
 
-instance matchFox :: Match "🦊" E.Fox
+instance ematchWolf :: EMatch "🐺" where
+  ematch _ = Right E.wolf
 
-instance matchRaccoon :: Match "🦝" E.Raccoon
+instance ematchFox :: EMatch "🦊" where
+  ematch _ = Right E.fox
 
-instance matchCatFace :: Match "🐱" E.CatFace
+instance ematchRaccoon :: EMatch "🦝" where
+  ematch _ = Right E.raccoon
 
-instance matchCat :: Match "🐈" E.Cat
+instance ematchCatFace :: EMatch "🐱" where
+  ematch _ = Right E.catFace
 
-instance matchLion :: Match "🦁" E.Lion
+instance ematchCat :: EMatch "🐈" where
+  ematch _ = Right E.cat
 
-instance matchTigerFace :: Match "🐯" E.TigerFace
+instance ematchLion :: EMatch "🦁" where
+  ematch _ = Right E.lion
 
-instance matchTiger :: Match "🐅" E.Tiger
+instance ematchTigerFace :: EMatch "🐯" where
+  ematch _ = Right E.tigerFace
 
-instance matchLeopard :: Match "🐆" E.Leopard
+instance ematchTiger :: EMatch "🐅" where
+  ematch _ = Right E.tiger
 
-instance matchHorseFace :: Match "🐴" E.HorseFace
+instance ematchLeopard :: EMatch "🐆" where
+  ematch _ = Right E.leopard
 
-instance matchHorse :: Match "🐎" E.Horse
+instance ematchHorseFace :: EMatch "🐴" where
+  ematch _ = Right E.horseFace
 
-instance matchUnicorn :: Match "🦄" E.Unicorn
+instance ematchHorse :: EMatch "🐎" where
+  ematch _ = Right E.horse
 
-instance matchZebra :: Match "🦓" E.Zebra
+instance ematchUnicorn :: EMatch "🦄" where
+  ematch _ = Right E.unicorn
 
-instance matchDeer :: Match "🦌" E.Deer
+instance ematchZebra :: EMatch "🦓" where
+  ematch _ = Right E.zebra
 
-instance matchBison :: Match "🦬" E.Bison
+instance ematchDeer :: EMatch "🦌" where
+  ematch _ = Right E.deer
 
-instance matchCowFace :: Match "🐮" E.CowFace
+instance ematchBison :: EMatch "🦬" where
+  ematch _ = Right E.bison
 
-instance matchOx :: Match "🐂" E.Ox
+instance ematchCowFace :: EMatch "🐮" where
+  ematch _ = Right E.cowFace
 
-instance matchWaterBuffalo :: Match "🐃" E.WaterBuffalo
+instance ematchOx :: EMatch "🐂" where
+  ematch _ = Right E.ox
 
-instance matchCow :: Match "🐄" E.Cow
+instance ematchWaterBuffalo :: EMatch "🐃" where
+  ematch _ = Right E.waterBuffalo
 
-instance matchPigFace :: Match "🐷" E.PigFace
+instance ematchCow :: EMatch "🐄" where
+  ematch _ = Right E.cow
 
-instance matchPig :: Match "🐖" E.Pig
+instance ematchPigFace :: EMatch "🐷" where
+  ematch _ = Right E.pigFace
 
-instance matchBoar :: Match "🐗" E.Boar
+instance ematchPig :: EMatch "🐖" where
+  ematch _ = Right E.pig
 
-instance matchPigNose :: Match "🐽" E.PigNose
+instance ematchBoar :: EMatch "🐗" where
+  ematch _ = Right E.boar
 
-instance matchRam :: Match "🐏" E.Ram
+instance ematchPigNose :: EMatch "🐽" where
+  ematch _ = Right E.pigNose
 
-instance matchEwe :: Match "🐑" E.Ewe
+instance ematchRam :: EMatch "🐏" where
+  ematch _ = Right E.ram
 
-instance matchGoat :: Match "🐐" E.Goat
+instance ematchEwe :: EMatch "🐑" where
+  ematch _ = Right E.ewe
 
-instance matchCamel :: Match "🐪" E.Camel
+instance ematchGoat :: EMatch "🐐" where
+  ematch _ = Right E.goat
 
-instance matchTwoHumpCamel :: Match "🐫" E.TwoHumpCamel
+instance ematchCamel :: EMatch "🐪" where
+  ematch _ = Right E.camel
 
-instance matchLlama :: Match "🦙" E.Llama
+instance ematchTwoHumpCamel :: EMatch "🐫" where
+  ematch _ = Right E.twoHumpCamel
 
-instance matchGiraffe :: Match "🦒" E.Giraffe
+instance ematchLlama :: EMatch "🦙" where
+  ematch _ = Right E.llama
 
-instance matchElephant :: Match "🐘" E.Elephant
+instance ematchGiraffe :: EMatch "🦒" where
+  ematch _ = Right E.giraffe
 
-instance matchMammoth :: Match "🦣" E.Mammoth
+instance ematchElephant :: EMatch "🐘" where
+  ematch _ = Right E.elephant
 
-instance matchRhinoceros :: Match "🦏" E.Rhinoceros
+instance ematchMammoth :: EMatch "🦣" where
+  ematch _ = Right E.mammoth
 
-instance matchHippopotamus :: Match "🦛" E.Hippopotamus
+instance ematchRhinoceros :: EMatch "🦏" where
+  ematch _ = Right E.rhinoceros
 
-instance matchMouseFace :: Match "🐭" E.MouseFace
+instance ematchHippopotamus :: EMatch "🦛" where
+  ematch _ = Right E.hippopotamus
 
-instance matchMouse :: Match "🐁" E.Mouse
+instance ematchMouseFace :: EMatch "🐭" where
+  ematch _ = Right E.mouseFace
 
-instance matchRat :: Match "🐀" E.Rat
+instance ematchMouse :: EMatch "🐁" where
+  ematch _ = Right E.mouse
 
-instance matchHamster :: Match "🐹" E.Hamster
+instance ematchRat :: EMatch "🐀" where
+  ematch _ = Right E.rat
 
-instance matchRabbitFace :: Match "🐰" E.RabbitFace
+instance ematchHamster :: EMatch "🐹" where
+  ematch _ = Right E.hamster
 
-instance matchRabbit :: Match "🐇" E.Rabbit
+instance ematchRabbitFace :: EMatch "🐰" where
+  ematch _ = Right E.rabbitFace
 
-instance matchChipmunk :: Match "🐿" E.Chipmunk
+instance ematchRabbit :: EMatch "🐇" where
+  ematch _ = Right E.rabbit
 
-instance matchBeaver :: Match "🦫" E.Beaver
+instance ematchChipmunk :: EMatch "🐿" where
+  ematch _ = Right E.chipmunk
 
-instance matchHedgehog :: Match "🦔" E.Hedgehog
+instance ematchBeaver :: EMatch "🦫" where
+  ematch _ = Right E.beaver
 
-instance matchBat :: Match "🦇" E.Bat
+instance ematchHedgehog :: EMatch "🦔" where
+  ematch _ = Right E.hedgehog
 
-instance matchBear :: Match "🐻" E.Bear
+instance ematchBat :: EMatch "🦇" where
+  ematch _ = Right E.bat
 
-instance matchKoala :: Match "🐨" E.Koala
+instance ematchBear :: EMatch "🐻" where
+  ematch _ = Right E.bear
 
-instance matchPanda :: Match "🐼" E.Panda
+instance ematchKoala :: EMatch "🐨" where
+  ematch _ = Right E.koala
 
-instance matchSloth :: Match "🦥" E.Sloth
+instance ematchPanda :: EMatch "🐼" where
+  ematch _ = Right E.panda
 
-instance matchOtter :: Match "🦦" E.Otter
+instance ematchSloth :: EMatch "🦥" where
+  ematch _ = Right E.sloth
 
-instance matchSkunk :: Match "🦨" E.Skunk
+instance ematchOtter :: EMatch "🦦" where
+  ematch _ = Right E.otter
 
-instance matchKangaroo :: Match "🦘" E.Kangaroo
+instance ematchSkunk :: EMatch "🦨" where
+  ematch _ = Right E.skunk
 
-instance matchBadger :: Match "🦡" E.Badger
+instance ematchKangaroo :: EMatch "🦘" where
+  ematch _ = Right E.kangaroo
 
-instance matchPawPrints :: Match "🐾" E.PawPrints
+instance ematchBadger :: EMatch "🦡" where
+  ematch _ = Right E.badger
 
-instance matchTurkey :: Match "🦃" E.Turkey
+instance ematchPawPrints :: EMatch "🐾" where
+  ematch _ = Right E.pawPrints
 
-instance matchChicken :: Match "🐔" E.Chicken
+instance ematchTurkey :: EMatch "🦃" where
+  ematch _ = Right E.turkey
 
-instance matchRooster :: Match "🐓" E.Rooster
+instance ematchChicken :: EMatch "🐔" where
+  ematch _ = Right E.chicken
 
-instance matchHatchingChick :: Match "🐣" E.HatchingChick
+instance ematchRooster :: EMatch "🐓" where
+  ematch _ = Right E.rooster
 
-instance matchBabyChick :: Match "🐤" E.BabyChick
+instance ematchHatchingChick :: EMatch "🐣" where
+  ematch _ = Right E.hatchingChick
 
-instance matchFrontFacingBabyChick :: Match "🐥" E.FrontFacingBabyChick
+instance ematchBabyChick :: EMatch "🐤" where
+  ematch _ = Right E.babyChick
 
-instance matchBird :: Match "🐦" E.Bird
+instance ematchFrontFacingBabyChick :: EMatch "🐥" where
+  ematch _ = Right E.frontFacingBabyChick
 
-instance matchPenguin :: Match "🐧" E.Penguin
+instance ematchBird :: EMatch "🐦" where
+  ematch _ = Right E.bird
 
-instance matchDove :: Match "🕊" E.Dove
+instance ematchPenguin :: EMatch "🐧" where
+  ematch _ = Right E.penguin
 
-instance matchEagle :: Match "🦅" E.Eagle
+instance ematchDove :: EMatch "🕊" where
+  ematch _ = Right E.dove
 
-instance matchDuck :: Match "🦆" E.Duck
+instance ematchEagle :: EMatch "🦅" where
+  ematch _ = Right E.eagle
 
-instance matchSwan :: Match "🦢" E.Swan
+instance ematchDuck :: EMatch "🦆" where
+  ematch _ = Right E.duck
 
-instance matchOwl :: Match "🦉" E.Owl
+instance ematchSwan :: EMatch "🦢" where
+  ematch _ = Right E.swan
 
-instance matchDodo :: Match "🦤" E.Dodo
+instance ematchOwl :: EMatch "🦉" where
+  ematch _ = Right E.owl
 
-instance matchFeather :: Match "🪶" E.Feather
+instance ematchDodo :: EMatch "🦤" where
+  ematch _ = Right E.dodo
 
-instance matchFlamingo :: Match "🦩" E.Flamingo
+instance ematchFeather :: EMatch "🪶" where
+  ematch _ = Right E.feather
 
-instance matchPeacock :: Match "🦚" E.Peacock
+instance ematchFlamingo :: EMatch "🦩" where
+  ematch _ = Right E.flamingo
 
-instance matchParrot :: Match "🦜" E.Parrot
+instance ematchPeacock :: EMatch "🦚" where
+  ematch _ = Right E.peacock
 
-instance matchFrog :: Match "🐸" E.Frog
+instance ematchParrot :: EMatch "🦜" where
+  ematch _ = Right E.parrot
 
-instance matchCrocodile :: Match "🐊" E.Crocodile
+instance ematchFrog :: EMatch "🐸" where
+  ematch _ = Right E.frog
 
-instance matchTurtle :: Match "🐢" E.Turtle
+instance ematchCrocodile :: EMatch "🐊" where
+  ematch _ = Right E.crocodile
 
-instance matchLizard :: Match "🦎" E.Lizard
+instance ematchTurtle :: EMatch "🐢" where
+  ematch _ = Right E.turtle
 
-instance matchSnake :: Match "🐍" E.Snake
+instance ematchLizard :: EMatch "🦎" where
+  ematch _ = Right E.lizard
 
-instance matchDragonFace :: Match "🐲" E.DragonFace
+instance ematchSnake :: EMatch "🐍" where
+  ematch _ = Right E.snake
 
-instance matchDragon :: Match "🐉" E.Dragon
+instance ematchDragonFace :: EMatch "🐲" where
+  ematch _ = Right E.dragonFace
 
-instance matchSauropod :: Match "🦕" E.Sauropod
+instance ematchDragon :: EMatch "🐉" where
+  ematch _ = Right E.dragon
 
-instance matchTRex :: Match "🦖" E.TRex
+instance ematchSauropod :: EMatch "🦕" where
+  ematch _ = Right E.sauropod
 
-instance matchSpoutingWhale :: Match "🐳" E.SpoutingWhale
+instance ematchTRex :: EMatch "🦖" where
+  ematch _ = Right E.tRex
 
-instance matchWhale :: Match "🐋" E.Whale
+instance ematchSpoutingWhale :: EMatch "🐳" where
+  ematch _ = Right E.spoutingWhale
 
-instance matchDolphin :: Match "🐬" E.Dolphin
+instance ematchWhale :: EMatch "🐋" where
+  ematch _ = Right E.whale
 
-instance matchSeal :: Match "🦭" E.Seal
+instance ematchDolphin :: EMatch "🐬" where
+  ematch _ = Right E.dolphin
 
-instance matchFish :: Match "🐟" E.Fish
+instance ematchSeal :: EMatch "🦭" where
+  ematch _ = Right E.seal
 
-instance matchTropicalFish :: Match "🐠" E.TropicalFish
+instance ematchFish :: EMatch "🐟" where
+  ematch _ = Right E.fish
 
-instance matchBlowfish :: Match "🐡" E.Blowfish
+instance ematchTropicalFish :: EMatch "🐠" where
+  ematch _ = Right E.tropicalFish
 
-instance matchShark :: Match "🦈" E.Shark
+instance ematchBlowfish :: EMatch "🐡" where
+  ematch _ = Right E.blowfish
 
-instance matchOctopus :: Match "🐙" E.Octopus
+instance ematchShark :: EMatch "🦈" where
+  ematch _ = Right E.shark
 
-instance matchSpiralShell :: Match "🐚" E.SpiralShell
+instance ematchOctopus :: EMatch "🐙" where
+  ematch _ = Right E.octopus
 
-instance matchSnail :: Match "🐌" E.Snail
+instance ematchSpiralShell :: EMatch "🐚" where
+  ematch _ = Right E.spiralShell
 
-instance matchButterfly :: Match "🦋" E.Butterfly
+instance ematchSnail :: EMatch "🐌" where
+  ematch _ = Right E.snail
 
-instance matchBug :: Match "🐛" E.Bug
+instance ematchButterfly :: EMatch "🦋" where
+  ematch _ = Right E.butterfly
 
-instance matchAnt :: Match "🐜" E.Ant
+instance ematchBug :: EMatch "🐛" where
+  ematch _ = Right E.bug
 
-instance matchHoneybee :: Match "🐝" E.Honeybee
+instance ematchAnt :: EMatch "🐜" where
+  ematch _ = Right E.ant
 
-instance matchBeetle :: Match "🪲" E.Beetle
+instance ematchHoneybee :: EMatch "🐝" where
+  ematch _ = Right E.honeybee
 
-instance matchLadyBeetle :: Match "🐞" E.LadyBeetle
+instance ematchBeetle :: EMatch "🪲" where
+  ematch _ = Right E.beetle
 
-instance matchCricket :: Match "🦗" E.Cricket
+instance ematchLadyBeetle :: EMatch "🐞" where
+  ematch _ = Right E.ladyBeetle
 
-instance matchCockroach :: Match "🪳" E.Cockroach
+instance ematchCricket :: EMatch "🦗" where
+  ematch _ = Right E.cricket
 
-instance matchSpider :: Match "🕷" E.Spider
+instance ematchCockroach :: EMatch "🪳" where
+  ematch _ = Right E.cockroach
 
-instance matchSpiderWeb :: Match "🕸" E.SpiderWeb
+instance ematchSpider :: EMatch "🕷" where
+  ematch _ = Right E.spider
 
-instance matchScorpion :: Match "🦂" E.Scorpion
+instance ematchSpiderWeb :: EMatch "🕸" where
+  ematch _ = Right E.spiderWeb
 
-instance matchMosquito :: Match "🦟" E.Mosquito
+instance ematchScorpion :: EMatch "🦂" where
+  ematch _ = Right E.scorpion
 
-instance matchFly :: Match "🪰" E.Fly
+instance ematchMosquito :: EMatch "🦟" where
+  ematch _ = Right E.mosquito
 
-instance matchWorm :: Match "🪱" E.Worm
+instance ematchFly :: EMatch "🪰" where
+  ematch _ = Right E.fly
 
-instance matchMicrobe :: Match "🦠" E.Microbe
+instance ematchWorm :: EMatch "🪱" where
+  ematch _ = Right E.worm
 
-instance matchBouquet :: Match "💐" E.Bouquet
+instance ematchMicrobe :: EMatch "🦠" where
+  ematch _ = Right E.microbe
 
-instance matchCherryBlossom :: Match "🌸" E.CherryBlossom
+instance ematchBouquet :: EMatch "💐" where
+  ematch _ = Right E.bouquet
 
-instance matchWhiteFlower :: Match "💮" E.WhiteFlower
+instance ematchCherryBlossom :: EMatch "🌸" where
+  ematch _ = Right E.cherryBlossom
 
-instance matchRosette :: Match "🏵" E.Rosette
+instance ematchWhiteFlower :: EMatch "💮" where
+  ematch _ = Right E.whiteFlower
 
-instance matchRose :: Match "🌹" E.Rose
+instance ematchRosette :: EMatch "🏵" where
+  ematch _ = Right E.rosette
 
-instance matchWiltedFlower :: Match "🥀" E.WiltedFlower
+instance ematchRose :: EMatch "🌹" where
+  ematch _ = Right E.rose
 
-instance matchHibiscus :: Match "🌺" E.Hibiscus
+instance ematchWiltedFlower :: EMatch "🥀" where
+  ematch _ = Right E.wiltedFlower
 
-instance matchSunflower :: Match "🌻" E.Sunflower
+instance ematchHibiscus :: EMatch "🌺" where
+  ematch _ = Right E.hibiscus
 
-instance matchBlossom :: Match "🌼" E.Blossom
+instance ematchSunflower :: EMatch "🌻" where
+  ematch _ = Right E.sunflower
 
-instance matchTulip :: Match "🌷" E.Tulip
+instance ematchBlossom :: EMatch "🌼" where
+  ematch _ = Right E.blossom
 
-instance matchSeedling :: Match "🌱" E.Seedling
+instance ematchTulip :: EMatch "🌷" where
+  ematch _ = Right E.tulip
 
-instance matchPottedPlant :: Match "🪴" E.PottedPlant
+instance ematchSeedling :: EMatch "🌱" where
+  ematch _ = Right E.seedling
 
-instance matchEvergreenTree :: Match "🌲" E.EvergreenTree
+instance ematchPottedPlant :: EMatch "🪴" where
+  ematch _ = Right E.pottedPlant
 
-instance matchDeciduousTree :: Match "🌳" E.DeciduousTree
+instance ematchEvergreenTree :: EMatch "🌲" where
+  ematch _ = Right E.evergreenTree
 
-instance matchPalmTree :: Match "🌴" E.PalmTree
+instance ematchDeciduousTree :: EMatch "🌳" where
+  ematch _ = Right E.deciduousTree
 
-instance matchCactus :: Match "🌵" E.Cactus
+instance ematchPalmTree :: EMatch "🌴" where
+  ematch _ = Right E.palmTree
 
-instance matchSheafOfRice :: Match "🌾" E.SheafOfRice
+instance ematchCactus :: EMatch "🌵" where
+  ematch _ = Right E.cactus
 
-instance matchHerb :: Match "🌿" E.Herb
+instance ematchSheafOfRice :: EMatch "🌾" where
+  ematch _ = Right E.sheafOfRice
 
-instance matchShamrock :: Match "☘" E.Shamrock
+instance ematchHerb :: EMatch "🌿" where
+  ematch _ = Right E.herb
 
-instance matchFourLeafClover :: Match "🍀" E.FourLeafClover
+instance ematchShamrock :: EMatch "☘" where
+  ematch _ = Right E.shamrock
 
-instance matchMapleLeaf :: Match "🍁" E.MapleLeaf
+instance ematchFourLeafClover :: EMatch "🍀" where
+  ematch _ = Right E.fourLeafClover
 
-instance matchFallenLeaf :: Match "🍂" E.FallenLeaf
+instance ematchMapleLeaf :: EMatch "🍁" where
+  ematch _ = Right E.mapleLeaf
 
-instance matchLeafFlutteringInWind :: Match "🍃" E.LeafFlutteringInWind
+instance ematchFallenLeaf :: EMatch "🍂" where
+  ematch _ = Right E.fallenLeaf
 
-instance matchGrapes :: Match "🍇" E.Grapes
+instance ematchLeafFlutteringInWind :: EMatch "🍃" where
+  ematch _ = Right E.leafFlutteringInWind
 
-instance matchMelon :: Match "🍈" E.Melon
+instance ematchGrapes :: EMatch "🍇" where
+  ematch _ = Right E.grapes
 
-instance matchWatermelon :: Match "🍉" E.Watermelon
+instance ematchMelon :: EMatch "🍈" where
+  ematch _ = Right E.melon
 
-instance matchTangerine :: Match "🍊" E.Tangerine
+instance ematchWatermelon :: EMatch "🍉" where
+  ematch _ = Right E.watermelon
 
-instance matchLemon :: Match "🍋" E.Lemon
+instance ematchTangerine :: EMatch "🍊" where
+  ematch _ = Right E.tangerine
 
-instance matchBanana :: Match "🍌" E.Banana
+instance ematchLemon :: EMatch "🍋" where
+  ematch _ = Right E.lemon
 
-instance matchPineapple :: Match "🍍" E.Pineapple
+instance ematchBanana :: EMatch "🍌" where
+  ematch _ = Right E.banana
 
-instance matchMango :: Match "🥭" E.Mango
+instance ematchPineapple :: EMatch "🍍" where
+  ematch _ = Right E.pineapple
 
-instance matchRedApple :: Match "🍎" E.RedApple
+instance ematchMango :: EMatch "🥭" where
+  ematch _ = Right E.mango
 
-instance matchGreenApple :: Match "🍏" E.GreenApple
+instance ematchRedApple :: EMatch "🍎" where
+  ematch _ = Right E.redApple
 
-instance matchPear :: Match "🍐" E.Pear
+instance ematchGreenApple :: EMatch "🍏" where
+  ematch _ = Right E.greenApple
 
-instance matchPeach :: Match "🍑" E.Peach
+instance ematchPear :: EMatch "🍐" where
+  ematch _ = Right E.pear
 
-instance matchCherries :: Match "🍒" E.Cherries
+instance ematchPeach :: EMatch "🍑" where
+  ematch _ = Right E.peach
 
-instance matchStrawberry :: Match "🍓" E.Strawberry
+instance ematchCherries :: EMatch "🍒" where
+  ematch _ = Right E.cherries
 
-instance matchBlueberries :: Match "🫐" E.Blueberries
+instance ematchStrawberry :: EMatch "🍓" where
+  ematch _ = Right E.strawberry
 
-instance matchKiwiFruit :: Match "🥝" E.KiwiFruit
+instance ematchBlueberries :: EMatch "🫐" where
+  ematch _ = Right E.blueberries
 
-instance matchTomato :: Match "🍅" E.Tomato
+instance ematchKiwiFruit :: EMatch "🥝" where
+  ematch _ = Right E.kiwiFruit
 
-instance matchOlive :: Match "🫒" E.Olive
+instance ematchTomato :: EMatch "🍅" where
+  ematch _ = Right E.tomato
 
-instance matchCoconut :: Match "🥥" E.Coconut
+instance ematchOlive :: EMatch "🫒" where
+  ematch _ = Right E.olive
 
-instance matchAvocado :: Match "🥑" E.Avocado
+instance ematchCoconut :: EMatch "🥥" where
+  ematch _ = Right E.coconut
 
-instance matchEggplant :: Match "🍆" E.Eggplant
+instance ematchAvocado :: EMatch "🥑" where
+  ematch _ = Right E.avocado
 
-instance matchPotato :: Match "🥔" E.Potato
+instance ematchEggplant :: EMatch "🍆" where
+  ematch _ = Right E.eggplant
 
-instance matchCarrot :: Match "🥕" E.Carrot
+instance ematchPotato :: EMatch "🥔" where
+  ematch _ = Right E.potato
 
-instance matchEarOfCorn :: Match "🌽" E.EarOfCorn
+instance ematchCarrot :: EMatch "🥕" where
+  ematch _ = Right E.carrot
 
-instance matchHotPepper :: Match "🌶" E.HotPepper
+instance ematchEarOfCorn :: EMatch "🌽" where
+  ematch _ = Right E.earOfCorn
 
-instance matchBellPepper :: Match "🫑" E.BellPepper
+instance ematchHotPepper :: EMatch "🌶" where
+  ematch _ = Right E.hotPepper
 
-instance matchCucumber :: Match "🥒" E.Cucumber
+instance ematchBellPepper :: EMatch "🫑" where
+  ematch _ = Right E.bellPepper
 
-instance matchLeafyGreen :: Match "🥬" E.LeafyGreen
+instance ematchCucumber :: EMatch "🥒" where
+  ematch _ = Right E.cucumber
 
-instance matchBroccoli :: Match "🥦" E.Broccoli
+instance ematchLeafyGreen :: EMatch "🥬" where
+  ematch _ = Right E.leafyGreen
 
-instance matchGarlic :: Match "🧄" E.Garlic
+instance ematchBroccoli :: EMatch "🥦" where
+  ematch _ = Right E.broccoli
 
-instance matchOnion :: Match "🧅" E.Onion
+instance ematchGarlic :: EMatch "🧄" where
+  ematch _ = Right E.garlic
 
-instance matchMushroom :: Match "🍄" E.Mushroom
+instance ematchOnion :: EMatch "🧅" where
+  ematch _ = Right E.onion
 
-instance matchPeanuts :: Match "🥜" E.Peanuts
+instance ematchMushroom :: EMatch "🍄" where
+  ematch _ = Right E.mushroom
 
-instance matchChestnut :: Match "🌰" E.Chestnut
+instance ematchPeanuts :: EMatch "🥜" where
+  ematch _ = Right E.peanuts
 
-instance matchBread :: Match "🍞" E.Bread
+instance ematchChestnut :: EMatch "🌰" where
+  ematch _ = Right E.chestnut
 
-instance matchCroissant :: Match "🥐" E.Croissant
+instance ematchBread :: EMatch "🍞" where
+  ematch _ = Right E.bread
 
-instance matchBaguetteBread :: Match "🥖" E.BaguetteBread
+instance ematchCroissant :: EMatch "🥐" where
+  ematch _ = Right E.croissant
 
-instance matchFlatbread :: Match "🫓" E.Flatbread
+instance ematchBaguetteBread :: EMatch "🥖" where
+  ematch _ = Right E.baguetteBread
 
-instance matchPretzel :: Match "🥨" E.Pretzel
+instance ematchFlatbread :: EMatch "🫓" where
+  ematch _ = Right E.flatbread
 
-instance matchBagel :: Match "🥯" E.Bagel
+instance ematchPretzel :: EMatch "🥨" where
+  ematch _ = Right E.pretzel
 
-instance matchPancakes :: Match "🥞" E.Pancakes
+instance ematchBagel :: EMatch "🥯" where
+  ematch _ = Right E.bagel
 
-instance matchWaffle :: Match "🧇" E.Waffle
+instance ematchPancakes :: EMatch "🥞" where
+  ematch _ = Right E.pancakes
 
-instance matchCheeseWedge :: Match "🧀" E.CheeseWedge
+instance ematchWaffle :: EMatch "🧇" where
+  ematch _ = Right E.waffle
 
-instance matchMeatOnBone :: Match "🍖" E.MeatOnBone
+instance ematchCheeseWedge :: EMatch "🧀" where
+  ematch _ = Right E.cheeseWedge
 
-instance matchPoultryLeg :: Match "🍗" E.PoultryLeg
+instance ematchMeatOnBone :: EMatch "🍖" where
+  ematch _ = Right E.meatOnBone
 
-instance matchCutOfMeat :: Match "🥩" E.CutOfMeat
+instance ematchPoultryLeg :: EMatch "🍗" where
+  ematch _ = Right E.poultryLeg
 
-instance matchBacon :: Match "🥓" E.Bacon
+instance ematchCutOfMeat :: EMatch "🥩" where
+  ematch _ = Right E.cutOfMeat
 
-instance matchHamburger :: Match "🍔" E.Hamburger
+instance ematchBacon :: EMatch "🥓" where
+  ematch _ = Right E.bacon
 
-instance matchFrenchFries :: Match "🍟" E.FrenchFries
+instance ematchHamburger :: EMatch "🍔" where
+  ematch _ = Right E.hamburger
 
-instance matchPizza :: Match "🍕" E.Pizza
+instance ematchFrenchFries :: EMatch "🍟" where
+  ematch _ = Right E.frenchFries
 
-instance matchHotDog :: Match "🌭" E.HotDog
+instance ematchPizza :: EMatch "🍕" where
+  ematch _ = Right E.pizza
 
-instance matchSandwich :: Match "🥪" E.Sandwich
+instance ematchHotDog :: EMatch "🌭" where
+  ematch _ = Right E.hotDog
 
-instance matchTaco :: Match "🌮" E.Taco
+instance ematchSandwich :: EMatch "🥪" where
+  ematch _ = Right E.sandwich
 
-instance matchBurrito :: Match "🌯" E.Burrito
+instance ematchTaco :: EMatch "🌮" where
+  ematch _ = Right E.taco
 
-instance matchTamale :: Match "🫔" E.Tamale
+instance ematchBurrito :: EMatch "🌯" where
+  ematch _ = Right E.burrito
 
-instance matchStuffedFlatbread :: Match "🥙" E.StuffedFlatbread
+instance ematchTamale :: EMatch "🫔" where
+  ematch _ = Right E.tamale
 
-instance matchFalafel :: Match "🧆" E.Falafel
+instance ematchStuffedFlatbread :: EMatch "🥙" where
+  ematch _ = Right E.stuffedFlatbread
 
-instance matchEgg :: Match "🥚" E.Egg
+instance ematchFalafel :: EMatch "🧆" where
+  ematch _ = Right E.falafel
 
-instance matchCooking :: Match "🍳" E.Cooking
+instance ematchEgg :: EMatch "🥚" where
+  ematch _ = Right E.egg
 
-instance matchShallowPanOfFood :: Match "🥘" E.ShallowPanOfFood
+instance ematchCooking :: EMatch "🍳" where
+  ematch _ = Right E.cooking
 
-instance matchPotOfFood :: Match "🍲" E.PotOfFood
+instance ematchShallowPanOfFood :: EMatch "🥘" where
+  ematch _ = Right E.shallowPanOfFood
 
-instance matchFondue :: Match "🫕" E.Fondue
+instance ematchPotOfFood :: EMatch "🍲" where
+  ematch _ = Right E.potOfFood
 
-instance matchBowlWithSpoon :: Match "🥣" E.BowlWithSpoon
+instance ematchFondue :: EMatch "🫕" where
+  ematch _ = Right E.fondue
 
-instance matchGreenSalad :: Match "🥗" E.GreenSalad
+instance ematchBowlWithSpoon :: EMatch "🥣" where
+  ematch _ = Right E.bowlWithSpoon
 
-instance matchPopcorn :: Match "🍿" E.Popcorn
+instance ematchGreenSalad :: EMatch "🥗" where
+  ematch _ = Right E.greenSalad
 
-instance matchButter :: Match "🧈" E.Butter
+instance ematchPopcorn :: EMatch "🍿" where
+  ematch _ = Right E.popcorn
 
-instance matchSalt :: Match "🧂" E.Salt
+instance ematchButter :: EMatch "🧈" where
+  ematch _ = Right E.butter
 
-instance matchCannedFood :: Match "🥫" E.CannedFood
+instance ematchSalt :: EMatch "🧂" where
+  ematch _ = Right E.salt
 
-instance matchBentoBox :: Match "🍱" E.BentoBox
+instance ematchCannedFood :: EMatch "🥫" where
+  ematch _ = Right E.cannedFood
 
-instance matchRiceCracker :: Match "🍘" E.RiceCracker
+instance ematchBentoBox :: EMatch "🍱" where
+  ematch _ = Right E.bentoBox
 
-instance matchRiceBall :: Match "🍙" E.RiceBall
+instance ematchRiceCracker :: EMatch "🍘" where
+  ematch _ = Right E.riceCracker
 
-instance matchCookedRice :: Match "🍚" E.CookedRice
+instance ematchRiceBall :: EMatch "🍙" where
+  ematch _ = Right E.riceBall
 
-instance matchCurryRice :: Match "🍛" E.CurryRice
+instance ematchCookedRice :: EMatch "🍚" where
+  ematch _ = Right E.cookedRice
 
-instance matchSteamingBowl :: Match "🍜" E.SteamingBowl
+instance ematchCurryRice :: EMatch "🍛" where
+  ematch _ = Right E.curryRice
 
-instance matchSpaghetti :: Match "🍝" E.Spaghetti
+instance ematchSteamingBowl :: EMatch "🍜" where
+  ematch _ = Right E.steamingBowl
 
-instance matchRoastedSweetPotato :: Match "🍠" E.RoastedSweetPotato
+instance ematchSpaghetti :: EMatch "🍝" where
+  ematch _ = Right E.spaghetti
 
-instance matchOden :: Match "🍢" E.Oden
+instance ematchRoastedSweetPotato :: EMatch "🍠" where
+  ematch _ = Right E.roastedSweetPotato
 
-instance matchSushi :: Match "🍣" E.Sushi
+instance ematchOden :: EMatch "🍢" where
+  ematch _ = Right E.oden
 
-instance matchFriedShrimp :: Match "🍤" E.FriedShrimp
+instance ematchSushi :: EMatch "🍣" where
+  ematch _ = Right E.sushi
 
-instance matchFishCakeWithSwirl :: Match "🍥" E.FishCakeWithSwirl
+instance ematchFriedShrimp :: EMatch "🍤" where
+  ematch _ = Right E.friedShrimp
 
-instance matchMoonCake :: Match "🥮" E.MoonCake
+instance ematchFishCakeWithSwirl :: EMatch "🍥" where
+  ematch _ = Right E.fishCakeWithSwirl
 
-instance matchDango :: Match "🍡" E.Dango
+instance ematchMoonCake :: EMatch "🥮" where
+  ematch _ = Right E.moonCake
 
-instance matchDumpling :: Match "🥟" E.Dumpling
+instance ematchDango :: EMatch "🍡" where
+  ematch _ = Right E.dango
 
-instance matchFortuneCookie :: Match "🥠" E.FortuneCookie
+instance ematchDumpling :: EMatch "🥟" where
+  ematch _ = Right E.dumpling
 
-instance matchTakeoutBox :: Match "🥡" E.TakeoutBox
+instance ematchFortuneCookie :: EMatch "🥠" where
+  ematch _ = Right E.fortuneCookie
 
-instance matchCrab :: Match "🦀" E.Crab
+instance ematchTakeoutBox :: EMatch "🥡" where
+  ematch _ = Right E.takeoutBox
 
-instance matchLobster :: Match "🦞" E.Lobster
+instance ematchCrab :: EMatch "🦀" where
+  ematch _ = Right E.crab
 
-instance matchShrimp :: Match "🦐" E.Shrimp
+instance ematchLobster :: EMatch "🦞" where
+  ematch _ = Right E.lobster
 
-instance matchSquid :: Match "🦑" E.Squid
+instance ematchShrimp :: EMatch "🦐" where
+  ematch _ = Right E.shrimp
 
-instance matchOyster :: Match "🦪" E.Oyster
+instance ematchSquid :: EMatch "🦑" where
+  ematch _ = Right E.squid
 
-instance matchSoftIceCream :: Match "🍦" E.SoftIceCream
+instance ematchOyster :: EMatch "🦪" where
+  ematch _ = Right E.oyster
 
-instance matchShavedIce :: Match "🍧" E.ShavedIce
+instance ematchSoftIceCream :: EMatch "🍦" where
+  ematch _ = Right E.softIceCream
 
-instance matchIceCream :: Match "🍨" E.IceCream
+instance ematchShavedIce :: EMatch "🍧" where
+  ematch _ = Right E.shavedIce
 
-instance matchDoughnut :: Match "🍩" E.Doughnut
+instance ematchIceCream :: EMatch "🍨" where
+  ematch _ = Right E.iceCream
 
-instance matchCookie :: Match "🍪" E.Cookie
+instance ematchDoughnut :: EMatch "🍩" where
+  ematch _ = Right E.doughnut
 
-instance matchBirthdayCake :: Match "🎂" E.BirthdayCake
+instance ematchCookie :: EMatch "🍪" where
+  ematch _ = Right E.cookie
 
-instance matchShortcake :: Match "🍰" E.Shortcake
+instance ematchBirthdayCake :: EMatch "🎂" where
+  ematch _ = Right E.birthdayCake
 
-instance matchCupcake :: Match "🧁" E.Cupcake
+instance ematchShortcake :: EMatch "🍰" where
+  ematch _ = Right E.shortcake
 
-instance matchPie :: Match "🥧" E.Pie
+instance ematchCupcake :: EMatch "🧁" where
+  ematch _ = Right E.cupcake
 
-instance matchChocolateBar :: Match "🍫" E.ChocolateBar
+instance ematchPie :: EMatch "🥧" where
+  ematch _ = Right E.pie
 
-instance matchCandy :: Match "🍬" E.Candy
+instance ematchChocolateBar :: EMatch "🍫" where
+  ematch _ = Right E.chocolateBar
 
-instance matchLollipop :: Match "🍭" E.Lollipop
+instance ematchCandy :: EMatch "🍬" where
+  ematch _ = Right E.candy
 
-instance matchCustard :: Match "🍮" E.Custard
+instance ematchLollipop :: EMatch "🍭" where
+  ematch _ = Right E.lollipop
 
-instance matchHoneyPot :: Match "🍯" E.HoneyPot
+instance ematchCustard :: EMatch "🍮" where
+  ematch _ = Right E.custard
 
-instance matchBabyBottle :: Match "🍼" E.BabyBottle
+instance ematchHoneyPot :: EMatch "🍯" where
+  ematch _ = Right E.honeyPot
 
-instance matchGlassOfMilk :: Match "🥛" E.GlassOfMilk
+instance ematchBabyBottle :: EMatch "🍼" where
+  ematch _ = Right E.babyBottle
 
-instance matchHotBeverage :: Match "☕" E.HotBeverage
+instance ematchGlassOfMilk :: EMatch "🥛" where
+  ematch _ = Right E.glassOfMilk
 
-instance matchTeapot :: Match "🫖" E.Teapot
+instance ematchHotBeverage :: EMatch "☕" where
+  ematch _ = Right E.hotBeverage
 
-instance matchTeacupWithoutHandle :: Match "🍵" E.TeacupWithoutHandle
+instance ematchTeapot :: EMatch "🫖" where
+  ematch _ = Right E.teapot
 
-instance matchSake :: Match "🍶" E.Sake
+instance ematchTeacupWithoutHandle :: EMatch "🍵" where
+  ematch _ = Right E.teacupWithoutHandle
 
-instance matchBottleWithPoppingCork :: Match "🍾" E.BottleWithPoppingCork
+instance ematchSake :: EMatch "🍶" where
+  ematch _ = Right E.sake
 
-instance matchWineGlass :: Match "🍷" E.WineGlass
+instance ematchBottleWithPoppingCork :: EMatch "🍾" where
+  ematch _ = Right E.bottleWithPoppingCork
 
-instance matchCocktailGlass :: Match "🍸" E.CocktailGlass
+instance ematchWineGlass :: EMatch "🍷" where
+  ematch _ = Right E.wineGlass
 
-instance matchTropicalDrink :: Match "🍹" E.TropicalDrink
+instance ematchCocktailGlass :: EMatch "🍸" where
+  ematch _ = Right E.cocktailGlass
 
-instance matchBeerMug :: Match "🍺" E.BeerMug
+instance ematchTropicalDrink :: EMatch "🍹" where
+  ematch _ = Right E.tropicalDrink
 
-instance matchClinkingBeerMugs :: Match "🍻" E.ClinkingBeerMugs
+instance ematchBeerMug :: EMatch "🍺" where
+  ematch _ = Right E.beerMug
 
-instance matchClinkingGlasses :: Match "🥂" E.ClinkingGlasses
+instance ematchClinkingBeerMugs :: EMatch "🍻" where
+  ematch _ = Right E.clinkingBeerMugs
 
-instance matchTumblerGlass :: Match "🥃" E.TumblerGlass
+instance ematchClinkingGlasses :: EMatch "🥂" where
+  ematch _ = Right E.clinkingGlasses
 
-instance matchCupWithStraw :: Match "🥤" E.CupWithStraw
+instance ematchTumblerGlass :: EMatch "🥃" where
+  ematch _ = Right E.tumblerGlass
 
-instance matchBubbleTea :: Match "🧋" E.BubbleTea
+instance ematchCupWithStraw :: EMatch "🥤" where
+  ematch _ = Right E.cupWithStraw
 
-instance matchBeverageBox :: Match "🧃" E.BeverageBox
+instance ematchBubbleTea :: EMatch "🧋" where
+  ematch _ = Right E.bubbleTea
 
-instance matchMate :: Match "🧉" E.Mate
+instance ematchBeverageBox :: EMatch "🧃" where
+  ematch _ = Right E.beverageBox
 
-instance matchIce :: Match "🧊" E.Ice
+instance ematchMate :: EMatch "🧉" where
+  ematch _ = Right E.mate
 
-instance matchChopsticks :: Match "🥢" E.Chopsticks
+instance ematchIce :: EMatch "🧊" where
+  ematch _ = Right E.ice
 
-instance matchForkAndKnifeWithPlate :: Match "🍽" E.ForkAndKnifeWithPlate
+instance ematchChopsticks :: EMatch "🥢" where
+  ematch _ = Right E.chopsticks
 
-instance matchForkAndKnife :: Match "🍴" E.ForkAndKnife
+instance ematchForkAndKnifeWithPlate :: EMatch "🍽" where
+  ematch _ = Right E.forkAndKnifeWithPlate
 
-instance matchSpoon :: Match "🥄" E.Spoon
+instance ematchForkAndKnife :: EMatch "🍴" where
+  ematch _ = Right E.forkAndKnife
 
-instance matchKitchenKnife :: Match "🔪" E.KitchenKnife
+instance ematchSpoon :: EMatch "🥄" where
+  ematch _ = Right E.spoon
 
-instance matchAmphora :: Match "🏺" E.Amphora
+instance ematchKitchenKnife :: EMatch "🔪" where
+  ematch _ = Right E.kitchenKnife
 
-instance matchGlobeShowingEuropeAfrica :: Match "🌍" E.GlobeShowingEuropeAfrica
+instance ematchAmphora :: EMatch "🏺" where
+  ematch _ = Right E.amphora
 
-instance matchGlobeShowingAmericas :: Match "🌎" E.GlobeShowingAmericas
+instance ematchGlobeShowingEuropeAfrica :: EMatch "🌍" where
+  ematch _ = Right E.globeShowingEuropeAfrica
 
-instance matchGlobeShowingAsiaAustralia :: Match "🌏" E.GlobeShowingAsiaAustralia
+instance ematchGlobeShowingAmericas :: EMatch "🌎" where
+  ematch _ = Right E.globeShowingAmericas
 
-instance matchGlobeWithMeridians :: Match "🌐" E.GlobeWithMeridians
+instance ematchGlobeShowingAsiaAustralia :: EMatch "🌏" where
+  ematch _ = Right E.globeShowingAsiaAustralia
 
-instance matchWorldMap :: Match "🗺" E.WorldMap
+instance ematchGlobeWithMeridians :: EMatch "🌐" where
+  ematch _ = Right E.globeWithMeridians
 
-instance matchMapOfJapan :: Match "🗾" E.MapOfJapan
+instance ematchWorldMap :: EMatch "🗺" where
+  ematch _ = Right E.worldMap
 
-instance matchCompass :: Match "🧭" E.Compass
+instance ematchMapOfJapan :: EMatch "🗾" where
+  ematch _ = Right E.mapOfJapan
 
-instance matchSnowCappedMountain :: Match "🏔" E.SnowCappedMountain
+instance ematchCompass :: EMatch "🧭" where
+  ematch _ = Right E.compass
 
-instance matchMountain :: Match "⛰" E.Mountain
+instance ematchSnowCappedMountain :: EMatch "🏔" where
+  ematch _ = Right E.snowCappedMountain
 
-instance matchVolcano :: Match "🌋" E.Volcano
+instance ematchMountain :: EMatch "⛰" where
+  ematch _ = Right E.mountain
 
-instance matchMountFuji :: Match "🗻" E.MountFuji
+instance ematchVolcano :: EMatch "🌋" where
+  ematch _ = Right E.volcano
 
-instance matchCamping :: Match "🏕" E.Camping
+instance ematchMountFuji :: EMatch "🗻" where
+  ematch _ = Right E.mountFuji
 
-instance matchBeachWithUmbrella :: Match "🏖" E.BeachWithUmbrella
+instance ematchCamping :: EMatch "🏕" where
+  ematch _ = Right E.camping
 
-instance matchDesert :: Match "🏜" E.Desert
+instance ematchBeachWithUmbrella :: EMatch "🏖" where
+  ematch _ = Right E.beachWithUmbrella
 
-instance matchDesertIsland :: Match "🏝" E.DesertIsland
+instance ematchDesert :: EMatch "🏜" where
+  ematch _ = Right E.desert
 
-instance matchNationalPark :: Match "🏞" E.NationalPark
+instance ematchDesertIsland :: EMatch "🏝" where
+  ematch _ = Right E.desertIsland
 
-instance matchStadium :: Match "🏟" E.Stadium
+instance ematchNationalPark :: EMatch "🏞" where
+  ematch _ = Right E.nationalPark
 
-instance matchClassicalBuilding :: Match "🏛" E.ClassicalBuilding
+instance ematchStadium :: EMatch "🏟" where
+  ematch _ = Right E.stadium
 
-instance matchBuildingConstruction :: Match "🏗" E.BuildingConstruction
+instance ematchClassicalBuilding :: EMatch "🏛" where
+  ematch _ = Right E.classicalBuilding
 
-instance matchBrick :: Match "🧱" E.Brick
+instance ematchBuildingConstruction :: EMatch "🏗" where
+  ematch _ = Right E.buildingConstruction
 
-instance matchRock :: Match "🪨" E.Rock
+instance ematchBrick :: EMatch "🧱" where
+  ematch _ = Right E.brick
 
-instance matchWood :: Match "🪵" E.Wood
+instance ematchRock :: EMatch "🪨" where
+  ematch _ = Right E.rock
 
-instance matchHut :: Match "🛖" E.Hut
+instance ematchWood :: EMatch "🪵" where
+  ematch _ = Right E.wood
 
-instance matchHouses :: Match "🏘" E.Houses
+instance ematchHut :: EMatch "🛖" where
+  ematch _ = Right E.hut
 
-instance matchDerelictHouse :: Match "🏚" E.DerelictHouse
+instance ematchHouses :: EMatch "🏘" where
+  ematch _ = Right E.houses
 
-instance matchHouse :: Match "🏠" E.House
+instance ematchDerelictHouse :: EMatch "🏚" where
+  ematch _ = Right E.derelictHouse
 
-instance matchHouseWithGarden :: Match "🏡" E.HouseWithGarden
+instance ematchHouse :: EMatch "🏠" where
+  ematch _ = Right E.house
 
-instance matchOfficeBuilding :: Match "🏢" E.OfficeBuilding
+instance ematchHouseWithGarden :: EMatch "🏡" where
+  ematch _ = Right E.houseWithGarden
 
-instance matchJapanesePostOffice :: Match "🏣" E.JapanesePostOffice
+instance ematchOfficeBuilding :: EMatch "🏢" where
+  ematch _ = Right E.officeBuilding
 
-instance matchPostOffice :: Match "🏤" E.PostOffice
+instance ematchJapanesePostOffice :: EMatch "🏣" where
+  ematch _ = Right E.japanesePostOffice
 
-instance matchHospital :: Match "🏥" E.Hospital
+instance ematchPostOffice :: EMatch "🏤" where
+  ematch _ = Right E.postOffice
 
-instance matchBank :: Match "🏦" E.Bank
+instance ematchHospital :: EMatch "🏥" where
+  ematch _ = Right E.hospital
 
-instance matchHotel :: Match "🏨" E.Hotel
+instance ematchBank :: EMatch "🏦" where
+  ematch _ = Right E.bank
 
-instance matchLoveHotel :: Match "🏩" E.LoveHotel
+instance ematchHotel :: EMatch "🏨" where
+  ematch _ = Right E.hotel
 
-instance matchConvenienceStore :: Match "🏪" E.ConvenienceStore
+instance ematchLoveHotel :: EMatch "🏩" where
+  ematch _ = Right E.loveHotel
 
-instance matchSchool :: Match "🏫" E.School
+instance ematchConvenienceStore :: EMatch "🏪" where
+  ematch _ = Right E.convenienceStore
 
-instance matchDepartmentStore :: Match "🏬" E.DepartmentStore
+instance ematchSchool :: EMatch "🏫" where
+  ematch _ = Right E.school
 
-instance matchFactory :: Match "🏭" E.Factory
+instance ematchDepartmentStore :: EMatch "🏬" where
+  ematch _ = Right E.departmentStore
 
-instance matchJapaneseCastle :: Match "🏯" E.JapaneseCastle
+instance ematchFactory :: EMatch "🏭" where
+  ematch _ = Right E.factory
 
-instance matchCastle :: Match "🏰" E.Castle
+instance ematchJapaneseCastle :: EMatch "🏯" where
+  ematch _ = Right E.japaneseCastle
 
-instance matchWedding :: Match "💒" E.Wedding
+instance ematchCastle :: EMatch "🏰" where
+  ematch _ = Right E.castle
 
-instance matchTokyoTower :: Match "🗼" E.TokyoTower
+instance ematchWedding :: EMatch "💒" where
+  ematch _ = Right E.wedding
 
-instance matchStatueOfLiberty :: Match "🗽" E.StatueOfLiberty
+instance ematchTokyoTower :: EMatch "🗼" where
+  ematch _ = Right E.tokyoTower
 
-instance matchChurch :: Match "⛪" E.Church
+instance ematchStatueOfLiberty :: EMatch "🗽" where
+  ematch _ = Right E.statueOfLiberty
 
-instance matchMosque :: Match "🕌" E.Mosque
+instance ematchChurch :: EMatch "⛪" where
+  ematch _ = Right E.church
 
-instance matchHinduTemple :: Match "🛕" E.HinduTemple
+instance ematchMosque :: EMatch "🕌" where
+  ematch _ = Right E.mosque
 
-instance matchSynagogue :: Match "🕍" E.Synagogue
+instance ematchHinduTemple :: EMatch "🛕" where
+  ematch _ = Right E.hinduTemple
 
-instance matchShintoShrine :: Match "⛩" E.ShintoShrine
+instance ematchSynagogue :: EMatch "🕍" where
+  ematch _ = Right E.synagogue
 
-instance matchKaaba :: Match "🕋" E.Kaaba
+instance ematchShintoShrine :: EMatch "⛩" where
+  ematch _ = Right E.shintoShrine
 
-instance matchFountain :: Match "⛲" E.Fountain
+instance ematchKaaba :: EMatch "🕋" where
+  ematch _ = Right E.kaaba
 
-instance matchTent :: Match "⛺" E.Tent
+instance ematchFountain :: EMatch "⛲" where
+  ematch _ = Right E.fountain
 
-instance matchFoggy :: Match "🌁" E.Foggy
+instance ematchTent :: EMatch "⛺" where
+  ematch _ = Right E.tent
 
-instance matchNightWithStars :: Match "🌃" E.NightWithStars
+instance ematchFoggy :: EMatch "🌁" where
+  ematch _ = Right E.foggy
 
-instance matchCityscape :: Match "🏙" E.Cityscape
+instance ematchNightWithStars :: EMatch "🌃" where
+  ematch _ = Right E.nightWithStars
 
-instance matchSunriseOverMountains :: Match "🌄" E.SunriseOverMountains
+instance ematchCityscape :: EMatch "🏙" where
+  ematch _ = Right E.cityscape
 
-instance matchSunrise :: Match "🌅" E.Sunrise
+instance ematchSunriseOverMountains :: EMatch "🌄" where
+  ematch _ = Right E.sunriseOverMountains
 
-instance matchCityscapeAtDusk :: Match "🌆" E.CityscapeAtDusk
+instance ematchSunrise :: EMatch "🌅" where
+  ematch _ = Right E.sunrise
 
-instance matchSunset :: Match "🌇" E.Sunset
+instance ematchCityscapeAtDusk :: EMatch "🌆" where
+  ematch _ = Right E.cityscapeAtDusk
 
-instance matchBridgeAtNight :: Match "🌉" E.BridgeAtNight
+instance ematchSunset :: EMatch "🌇" where
+  ematch _ = Right E.sunset
 
-instance matchHotSprings :: Match "♨" E.HotSprings
+instance ematchBridgeAtNight :: EMatch "🌉" where
+  ematch _ = Right E.bridgeAtNight
 
-instance matchCarouselHorse :: Match "🎠" E.CarouselHorse
+instance ematchHotSprings :: EMatch "♨" where
+  ematch _ = Right E.hotSprings
 
-instance matchFerrisWheel :: Match "🎡" E.FerrisWheel
+instance ematchCarouselHorse :: EMatch "🎠" where
+  ematch _ = Right E.carouselHorse
 
-instance matchRollerCoaster :: Match "🎢" E.RollerCoaster
+instance ematchFerrisWheel :: EMatch "🎡" where
+  ematch _ = Right E.ferrisWheel
 
-instance matchBarberPole :: Match "💈" E.BarberPole
+instance ematchRollerCoaster :: EMatch "🎢" where
+  ematch _ = Right E.rollerCoaster
 
-instance matchCircusTent :: Match "🎪" E.CircusTent
+instance ematchBarberPole :: EMatch "💈" where
+  ematch _ = Right E.barberPole
 
-instance matchLocomotive :: Match "🚂" E.Locomotive
+instance ematchCircusTent :: EMatch "🎪" where
+  ematch _ = Right E.circusTent
 
-instance matchRailwayCar :: Match "🚃" E.RailwayCar
+instance ematchLocomotive :: EMatch "🚂" where
+  ematch _ = Right E.locomotive
 
-instance matchHighSpeedTrain :: Match "🚄" E.HighSpeedTrain
+instance ematchRailwayCar :: EMatch "🚃" where
+  ematch _ = Right E.railwayCar
 
-instance matchBulletTrain :: Match "🚅" E.BulletTrain
+instance ematchHighSpeedTrain :: EMatch "🚄" where
+  ematch _ = Right E.highSpeedTrain
 
-instance matchTrain :: Match "🚆" E.Train
+instance ematchBulletTrain :: EMatch "🚅" where
+  ematch _ = Right E.bulletTrain
 
-instance matchMetro :: Match "🚇" E.Metro
+instance ematchTrain :: EMatch "🚆" where
+  ematch _ = Right E.train
 
-instance matchLightRail :: Match "🚈" E.LightRail
+instance ematchMetro :: EMatch "🚇" where
+  ematch _ = Right E.metro
 
-instance matchStation :: Match "🚉" E.Station
+instance ematchLightRail :: EMatch "🚈" where
+  ematch _ = Right E.lightRail
 
-instance matchTram :: Match "🚊" E.Tram
+instance ematchStation :: EMatch "🚉" where
+  ematch _ = Right E.station
 
-instance matchMonorail :: Match "🚝" E.Monorail
+instance ematchTram :: EMatch "🚊" where
+  ematch _ = Right E.tram
 
-instance matchMountainRailway :: Match "🚞" E.MountainRailway
+instance ematchMonorail :: EMatch "🚝" where
+  ematch _ = Right E.monorail
 
-instance matchTramCar :: Match "🚋" E.TramCar
+instance ematchMountainRailway :: EMatch "🚞" where
+  ematch _ = Right E.mountainRailway
 
-instance matchBus :: Match "🚌" E.Bus
+instance ematchTramCar :: EMatch "🚋" where
+  ematch _ = Right E.tramCar
 
-instance matchOncomingBus :: Match "🚍" E.OncomingBus
+instance ematchBus :: EMatch "🚌" where
+  ematch _ = Right E.bus
 
-instance matchTrolleybus :: Match "🚎" E.Trolleybus
+instance ematchOncomingBus :: EMatch "🚍" where
+  ematch _ = Right E.oncomingBus
 
-instance matchMinibus :: Match "🚐" E.Minibus
+instance ematchTrolleybus :: EMatch "🚎" where
+  ematch _ = Right E.trolleybus
 
-instance matchAmbulance :: Match "🚑" E.Ambulance
+instance ematchMinibus :: EMatch "🚐" where
+  ematch _ = Right E.minibus
 
-instance matchFireEngine :: Match "🚒" E.FireEngine
+instance ematchAmbulance :: EMatch "🚑" where
+  ematch _ = Right E.ambulance
 
-instance matchPoliceCar :: Match "🚓" E.PoliceCar
+instance ematchFireEngine :: EMatch "🚒" where
+  ematch _ = Right E.fireEngine
 
-instance matchOncomingPoliceCar :: Match "🚔" E.OncomingPoliceCar
+instance ematchPoliceCar :: EMatch "🚓" where
+  ematch _ = Right E.policeCar
 
-instance matchTaxi :: Match "🚕" E.Taxi
+instance ematchOncomingPoliceCar :: EMatch "🚔" where
+  ematch _ = Right E.oncomingPoliceCar
 
-instance matchOncomingTaxi :: Match "🚖" E.OncomingTaxi
+instance ematchTaxi :: EMatch "🚕" where
+  ematch _ = Right E.taxi
 
-instance matchAutomobile :: Match "🚗" E.Automobile
+instance ematchOncomingTaxi :: EMatch "🚖" where
+  ematch _ = Right E.oncomingTaxi
 
-instance matchOncomingAutomobile :: Match "🚘" E.OncomingAutomobile
+instance ematchAutomobile :: EMatch "🚗" where
+  ematch _ = Right E.automobile
 
-instance matchSportUtilityVehicle :: Match "🚙" E.SportUtilityVehicle
+instance ematchOncomingAutomobile :: EMatch "🚘" where
+  ematch _ = Right E.oncomingAutomobile
 
-instance matchPickupTruck :: Match "🛻" E.PickupTruck
+instance ematchSportUtilityVehicle :: EMatch "🚙" where
+  ematch _ = Right E.sportUtilityVehicle
 
-instance matchDeliveryTruck :: Match "🚚" E.DeliveryTruck
+instance ematchPickupTruck :: EMatch "🛻" where
+  ematch _ = Right E.pickupTruck
 
-instance matchArticulatedLorry :: Match "🚛" E.ArticulatedLorry
+instance ematchDeliveryTruck :: EMatch "🚚" where
+  ematch _ = Right E.deliveryTruck
 
-instance matchTractor :: Match "🚜" E.Tractor
+instance ematchArticulatedLorry :: EMatch "🚛" where
+  ematch _ = Right E.articulatedLorry
 
-instance matchRacingCar :: Match "🏎" E.RacingCar
+instance ematchTractor :: EMatch "🚜" where
+  ematch _ = Right E.tractor
 
-instance matchMotorcycle :: Match "🏍" E.Motorcycle
+instance ematchRacingCar :: EMatch "🏎" where
+  ematch _ = Right E.racingCar
 
-instance matchMotorScooter :: Match "🛵" E.MotorScooter
+instance ematchMotorcycle :: EMatch "🏍" where
+  ematch _ = Right E.motorcycle
 
-instance matchManualWheelchair :: Match "🦽" E.ManualWheelchair
+instance ematchMotorScooter :: EMatch "🛵" where
+  ematch _ = Right E.motorScooter
 
-instance matchMotorizedWheelchair :: Match "🦼" E.MotorizedWheelchair
+instance ematchManualWheelchair :: EMatch "🦽" where
+  ematch _ = Right E.manualWheelchair
 
-instance matchAutoRickshaw :: Match "🛺" E.AutoRickshaw
+instance ematchMotorizedWheelchair :: EMatch "🦼" where
+  ematch _ = Right E.motorizedWheelchair
 
-instance matchBicycle :: Match "🚲" E.Bicycle
+instance ematchAutoRickshaw :: EMatch "🛺" where
+  ematch _ = Right E.autoRickshaw
 
-instance matchKickScooter :: Match "🛴" E.KickScooter
+instance ematchBicycle :: EMatch "🚲" where
+  ematch _ = Right E.bicycle
 
-instance matchSkateboard :: Match "🛹" E.Skateboard
+instance ematchKickScooter :: EMatch "🛴" where
+  ematch _ = Right E.kickScooter
 
-instance matchRollerSkate :: Match "🛼" E.RollerSkate
+instance ematchSkateboard :: EMatch "🛹" where
+  ematch _ = Right E.skateboard
 
-instance matchBusStop :: Match "🚏" E.BusStop
+instance ematchRollerSkate :: EMatch "🛼" where
+  ematch _ = Right E.rollerSkate
 
-instance matchMotorway :: Match "🛣" E.Motorway
+instance ematchBusStop :: EMatch "🚏" where
+  ematch _ = Right E.busStop
 
-instance matchRailwayTrack :: Match "🛤" E.RailwayTrack
+instance ematchMotorway :: EMatch "🛣" where
+  ematch _ = Right E.motorway
 
-instance matchOilDrum :: Match "🛢" E.OilDrum
+instance ematchRailwayTrack :: EMatch "🛤" where
+  ematch _ = Right E.railwayTrack
 
-instance matchFuelPump :: Match "⛽" E.FuelPump
+instance ematchOilDrum :: EMatch "🛢" where
+  ematch _ = Right E.oilDrum
 
-instance matchPoliceCarLight :: Match "🚨" E.PoliceCarLight
+instance ematchFuelPump :: EMatch "⛽" where
+  ematch _ = Right E.fuelPump
 
-instance matchHorizontalTrafficLight :: Match "🚥" E.HorizontalTrafficLight
+instance ematchPoliceCarLight :: EMatch "🚨" where
+  ematch _ = Right E.policeCarLight
 
-instance matchVerticalTrafficLight :: Match "🚦" E.VerticalTrafficLight
+instance ematchHorizontalTrafficLight :: EMatch "🚥" where
+  ematch _ = Right E.horizontalTrafficLight
 
-instance matchStopSign :: Match "🛑" E.StopSign
+instance ematchVerticalTrafficLight :: EMatch "🚦" where
+  ematch _ = Right E.verticalTrafficLight
 
-instance matchConstruction :: Match "🚧" E.Construction
+instance ematchStopSign :: EMatch "🛑" where
+  ematch _ = Right E.stopSign
 
-instance matchAnchor :: Match "⚓" E.Anchor
+instance ematchConstruction :: EMatch "🚧" where
+  ematch _ = Right E.construction
 
-instance matchSailboat :: Match "⛵" E.Sailboat
+instance ematchAnchor :: EMatch "⚓" where
+  ematch _ = Right E.anchor
 
-instance matchCanoe :: Match "🛶" E.Canoe
+instance ematchSailboat :: EMatch "⛵" where
+  ematch _ = Right E.sailboat
 
-instance matchSpeedboat :: Match "🚤" E.Speedboat
+instance ematchCanoe :: EMatch "🛶" where
+  ematch _ = Right E.canoe
 
-instance matchPassengerShip :: Match "🛳" E.PassengerShip
+instance ematchSpeedboat :: EMatch "🚤" where
+  ematch _ = Right E.speedboat
 
-instance matchFerry :: Match "⛴" E.Ferry
+instance ematchPassengerShip :: EMatch "🛳" where
+  ematch _ = Right E.passengerShip
 
-instance matchMotorBoat :: Match "🛥" E.MotorBoat
+instance ematchFerry :: EMatch "⛴" where
+  ematch _ = Right E.ferry
 
-instance matchShip :: Match "🚢" E.Ship
+instance ematchMotorBoat :: EMatch "🛥" where
+  ematch _ = Right E.motorBoat
 
-instance matchAirplane :: Match "✈" E.Airplane
+instance ematchShip :: EMatch "🚢" where
+  ematch _ = Right E.ship
 
-instance matchSmallAirplane :: Match "🛩" E.SmallAirplane
+instance ematchAirplane :: EMatch "✈" where
+  ematch _ = Right E.airplane
 
-instance matchAirplaneDeparture :: Match "🛫" E.AirplaneDeparture
+instance ematchSmallAirplane :: EMatch "🛩" where
+  ematch _ = Right E.smallAirplane
 
-instance matchAirplaneArrival :: Match "🛬" E.AirplaneArrival
+instance ematchAirplaneDeparture :: EMatch "🛫" where
+  ematch _ = Right E.airplaneDeparture
 
-instance matchParachute :: Match "🪂" E.Parachute
+instance ematchAirplaneArrival :: EMatch "🛬" where
+  ematch _ = Right E.airplaneArrival
 
-instance matchSeat :: Match "💺" E.Seat
+instance ematchParachute :: EMatch "🪂" where
+  ematch _ = Right E.parachute
 
-instance matchHelicopter :: Match "🚁" E.Helicopter
+instance ematchSeat :: EMatch "💺" where
+  ematch _ = Right E.seat
 
-instance matchSuspensionRailway :: Match "🚟" E.SuspensionRailway
+instance ematchHelicopter :: EMatch "🚁" where
+  ematch _ = Right E.helicopter
 
-instance matchMountainCableway :: Match "🚠" E.MountainCableway
+instance ematchSuspensionRailway :: EMatch "🚟" where
+  ematch _ = Right E.suspensionRailway
 
-instance matchAerialTramway :: Match "🚡" E.AerialTramway
+instance ematchMountainCableway :: EMatch "🚠" where
+  ematch _ = Right E.mountainCableway
 
-instance matchSatellite :: Match "🛰" E.Satellite
+instance ematchAerialTramway :: EMatch "🚡" where
+  ematch _ = Right E.aerialTramway
 
-instance matchRocket :: Match "🚀" E.Rocket
+instance ematchSatellite :: EMatch "🛰" where
+  ematch _ = Right E.satellite
 
-instance matchFlyingSaucer :: Match "🛸" E.FlyingSaucer
+instance ematchRocket :: EMatch "🚀" where
+  ematch _ = Right E.rocket
 
-instance matchBellhopBell :: Match "🛎" E.BellhopBell
+instance ematchFlyingSaucer :: EMatch "🛸" where
+  ematch _ = Right E.flyingSaucer
 
-instance matchLuggage :: Match "🧳" E.Luggage
+instance ematchBellhopBell :: EMatch "🛎" where
+  ematch _ = Right E.bellhopBell
 
-instance matchHourglassDone :: Match "⌛" E.HourglassDone
+instance ematchLuggage :: EMatch "🧳" where
+  ematch _ = Right E.luggage
 
-instance matchHourglassNotDone :: Match "⏳" E.HourglassNotDone
+instance ematchHourglassDone :: EMatch "⌛" where
+  ematch _ = Right E.hourglassDone
 
-instance matchWatch :: Match "⌚" E.Watch
+instance ematchHourglassNotDone :: EMatch "⏳" where
+  ematch _ = Right E.hourglassNotDone
 
-instance matchAlarmClock :: Match "⏰" E.AlarmClock
+instance ematchWatch :: EMatch "⌚" where
+  ematch _ = Right E.watch
 
-instance matchStopwatch :: Match "⏱" E.Stopwatch
+instance ematchAlarmClock :: EMatch "⏰" where
+  ematch _ = Right E.alarmClock
 
-instance matchTimerClock :: Match "⏲" E.TimerClock
+instance ematchStopwatch :: EMatch "⏱" where
+  ematch _ = Right E.stopwatch
 
-instance matchMantelpieceClock :: Match "🕰" E.MantelpieceClock
+instance ematchTimerClock :: EMatch "⏲" where
+  ematch _ = Right E.timerClock
 
-instance matchTwelveOClock :: Match "🕛" E.TwelveOClock
+instance ematchMantelpieceClock :: EMatch "🕰" where
+  ematch _ = Right E.mantelpieceClock
 
-instance matchTwelveThirty :: Match "🕧" E.TwelveThirty
+instance ematchTwelveOClock :: EMatch "🕛" where
+  ematch _ = Right E.twelveOClock
 
-instance matchOneOClock :: Match "🕐" E.OneOClock
+instance ematchTwelveThirty :: EMatch "🕧" where
+  ematch _ = Right E.twelveThirty
 
-instance matchOneThirty :: Match "🕜" E.OneThirty
+instance ematchOneOClock :: EMatch "🕐" where
+  ematch _ = Right E.oneOClock
 
-instance matchTwoOClock :: Match "🕑" E.TwoOClock
+instance ematchOneThirty :: EMatch "🕜" where
+  ematch _ = Right E.oneThirty
 
-instance matchTwoThirty :: Match "🕝" E.TwoThirty
+instance ematchTwoOClock :: EMatch "🕑" where
+  ematch _ = Right E.twoOClock
 
-instance matchThreeOClock :: Match "🕒" E.ThreeOClock
+instance ematchTwoThirty :: EMatch "🕝" where
+  ematch _ = Right E.twoThirty
 
-instance matchThreeThirty :: Match "🕞" E.ThreeThirty
+instance ematchThreeOClock :: EMatch "🕒" where
+  ematch _ = Right E.threeOClock
 
-instance matchFourOClock :: Match "🕓" E.FourOClock
+instance ematchThreeThirty :: EMatch "🕞" where
+  ematch _ = Right E.threeThirty
 
-instance matchFourThirty :: Match "🕟" E.FourThirty
+instance ematchFourOClock :: EMatch "🕓" where
+  ematch _ = Right E.fourOClock
 
-instance matchFiveOClock :: Match "🕔" E.FiveOClock
+instance ematchFourThirty :: EMatch "🕟" where
+  ematch _ = Right E.fourThirty
 
-instance matchFiveThirty :: Match "🕠" E.FiveThirty
+instance ematchFiveOClock :: EMatch "🕔" where
+  ematch _ = Right E.fiveOClock
 
-instance matchSixOClock :: Match "🕕" E.SixOClock
+instance ematchFiveThirty :: EMatch "🕠" where
+  ematch _ = Right E.fiveThirty
 
-instance matchSixThirty :: Match "🕡" E.SixThirty
+instance ematchSixOClock :: EMatch "🕕" where
+  ematch _ = Right E.sixOClock
 
-instance matchSevenOClock :: Match "🕖" E.SevenOClock
+instance ematchSixThirty :: EMatch "🕡" where
+  ematch _ = Right E.sixThirty
 
-instance matchSevenThirty :: Match "🕢" E.SevenThirty
+instance ematchSevenOClock :: EMatch "🕖" where
+  ematch _ = Right E.sevenOClock
 
-instance matchEightOClock :: Match "🕗" E.EightOClock
+instance ematchSevenThirty :: EMatch "🕢" where
+  ematch _ = Right E.sevenThirty
 
-instance matchEightThirty :: Match "🕣" E.EightThirty
+instance ematchEightOClock :: EMatch "🕗" where
+  ematch _ = Right E.eightOClock
 
-instance matchNineOClock :: Match "🕘" E.NineOClock
+instance ematchEightThirty :: EMatch "🕣" where
+  ematch _ = Right E.eightThirty
 
-instance matchNineThirty :: Match "🕤" E.NineThirty
+instance ematchNineOClock :: EMatch "🕘" where
+  ematch _ = Right E.nineOClock
 
-instance matchTenOClock :: Match "🕙" E.TenOClock
+instance ematchNineThirty :: EMatch "🕤" where
+  ematch _ = Right E.nineThirty
 
-instance matchTenThirty :: Match "🕥" E.TenThirty
+instance ematchTenOClock :: EMatch "🕙" where
+  ematch _ = Right E.tenOClock
 
-instance matchElevenOClock :: Match "🕚" E.ElevenOClock
+instance ematchTenThirty :: EMatch "🕥" where
+  ematch _ = Right E.tenThirty
 
-instance matchElevenThirty :: Match "🕦" E.ElevenThirty
+instance ematchElevenOClock :: EMatch "🕚" where
+  ematch _ = Right E.elevenOClock
 
-instance matchNewMoon :: Match "🌑" E.NewMoon
+instance ematchElevenThirty :: EMatch "🕦" where
+  ematch _ = Right E.elevenThirty
 
-instance matchWaxingCrescentMoon :: Match "🌒" E.WaxingCrescentMoon
+instance ematchNewMoon :: EMatch "🌑" where
+  ematch _ = Right E.newMoon
 
-instance matchFirstQuarterMoon :: Match "🌓" E.FirstQuarterMoon
+instance ematchWaxingCrescentMoon :: EMatch "🌒" where
+  ematch _ = Right E.waxingCrescentMoon
 
-instance matchWaxingGibbousMoon :: Match "🌔" E.WaxingGibbousMoon
+instance ematchFirstQuarterMoon :: EMatch "🌓" where
+  ematch _ = Right E.firstQuarterMoon
 
-instance matchFullMoon :: Match "🌕" E.FullMoon
+instance ematchWaxingGibbousMoon :: EMatch "🌔" where
+  ematch _ = Right E.waxingGibbousMoon
 
-instance matchWaningGibbousMoon :: Match "🌖" E.WaningGibbousMoon
+instance ematchFullMoon :: EMatch "🌕" where
+  ematch _ = Right E.fullMoon
 
-instance matchLastQuarterMoon :: Match "🌗" E.LastQuarterMoon
+instance ematchWaningGibbousMoon :: EMatch "🌖" where
+  ematch _ = Right E.waningGibbousMoon
 
-instance matchWaningCrescentMoon :: Match "🌘" E.WaningCrescentMoon
+instance ematchLastQuarterMoon :: EMatch "🌗" where
+  ematch _ = Right E.lastQuarterMoon
 
-instance matchCrescentMoon :: Match "🌙" E.CrescentMoon
+instance ematchWaningCrescentMoon :: EMatch "🌘" where
+  ematch _ = Right E.waningCrescentMoon
 
-instance matchNewMoonFace :: Match "🌚" E.NewMoonFace
+instance ematchCrescentMoon :: EMatch "🌙" where
+  ematch _ = Right E.crescentMoon
 
-instance matchFirstQuarterMoonFace :: Match "🌛" E.FirstQuarterMoonFace
+instance ematchNewMoonFace :: EMatch "🌚" where
+  ematch _ = Right E.newMoonFace
 
-instance matchLastQuarterMoonFace :: Match "🌜" E.LastQuarterMoonFace
+instance ematchFirstQuarterMoonFace :: EMatch "🌛" where
+  ematch _ = Right E.firstQuarterMoonFace
 
-instance matchThermometer :: Match "🌡" E.Thermometer
+instance ematchLastQuarterMoonFace :: EMatch "🌜" where
+  ematch _ = Right E.lastQuarterMoonFace
 
-instance matchSun :: Match "☀" E.Sun
+instance ematchThermometer :: EMatch "🌡" where
+  ematch _ = Right E.thermometer
 
-instance matchFullMoonFace :: Match "🌝" E.FullMoonFace
+instance ematchSun :: EMatch "☀" where
+  ematch _ = Right E.sun
 
-instance matchSunWithFace :: Match "🌞" E.SunWithFace
+instance ematchFullMoonFace :: EMatch "🌝" where
+  ematch _ = Right E.fullMoonFace
 
-instance matchRingedPlanet :: Match "🪐" E.RingedPlanet
+instance ematchSunWithFace :: EMatch "🌞" where
+  ematch _ = Right E.sunWithFace
 
-instance matchStar :: Match "⭐" E.Star
+instance ematchRingedPlanet :: EMatch "🪐" where
+  ematch _ = Right E.ringedPlanet
 
-instance matchGlowingStar :: Match "🌟" E.GlowingStar
+instance ematchStar :: EMatch "⭐" where
+  ematch _ = Right E.star
 
-instance matchShootingStar :: Match "🌠" E.ShootingStar
+instance ematchGlowingStar :: EMatch "🌟" where
+  ematch _ = Right E.glowingStar
 
-instance matchMilkyWay :: Match "🌌" E.MilkyWay
+instance ematchShootingStar :: EMatch "🌠" where
+  ematch _ = Right E.shootingStar
 
-instance matchCloud :: Match "☁" E.Cloud
+instance ematchMilkyWay :: EMatch "🌌" where
+  ematch _ = Right E.milkyWay
 
-instance matchSunBehindCloud :: Match "⛅" E.SunBehindCloud
+instance ematchCloud :: EMatch "☁" where
+  ematch _ = Right E.cloud
 
-instance matchCloudWithLightningAndRain :: Match "⛈" E.CloudWithLightningAndRain
+instance ematchSunBehindCloud :: EMatch "⛅" where
+  ematch _ = Right E.sunBehindCloud
 
-instance matchSunBehindSmallCloud :: Match "🌤" E.SunBehindSmallCloud
+instance ematchCloudWithLightningAndRain :: EMatch "⛈" where
+  ematch _ = Right E.cloudWithLightningAndRain
 
-instance matchSunBehindLargeCloud :: Match "🌥" E.SunBehindLargeCloud
+instance ematchSunBehindSmallCloud :: EMatch "🌤" where
+  ematch _ = Right E.sunBehindSmallCloud
 
-instance matchSunBehindRainCloud :: Match "🌦" E.SunBehindRainCloud
+instance ematchSunBehindLargeCloud :: EMatch "🌥" where
+  ematch _ = Right E.sunBehindLargeCloud
 
-instance matchCloudWithRain :: Match "🌧" E.CloudWithRain
+instance ematchSunBehindRainCloud :: EMatch "🌦" where
+  ematch _ = Right E.sunBehindRainCloud
 
-instance matchCloudWithSnow :: Match "🌨" E.CloudWithSnow
+instance ematchCloudWithRain :: EMatch "🌧" where
+  ematch _ = Right E.cloudWithRain
 
-instance matchCloudWithLightning :: Match "🌩" E.CloudWithLightning
+instance ematchCloudWithSnow :: EMatch "🌨" where
+  ematch _ = Right E.cloudWithSnow
 
-instance matchTornado :: Match "🌪" E.Tornado
+instance ematchCloudWithLightning :: EMatch "🌩" where
+  ematch _ = Right E.cloudWithLightning
 
-instance matchFog :: Match "🌫" E.Fog
+instance ematchTornado :: EMatch "🌪" where
+  ematch _ = Right E.tornado
 
-instance matchWindFace :: Match "🌬" E.WindFace
+instance ematchFog :: EMatch "🌫" where
+  ematch _ = Right E.fog
 
-instance matchCyclone :: Match "🌀" E.Cyclone
+instance ematchWindFace :: EMatch "🌬" where
+  ematch _ = Right E.windFace
 
-instance matchRainbow :: Match "🌈" E.Rainbow
+instance ematchCyclone :: EMatch "🌀" where
+  ematch _ = Right E.cyclone
 
-instance matchClosedUmbrella :: Match "🌂" E.ClosedUmbrella
+instance ematchRainbow :: EMatch "🌈" where
+  ematch _ = Right E.rainbow
 
-instance matchUmbrella :: Match "☂" E.Umbrella
+instance ematchClosedUmbrella :: EMatch "🌂" where
+  ematch _ = Right E.closedUmbrella
 
-instance matchUmbrellaWithRainDrops :: Match "☔" E.UmbrellaWithRainDrops
+instance ematchUmbrella :: EMatch "☂" where
+  ematch _ = Right E.umbrella
 
-instance matchUmbrellaOnGround :: Match "⛱" E.UmbrellaOnGround
+instance ematchUmbrellaWithRainDrops :: EMatch "☔" where
+  ematch _ = Right E.umbrellaWithRainDrops
 
-instance matchHighVoltage :: Match "⚡" E.HighVoltage
+instance ematchUmbrellaOnGround :: EMatch "⛱" where
+  ematch _ = Right E.umbrellaOnGround
 
-instance matchSnowflake :: Match "❄" E.Snowflake
+instance ematchHighVoltage :: EMatch "⚡" where
+  ematch _ = Right E.highVoltage
 
-instance matchSnowman :: Match "☃" E.Snowman
+instance ematchSnowflake :: EMatch "❄" where
+  ematch _ = Right E.snowflake
 
-instance matchSnowmanWithoutSnow :: Match "⛄" E.SnowmanWithoutSnow
+instance ematchSnowman :: EMatch "☃" where
+  ematch _ = Right E.snowman
 
-instance matchComet :: Match "☄" E.Comet
+instance ematchSnowmanWithoutSnow :: EMatch "⛄" where
+  ematch _ = Right E.snowmanWithoutSnow
 
-instance matchFire :: Match "🔥" E.Fire
+instance ematchComet :: EMatch "☄" where
+  ematch _ = Right E.comet
 
-instance matchDroplet :: Match "💧" E.Droplet
+instance ematchFire :: EMatch "🔥" where
+  ematch _ = Right E.fire
 
-instance matchWaterWave :: Match "🌊" E.WaterWave
+instance ematchDroplet :: EMatch "💧" where
+  ematch _ = Right E.droplet
 
-instance matchJackOLantern :: Match "🎃" E.JackOLantern
+instance ematchWaterWave :: EMatch "🌊" where
+  ematch _ = Right E.waterWave
 
-instance matchChristmasTree :: Match "🎄" E.ChristmasTree
+instance ematchJackOLantern :: EMatch "🎃" where
+  ematch _ = Right E.jackOLantern
 
-instance matchFireworks :: Match "🎆" E.Fireworks
+instance ematchChristmasTree :: EMatch "🎄" where
+  ematch _ = Right E.christmasTree
 
-instance matchSparkler :: Match "🎇" E.Sparkler
+instance ematchFireworks :: EMatch "🎆" where
+  ematch _ = Right E.fireworks
 
-instance matchFirecracker :: Match "🧨" E.Firecracker
+instance ematchSparkler :: EMatch "🎇" where
+  ematch _ = Right E.sparkler
 
-instance matchSparkles :: Match "✨" E.Sparkles
+instance ematchFirecracker :: EMatch "🧨" where
+  ematch _ = Right E.firecracker
 
-instance matchBalloon :: Match "🎈" E.Balloon
+instance ematchSparkles :: EMatch "✨" where
+  ematch _ = Right E.sparkles
 
-instance matchPartyPopper :: Match "🎉" E.PartyPopper
+instance ematchBalloon :: EMatch "🎈" where
+  ematch _ = Right E.balloon
 
-instance matchConfettiBall :: Match "🎊" E.ConfettiBall
+instance ematchPartyPopper :: EMatch "🎉" where
+  ematch _ = Right E.partyPopper
 
-instance matchTanabataTree :: Match "🎋" E.TanabataTree
+instance ematchConfettiBall :: EMatch "🎊" where
+  ematch _ = Right E.confettiBall
 
-instance matchPineDecoration :: Match "🎍" E.PineDecoration
+instance ematchTanabataTree :: EMatch "🎋" where
+  ematch _ = Right E.tanabataTree
 
-instance matchJapaneseDolls :: Match "🎎" E.JapaneseDolls
+instance ematchPineDecoration :: EMatch "🎍" where
+  ematch _ = Right E.pineDecoration
 
-instance matchCarpStreamer :: Match "🎏" E.CarpStreamer
+instance ematchJapaneseDolls :: EMatch "🎎" where
+  ematch _ = Right E.japaneseDolls
 
-instance matchWindChime :: Match "🎐" E.WindChime
+instance ematchCarpStreamer :: EMatch "🎏" where
+  ematch _ = Right E.carpStreamer
 
-instance matchMoonViewingCeremony :: Match "🎑" E.MoonViewingCeremony
+instance ematchWindChime :: EMatch "🎐" where
+  ematch _ = Right E.windChime
 
-instance matchRedEnvelope :: Match "🧧" E.RedEnvelope
+instance ematchMoonViewingCeremony :: EMatch "🎑" where
+  ematch _ = Right E.moonViewingCeremony
 
-instance matchRibbon :: Match "🎀" E.Ribbon
+instance ematchRedEnvelope :: EMatch "🧧" where
+  ematch _ = Right E.redEnvelope
 
-instance matchWrappedGift :: Match "🎁" E.WrappedGift
+instance ematchRibbon :: EMatch "🎀" where
+  ematch _ = Right E.ribbon
 
-instance matchReminderRibbon :: Match "🎗" E.ReminderRibbon
+instance ematchWrappedGift :: EMatch "🎁" where
+  ematch _ = Right E.wrappedGift
 
-instance matchAdmissionTickets :: Match "🎟" E.AdmissionTickets
+instance ematchReminderRibbon :: EMatch "🎗" where
+  ematch _ = Right E.reminderRibbon
 
-instance matchTicket :: Match "🎫" E.Ticket
+instance ematchAdmissionTickets :: EMatch "🎟" where
+  ematch _ = Right E.admissionTickets
 
-instance matchMilitaryMedal :: Match "🎖" E.MilitaryMedal
+instance ematchTicket :: EMatch "🎫" where
+  ematch _ = Right E.ticket
 
-instance matchTrophy :: Match "🏆" E.Trophy
+instance ematchMilitaryMedal :: EMatch "🎖" where
+  ematch _ = Right E.militaryMedal
 
-instance matchSportsMedal :: Match "🏅" E.SportsMedal
+instance ematchTrophy :: EMatch "🏆" where
+  ematch _ = Right E.trophy
 
-instance matchFirstPlaceMedal :: Match "🥇" E.FirstPlaceMedal
+instance ematchSportsMedal :: EMatch "🏅" where
+  ematch _ = Right E.sportsMedal
 
-instance matchSecondPlaceMedal :: Match "🥈" E.SecondPlaceMedal
+instance ematchFirstPlaceMedal :: EMatch "🥇" where
+  ematch _ = Right E.firstPlaceMedal
 
-instance matchThirdPlaceMedal :: Match "🥉" E.ThirdPlaceMedal
+instance ematchSecondPlaceMedal :: EMatch "🥈" where
+  ematch _ = Right E.secondPlaceMedal
 
-instance matchSoccerBall :: Match "⚽" E.SoccerBall
+instance ematchThirdPlaceMedal :: EMatch "🥉" where
+  ematch _ = Right E.thirdPlaceMedal
 
-instance matchBaseball :: Match "⚾" E.Baseball
+instance ematchSoccerBall :: EMatch "⚽" where
+  ematch _ = Right E.soccerBall
 
-instance matchSoftball :: Match "🥎" E.Softball
+instance ematchBaseball :: EMatch "⚾" where
+  ematch _ = Right E.baseball
 
-instance matchBasketball :: Match "🏀" E.Basketball
+instance ematchSoftball :: EMatch "🥎" where
+  ematch _ = Right E.softball
 
-instance matchVolleyball :: Match "🏐" E.Volleyball
+instance ematchBasketball :: EMatch "🏀" where
+  ematch _ = Right E.basketball
 
-instance matchAmericanFootball :: Match "🏈" E.AmericanFootball
+instance ematchVolleyball :: EMatch "🏐" where
+  ematch _ = Right E.volleyball
 
-instance matchRugbyFootball :: Match "🏉" E.RugbyFootball
+instance ematchAmericanFootball :: EMatch "🏈" where
+  ematch _ = Right E.americanFootball
 
-instance matchTennis :: Match "🎾" E.Tennis
+instance ematchRugbyFootball :: EMatch "🏉" where
+  ematch _ = Right E.rugbyFootball
 
-instance matchFlyingDisc :: Match "🥏" E.FlyingDisc
+instance ematchTennis :: EMatch "🎾" where
+  ematch _ = Right E.tennis
 
-instance matchBowling :: Match "🎳" E.Bowling
+instance ematchFlyingDisc :: EMatch "🥏" where
+  ematch _ = Right E.flyingDisc
 
-instance matchCricketGame :: Match "🏏" E.CricketGame
+instance ematchBowling :: EMatch "🎳" where
+  ematch _ = Right E.bowling
 
-instance matchFieldHockey :: Match "🏑" E.FieldHockey
+instance ematchCricketGame :: EMatch "🏏" where
+  ematch _ = Right E.cricketGame
 
-instance matchIceHockey :: Match "🏒" E.IceHockey
+instance ematchFieldHockey :: EMatch "🏑" where
+  ematch _ = Right E.fieldHockey
 
-instance matchLacrosse :: Match "🥍" E.Lacrosse
+instance ematchIceHockey :: EMatch "🏒" where
+  ematch _ = Right E.iceHockey
 
-instance matchPingPong :: Match "🏓" E.PingPong
+instance ematchLacrosse :: EMatch "🥍" where
+  ematch _ = Right E.lacrosse
 
-instance matchBadminton :: Match "🏸" E.Badminton
+instance ematchPingPong :: EMatch "🏓" where
+  ematch _ = Right E.pingPong
 
-instance matchBoxingGlove :: Match "🥊" E.BoxingGlove
+instance ematchBadminton :: EMatch "🏸" where
+  ematch _ = Right E.badminton
 
-instance matchMartialArtsUniform :: Match "🥋" E.MartialArtsUniform
+instance ematchBoxingGlove :: EMatch "🥊" where
+  ematch _ = Right E.boxingGlove
 
-instance matchGoalNet :: Match "🥅" E.GoalNet
+instance ematchMartialArtsUniform :: EMatch "🥋" where
+  ematch _ = Right E.martialArtsUniform
 
-instance matchFlagInHole :: Match "⛳" E.FlagInHole
+instance ematchGoalNet :: EMatch "🥅" where
+  ematch _ = Right E.goalNet
 
-instance matchIceSkate :: Match "⛸" E.IceSkate
+instance ematchFlagInHole :: EMatch "⛳" where
+  ematch _ = Right E.flagInHole
 
-instance matchFishingPole :: Match "🎣" E.FishingPole
+instance ematchIceSkate :: EMatch "⛸" where
+  ematch _ = Right E.iceSkate
 
-instance matchDivingMask :: Match "🤿" E.DivingMask
+instance ematchFishingPole :: EMatch "🎣" where
+  ematch _ = Right E.fishingPole
 
-instance matchRunningShirt :: Match "🎽" E.RunningShirt
+instance ematchDivingMask :: EMatch "🤿" where
+  ematch _ = Right E.divingMask
 
-instance matchSkis :: Match "🎿" E.Skis
+instance ematchRunningShirt :: EMatch "🎽" where
+  ematch _ = Right E.runningShirt
 
-instance matchSled :: Match "🛷" E.Sled
+instance ematchSkis :: EMatch "🎿" where
+  ematch _ = Right E.skis
 
-instance matchCurlingStone :: Match "🥌" E.CurlingStone
+instance ematchSled :: EMatch "🛷" where
+  ematch _ = Right E.sled
 
-instance matchDirectHit :: Match "🎯" E.DirectHit
+instance ematchCurlingStone :: EMatch "🥌" where
+  ematch _ = Right E.curlingStone
 
-instance matchYoYo :: Match "🪀" E.YoYo
+instance ematchDirectHit :: EMatch "🎯" where
+  ematch _ = Right E.directHit
 
-instance matchKite :: Match "🪁" E.Kite
+instance ematchYoYo :: EMatch "🪀" where
+  ematch _ = Right E.yoYo
 
-instance matchPool8Ball :: Match "🎱" E.Pool8Ball
+instance ematchKite :: EMatch "🪁" where
+  ematch _ = Right E.kite
 
-instance matchCrystalBall :: Match "🔮" E.CrystalBall
+instance ematchPool8Ball :: EMatch "🎱" where
+  ematch _ = Right E.pool8Ball
 
-instance matchMagicWand :: Match "🪄" E.MagicWand
+instance ematchCrystalBall :: EMatch "🔮" where
+  ematch _ = Right E.crystalBall
 
-instance matchNazarAmulet :: Match "🧿" E.NazarAmulet
+instance ematchMagicWand :: EMatch "🪄" where
+  ematch _ = Right E.magicWand
 
-instance matchVideoGame :: Match "🎮" E.VideoGame
+instance ematchNazarAmulet :: EMatch "🧿" where
+  ematch _ = Right E.nazarAmulet
 
-instance matchJoystick :: Match "🕹" E.Joystick
+instance ematchVideoGame :: EMatch "🎮" where
+  ematch _ = Right E.videoGame
 
-instance matchSlotMachine :: Match "🎰" E.SlotMachine
+instance ematchJoystick :: EMatch "🕹" where
+  ematch _ = Right E.joystick
 
-instance matchGameDie :: Match "🎲" E.GameDie
+instance ematchSlotMachine :: EMatch "🎰" where
+  ematch _ = Right E.slotMachine
 
-instance matchPuzzlePiece :: Match "🧩" E.PuzzlePiece
+instance ematchGameDie :: EMatch "🎲" where
+  ematch _ = Right E.gameDie
 
-instance matchTeddyBear :: Match "🧸" E.TeddyBear
+instance ematchPuzzlePiece :: EMatch "🧩" where
+  ematch _ = Right E.puzzlePiece
 
-instance matchPiñata :: Match "🪅" E.Piñata
+instance ematchTeddyBear :: EMatch "🧸" where
+  ematch _ = Right E.teddyBear
 
-instance matchNestingDolls :: Match "🪆" E.NestingDolls
+instance ematchPiñata :: EMatch "🪅" where
+  ematch _ = Right E.piñata
 
-instance matchSpadeSuit :: Match "♠" E.SpadeSuit
+instance ematchNestingDolls :: EMatch "🪆" where
+  ematch _ = Right E.nestingDolls
 
-instance matchHeartSuit :: Match "♥" E.HeartSuit
+instance ematchSpadeSuit :: EMatch "♠" where
+  ematch _ = Right E.spadeSuit
 
-instance matchDiamondSuit :: Match "♦" E.DiamondSuit
+instance ematchHeartSuit :: EMatch "♥" where
+  ematch _ = Right E.heartSuit
 
-instance matchClubSuit :: Match "♣" E.ClubSuit
+instance ematchDiamondSuit :: EMatch "♦" where
+  ematch _ = Right E.diamondSuit
 
-instance matchChessPawn :: Match "♟" E.ChessPawn
+instance ematchClubSuit :: EMatch "♣" where
+  ematch _ = Right E.clubSuit
 
-instance matchJoker :: Match "🃏" E.Joker
+instance ematchChessPawn :: EMatch "♟" where
+  ematch _ = Right E.chessPawn
 
-instance matchMahjongRedDragon :: Match "🀄" E.MahjongRedDragon
+instance ematchJoker :: EMatch "🃏" where
+  ematch _ = Right E.joker
 
-instance matchFlowerPlayingCards :: Match "🎴" E.FlowerPlayingCards
+instance ematchMahjongRedDragon :: EMatch "🀄" where
+  ematch _ = Right E.mahjongRedDragon
 
-instance matchPerformingArts :: Match "🎭" E.PerformingArts
+instance ematchFlowerPlayingCards :: EMatch "🎴" where
+  ematch _ = Right E.flowerPlayingCards
 
-instance matchFramedPicture :: Match "🖼" E.FramedPicture
+instance ematchPerformingArts :: EMatch "🎭" where
+  ematch _ = Right E.performingArts
 
-instance matchArtistPalette :: Match "🎨" E.ArtistPalette
+instance ematchFramedPicture :: EMatch "🖼" where
+  ematch _ = Right E.framedPicture
 
-instance matchThread :: Match "🧵" E.Thread
+instance ematchArtistPalette :: EMatch "🎨" where
+  ematch _ = Right E.artistPalette
 
-instance matchSewingNeedle :: Match "🪡" E.SewingNeedle
+instance ematchThread :: EMatch "🧵" where
+  ematch _ = Right E.thread
 
-instance matchYarn :: Match "🧶" E.Yarn
+instance ematchSewingNeedle :: EMatch "🪡" where
+  ematch _ = Right E.sewingNeedle
 
-instance matchKnot :: Match "🪢" E.Knot
+instance ematchYarn :: EMatch "🧶" where
+  ematch _ = Right E.yarn
 
-instance matchGlasses :: Match "👓" E.Glasses
+instance ematchKnot :: EMatch "🪢" where
+  ematch _ = Right E.knot
 
-instance matchSunglasses :: Match "🕶" E.Sunglasses
+instance ematchGlasses :: EMatch "👓" where
+  ematch _ = Right E.glasses
 
-instance matchGoggles :: Match "🥽" E.Goggles
+instance ematchSunglasses :: EMatch "🕶" where
+  ematch _ = Right E.sunglasses
 
-instance matchLabCoat :: Match "🥼" E.LabCoat
+instance ematchGoggles :: EMatch "🥽" where
+  ematch _ = Right E.goggles
 
-instance matchSafetyVest :: Match "🦺" E.SafetyVest
+instance ematchLabCoat :: EMatch "🥼" where
+  ematch _ = Right E.labCoat
 
-instance matchNecktie :: Match "👔" E.Necktie
+instance ematchSafetyVest :: EMatch "🦺" where
+  ematch _ = Right E.safetyVest
 
-instance matchTShirt :: Match "👕" E.TShirt
+instance ematchNecktie :: EMatch "👔" where
+  ematch _ = Right E.necktie
 
-instance matchJeans :: Match "👖" E.Jeans
+instance ematchTShirt :: EMatch "👕" where
+  ematch _ = Right E.tShirt
 
-instance matchScarf :: Match "🧣" E.Scarf
+instance ematchJeans :: EMatch "👖" where
+  ematch _ = Right E.jeans
 
-instance matchGloves :: Match "🧤" E.Gloves
+instance ematchScarf :: EMatch "🧣" where
+  ematch _ = Right E.scarf
 
-instance matchCoat :: Match "🧥" E.Coat
+instance ematchGloves :: EMatch "🧤" where
+  ematch _ = Right E.gloves
 
-instance matchSocks :: Match "🧦" E.Socks
+instance ematchCoat :: EMatch "🧥" where
+  ematch _ = Right E.coat
 
-instance matchDress :: Match "👗" E.Dress
+instance ematchSocks :: EMatch "🧦" where
+  ematch _ = Right E.socks
 
-instance matchKimono :: Match "👘" E.Kimono
+instance ematchDress :: EMatch "👗" where
+  ematch _ = Right E.dress
 
-instance matchSari :: Match "🥻" E.Sari
+instance ematchKimono :: EMatch "👘" where
+  ematch _ = Right E.kimono
 
-instance matchOnePieceSwimsuit :: Match "🩱" E.OnePieceSwimsuit
+instance ematchSari :: EMatch "🥻" where
+  ematch _ = Right E.sari
 
-instance matchBriefs :: Match "🩲" E.Briefs
+instance ematchOnePieceSwimsuit :: EMatch "🩱" where
+  ematch _ = Right E.onePieceSwimsuit
 
-instance matchShorts :: Match "🩳" E.Shorts
+instance ematchBriefs :: EMatch "🩲" where
+  ematch _ = Right E.briefs
 
-instance matchBikini :: Match "👙" E.Bikini
+instance ematchShorts :: EMatch "🩳" where
+  ematch _ = Right E.shorts
 
-instance matchWomanSClothes :: Match "👚" E.WomanSClothes
+instance ematchBikini :: EMatch "👙" where
+  ematch _ = Right E.bikini
 
-instance matchPurse :: Match "👛" E.Purse
+instance ematchWomanSClothes :: EMatch "👚" where
+  ematch _ = Right E.womanSClothes
 
-instance matchHandbag :: Match "👜" E.Handbag
+instance ematchPurse :: EMatch "👛" where
+  ematch _ = Right E.purse
 
-instance matchClutchBag :: Match "👝" E.ClutchBag
+instance ematchHandbag :: EMatch "👜" where
+  ematch _ = Right E.handbag
 
-instance matchShoppingBags :: Match "🛍" E.ShoppingBags
+instance ematchClutchBag :: EMatch "👝" where
+  ematch _ = Right E.clutchBag
 
-instance matchBackpack :: Match "🎒" E.Backpack
+instance ematchShoppingBags :: EMatch "🛍" where
+  ematch _ = Right E.shoppingBags
 
-instance matchThongSandal :: Match "🩴" E.ThongSandal
+instance ematchBackpack :: EMatch "🎒" where
+  ematch _ = Right E.backpack
 
-instance matchManSShoe :: Match "👞" E.ManSShoe
+instance ematchThongSandal :: EMatch "🩴" where
+  ematch _ = Right E.thongSandal
 
-instance matchRunningShoe :: Match "👟" E.RunningShoe
+instance ematchManSShoe :: EMatch "👞" where
+  ematch _ = Right E.manSShoe
 
-instance matchHikingBoot :: Match "🥾" E.HikingBoot
+instance ematchRunningShoe :: EMatch "👟" where
+  ematch _ = Right E.runningShoe
 
-instance matchFlatShoe :: Match "🥿" E.FlatShoe
+instance ematchHikingBoot :: EMatch "🥾" where
+  ematch _ = Right E.hikingBoot
 
-instance matchHighHeeledShoe :: Match "👠" E.HighHeeledShoe
+instance ematchFlatShoe :: EMatch "🥿" where
+  ematch _ = Right E.flatShoe
 
-instance matchWomanSSandal :: Match "👡" E.WomanSSandal
+instance ematchHighHeeledShoe :: EMatch "👠" where
+  ematch _ = Right E.highHeeledShoe
 
-instance matchBalletShoes :: Match "🩰" E.BalletShoes
+instance ematchWomanSSandal :: EMatch "👡" where
+  ematch _ = Right E.womanSSandal
 
-instance matchWomanSBoot :: Match "👢" E.WomanSBoot
+instance ematchBalletShoes :: EMatch "🩰" where
+  ematch _ = Right E.balletShoes
 
-instance matchCrown :: Match "👑" E.Crown
+instance ematchWomanSBoot :: EMatch "👢" where
+  ematch _ = Right E.womanSBoot
 
-instance matchWomanSHat :: Match "👒" E.WomanSHat
+instance ematchCrown :: EMatch "👑" where
+  ematch _ = Right E.crown
 
-instance matchTopHat :: Match "🎩" E.TopHat
+instance ematchWomanSHat :: EMatch "👒" where
+  ematch _ = Right E.womanSHat
 
-instance matchGraduationCap :: Match "🎓" E.GraduationCap
+instance ematchTopHat :: EMatch "🎩" where
+  ematch _ = Right E.topHat
 
-instance matchBilledCap :: Match "🧢" E.BilledCap
+instance ematchGraduationCap :: EMatch "🎓" where
+  ematch _ = Right E.graduationCap
 
-instance matchMilitaryHelmet :: Match "🪖" E.MilitaryHelmet
+instance ematchBilledCap :: EMatch "🧢" where
+  ematch _ = Right E.billedCap
 
-instance matchRescueWorkerSHelmet :: Match "⛑" E.RescueWorkerSHelmet
+instance ematchMilitaryHelmet :: EMatch "🪖" where
+  ematch _ = Right E.militaryHelmet
 
-instance matchPrayerBeads :: Match "📿" E.PrayerBeads
+instance ematchRescueWorkerSHelmet :: EMatch "⛑" where
+  ematch _ = Right E.rescueWorkerSHelmet
 
-instance matchLipstick :: Match "💄" E.Lipstick
+instance ematchPrayerBeads :: EMatch "📿" where
+  ematch _ = Right E.prayerBeads
 
-instance matchRing :: Match "💍" E.Ring
+instance ematchLipstick :: EMatch "💄" where
+  ematch _ = Right E.lipstick
 
-instance matchGemStone :: Match "💎" E.GemStone
+instance ematchRing :: EMatch "💍" where
+  ematch _ = Right E.ring
 
-instance matchMutedSpeaker :: Match "🔇" E.MutedSpeaker
+instance ematchGemStone :: EMatch "💎" where
+  ematch _ = Right E.gemStone
 
-instance matchSpeakerLowVolume :: Match "🔈" E.SpeakerLowVolume
+instance ematchMutedSpeaker :: EMatch "🔇" where
+  ematch _ = Right E.mutedSpeaker
 
-instance matchSpeakerMediumVolume :: Match "🔉" E.SpeakerMediumVolume
+instance ematchSpeakerLowVolume :: EMatch "🔈" where
+  ematch _ = Right E.speakerLowVolume
 
-instance matchSpeakerHighVolume :: Match "🔊" E.SpeakerHighVolume
+instance ematchSpeakerMediumVolume :: EMatch "🔉" where
+  ematch _ = Right E.speakerMediumVolume
 
-instance matchLoudspeaker :: Match "📢" E.Loudspeaker
+instance ematchSpeakerHighVolume :: EMatch "🔊" where
+  ematch _ = Right E.speakerHighVolume
 
-instance matchMegaphone :: Match "📣" E.Megaphone
+instance ematchLoudspeaker :: EMatch "📢" where
+  ematch _ = Right E.loudspeaker
 
-instance matchPostalHorn :: Match "📯" E.PostalHorn
+instance ematchMegaphone :: EMatch "📣" where
+  ematch _ = Right E.megaphone
 
-instance matchBell :: Match "🔔" E.Bell
+instance ematchPostalHorn :: EMatch "📯" where
+  ematch _ = Right E.postalHorn
 
-instance matchBellWithSlash :: Match "🔕" E.BellWithSlash
+instance ematchBell :: EMatch "🔔" where
+  ematch _ = Right E.bell
 
-instance matchMusicalScore :: Match "🎼" E.MusicalScore
+instance ematchBellWithSlash :: EMatch "🔕" where
+  ematch _ = Right E.bellWithSlash
 
-instance matchMusicalNote :: Match "🎵" E.MusicalNote
+instance ematchMusicalScore :: EMatch "🎼" where
+  ematch _ = Right E.musicalScore
 
-instance matchMusicalNotes :: Match "🎶" E.MusicalNotes
+instance ematchMusicalNote :: EMatch "🎵" where
+  ematch _ = Right E.musicalNote
 
-instance matchStudioMicrophone :: Match "🎙" E.StudioMicrophone
+instance ematchMusicalNotes :: EMatch "🎶" where
+  ematch _ = Right E.musicalNotes
 
-instance matchLevelSlider :: Match "🎚" E.LevelSlider
+instance ematchStudioMicrophone :: EMatch "🎙" where
+  ematch _ = Right E.studioMicrophone
 
-instance matchControlKnobs :: Match "🎛" E.ControlKnobs
+instance ematchLevelSlider :: EMatch "🎚" where
+  ematch _ = Right E.levelSlider
 
-instance matchMicrophone :: Match "🎤" E.Microphone
+instance ematchControlKnobs :: EMatch "🎛" where
+  ematch _ = Right E.controlKnobs
 
-instance matchHeadphone :: Match "🎧" E.Headphone
+instance ematchMicrophone :: EMatch "🎤" where
+  ematch _ = Right E.microphone
 
-instance matchRadio :: Match "📻" E.Radio
+instance ematchHeadphone :: EMatch "🎧" where
+  ematch _ = Right E.headphone
 
-instance matchSaxophone :: Match "🎷" E.Saxophone
+instance ematchRadio :: EMatch "📻" where
+  ematch _ = Right E.radio
 
-instance matchAccordion :: Match "🪗" E.Accordion
+instance ematchSaxophone :: EMatch "🎷" where
+  ematch _ = Right E.saxophone
 
-instance matchGuitar :: Match "🎸" E.Guitar
+instance ematchAccordion :: EMatch "🪗" where
+  ematch _ = Right E.accordion
 
-instance matchMusicalKeyboard :: Match "🎹" E.MusicalKeyboard
+instance ematchGuitar :: EMatch "🎸" where
+  ematch _ = Right E.guitar
 
-instance matchTrumpet :: Match "🎺" E.Trumpet
+instance ematchMusicalKeyboard :: EMatch "🎹" where
+  ematch _ = Right E.musicalKeyboard
 
-instance matchViolin :: Match "🎻" E.Violin
+instance ematchTrumpet :: EMatch "🎺" where
+  ematch _ = Right E.trumpet
 
-instance matchBanjo :: Match "🪕" E.Banjo
+instance ematchViolin :: EMatch "🎻" where
+  ematch _ = Right E.violin
 
-instance matchDrum :: Match "🥁" E.Drum
+instance ematchBanjo :: EMatch "🪕" where
+  ematch _ = Right E.banjo
 
-instance matchLongDrum :: Match "🪘" E.LongDrum
+instance ematchDrum :: EMatch "🥁" where
+  ematch _ = Right E.drum
 
-instance matchMobilePhone :: Match "📱" E.MobilePhone
+instance ematchLongDrum :: EMatch "🪘" where
+  ematch _ = Right E.longDrum
 
-instance matchMobilePhoneWithArrow :: Match "📲" E.MobilePhoneWithArrow
+instance ematchMobilePhone :: EMatch "📱" where
+  ematch _ = Right E.mobilePhone
 
-instance matchTelephone :: Match "☎" E.Telephone
+instance ematchMobilePhoneWithArrow :: EMatch "📲" where
+  ematch _ = Right E.mobilePhoneWithArrow
 
-instance matchTelephoneReceiver :: Match "📞" E.TelephoneReceiver
+instance ematchTelephone :: EMatch "☎" where
+  ematch _ = Right E.telephone
 
-instance matchPager :: Match "📟" E.Pager
+instance ematchTelephoneReceiver :: EMatch "📞" where
+  ematch _ = Right E.telephoneReceiver
 
-instance matchFaxMachine :: Match "📠" E.FaxMachine
+instance ematchPager :: EMatch "📟" where
+  ematch _ = Right E.pager
 
-instance matchBattery :: Match "🔋" E.Battery
+instance ematchFaxMachine :: EMatch "📠" where
+  ematch _ = Right E.faxMachine
 
-instance matchElectricPlug :: Match "🔌" E.ElectricPlug
+instance ematchBattery :: EMatch "🔋" where
+  ematch _ = Right E.battery
 
-instance matchLaptop :: Match "💻" E.Laptop
+instance ematchElectricPlug :: EMatch "🔌" where
+  ematch _ = Right E.electricPlug
 
-instance matchDesktopComputer :: Match "🖥" E.DesktopComputer
+instance ematchLaptop :: EMatch "💻" where
+  ematch _ = Right E.laptop
 
-instance matchPrinter :: Match "🖨" E.Printer
+instance ematchDesktopComputer :: EMatch "🖥" where
+  ematch _ = Right E.desktopComputer
 
-instance matchKeyboard :: Match "⌨" E.Keyboard
+instance ematchPrinter :: EMatch "🖨" where
+  ematch _ = Right E.printer
 
-instance matchComputerMouse :: Match "🖱" E.ComputerMouse
+instance ematchKeyboard :: EMatch "⌨" where
+  ematch _ = Right E.keyboard
 
-instance matchTrackball :: Match "🖲" E.Trackball
+instance ematchComputerMouse :: EMatch "🖱" where
+  ematch _ = Right E.computerMouse
 
-instance matchComputerDisk :: Match "💽" E.ComputerDisk
+instance ematchTrackball :: EMatch "🖲" where
+  ematch _ = Right E.trackball
 
-instance matchFloppyDisk :: Match "💾" E.FloppyDisk
+instance ematchComputerDisk :: EMatch "💽" where
+  ematch _ = Right E.computerDisk
 
-instance matchOpticalDisk :: Match "💿" E.OpticalDisk
+instance ematchFloppyDisk :: EMatch "💾" where
+  ematch _ = Right E.floppyDisk
 
-instance matchDvd :: Match "📀" E.Dvd
+instance ematchOpticalDisk :: EMatch "💿" where
+  ematch _ = Right E.opticalDisk
 
-instance matchAbacus :: Match "🧮" E.Abacus
+instance ematchDvd :: EMatch "📀" where
+  ematch _ = Right E.dvd
 
-instance matchMovieCamera :: Match "🎥" E.MovieCamera
+instance ematchAbacus :: EMatch "🧮" where
+  ematch _ = Right E.abacus
 
-instance matchFilmFrames :: Match "🎞" E.FilmFrames
+instance ematchMovieCamera :: EMatch "🎥" where
+  ematch _ = Right E.movieCamera
 
-instance matchFilmProjector :: Match "📽" E.FilmProjector
+instance ematchFilmFrames :: EMatch "🎞" where
+  ematch _ = Right E.filmFrames
 
-instance matchClapperBoard :: Match "🎬" E.ClapperBoard
+instance ematchFilmProjector :: EMatch "📽" where
+  ematch _ = Right E.filmProjector
 
-instance matchTelevision :: Match "📺" E.Television
+instance ematchClapperBoard :: EMatch "🎬" where
+  ematch _ = Right E.clapperBoard
 
-instance matchCamera :: Match "📷" E.Camera
+instance ematchTelevision :: EMatch "📺" where
+  ematch _ = Right E.television
 
-instance matchCameraWithFlash :: Match "📸" E.CameraWithFlash
+instance ematchCamera :: EMatch "📷" where
+  ematch _ = Right E.camera
 
-instance matchVideoCamera :: Match "📹" E.VideoCamera
+instance ematchCameraWithFlash :: EMatch "📸" where
+  ematch _ = Right E.cameraWithFlash
 
-instance matchVideocassette :: Match "📼" E.Videocassette
+instance ematchVideoCamera :: EMatch "📹" where
+  ematch _ = Right E.videoCamera
 
-instance matchMagnifyingGlassTiltedLeft :: Match "🔍" E.MagnifyingGlassTiltedLeft
+instance ematchVideocassette :: EMatch "📼" where
+  ematch _ = Right E.videocassette
 
-instance matchMagnifyingGlassTiltedRight :: Match "🔎" E.MagnifyingGlassTiltedRight
+instance ematchMagnifyingGlassTiltedLeft :: EMatch "🔍" where
+  ematch _ = Right E.magnifyingGlassTiltedLeft
 
-instance matchCandle :: Match "🕯" E.Candle
+instance ematchMagnifyingGlassTiltedRight :: EMatch "🔎" where
+  ematch _ = Right E.magnifyingGlassTiltedRight
 
-instance matchLightBulb :: Match "💡" E.LightBulb
+instance ematchCandle :: EMatch "🕯" where
+  ematch _ = Right E.candle
 
-instance matchFlashlight :: Match "🔦" E.Flashlight
+instance ematchLightBulb :: EMatch "💡" where
+  ematch _ = Right E.lightBulb
 
-instance matchRedPaperLantern :: Match "🏮" E.RedPaperLantern
+instance ematchFlashlight :: EMatch "🔦" where
+  ematch _ = Right E.flashlight
 
-instance matchDiyaLamp :: Match "🪔" E.DiyaLamp
+instance ematchRedPaperLantern :: EMatch "🏮" where
+  ematch _ = Right E.redPaperLantern
 
-instance matchNotebookWithDecorativeCover :: Match "📔" E.NotebookWithDecorativeCover
+instance ematchDiyaLamp :: EMatch "🪔" where
+  ematch _ = Right E.diyaLamp
 
-instance matchClosedBook :: Match "📕" E.ClosedBook
+instance ematchNotebookWithDecorativeCover :: EMatch "📔" where
+  ematch _ = Right E.notebookWithDecorativeCover
 
-instance matchOpenBook :: Match "📖" E.OpenBook
+instance ematchClosedBook :: EMatch "📕" where
+  ematch _ = Right E.closedBook
 
-instance matchGreenBook :: Match "📗" E.GreenBook
+instance ematchOpenBook :: EMatch "📖" where
+  ematch _ = Right E.openBook
 
-instance matchBlueBook :: Match "📘" E.BlueBook
+instance ematchGreenBook :: EMatch "📗" where
+  ematch _ = Right E.greenBook
 
-instance matchOrangeBook :: Match "📙" E.OrangeBook
+instance ematchBlueBook :: EMatch "📘" where
+  ematch _ = Right E.blueBook
 
-instance matchBooks :: Match "📚" E.Books
+instance ematchOrangeBook :: EMatch "📙" where
+  ematch _ = Right E.orangeBook
 
-instance matchNotebook :: Match "📓" E.Notebook
+instance ematchBooks :: EMatch "📚" where
+  ematch _ = Right E.books
 
-instance matchLedger :: Match "📒" E.Ledger
+instance ematchNotebook :: EMatch "📓" where
+  ematch _ = Right E.notebook
 
-instance matchPageWithCurl :: Match "📃" E.PageWithCurl
+instance ematchLedger :: EMatch "📒" where
+  ematch _ = Right E.ledger
 
-instance matchScroll :: Match "📜" E.Scroll
+instance ematchPageWithCurl :: EMatch "📃" where
+  ematch _ = Right E.pageWithCurl
 
-instance matchPageFacingUp :: Match "📄" E.PageFacingUp
+instance ematchScroll :: EMatch "📜" where
+  ematch _ = Right E.scroll
 
-instance matchNewspaper :: Match "📰" E.Newspaper
+instance ematchPageFacingUp :: EMatch "📄" where
+  ematch _ = Right E.pageFacingUp
 
-instance matchRolledUpNewspaper :: Match "🗞" E.RolledUpNewspaper
+instance ematchNewspaper :: EMatch "📰" where
+  ematch _ = Right E.newspaper
 
-instance matchBookmarkTabs :: Match "📑" E.BookmarkTabs
+instance ematchRolledUpNewspaper :: EMatch "🗞" where
+  ematch _ = Right E.rolledUpNewspaper
 
-instance matchBookmark :: Match "🔖" E.Bookmark
+instance ematchBookmarkTabs :: EMatch "📑" where
+  ematch _ = Right E.bookmarkTabs
 
-instance matchLabel :: Match "🏷" E.Label
+instance ematchBookmark :: EMatch "🔖" where
+  ematch _ = Right E.bookmark
 
-instance matchMoneyBag :: Match "💰" E.MoneyBag
+instance ematchLabel :: EMatch "🏷" where
+  ematch _ = Right E.label
 
-instance matchCoin :: Match "🪙" E.Coin
+instance ematchMoneyBag :: EMatch "💰" where
+  ematch _ = Right E.moneyBag
 
-instance matchYenBanknote :: Match "💴" E.YenBanknote
+instance ematchCoin :: EMatch "🪙" where
+  ematch _ = Right E.coin
 
-instance matchDollarBanknote :: Match "💵" E.DollarBanknote
+instance ematchYenBanknote :: EMatch "💴" where
+  ematch _ = Right E.yenBanknote
 
-instance matchEuroBanknote :: Match "💶" E.EuroBanknote
+instance ematchDollarBanknote :: EMatch "💵" where
+  ematch _ = Right E.dollarBanknote
 
-instance matchPoundBanknote :: Match "💷" E.PoundBanknote
+instance ematchEuroBanknote :: EMatch "💶" where
+  ematch _ = Right E.euroBanknote
 
-instance matchMoneyWithWings :: Match "💸" E.MoneyWithWings
+instance ematchPoundBanknote :: EMatch "💷" where
+  ematch _ = Right E.poundBanknote
 
-instance matchCreditCard :: Match "💳" E.CreditCard
+instance ematchMoneyWithWings :: EMatch "💸" where
+  ematch _ = Right E.moneyWithWings
 
-instance matchReceipt :: Match "🧾" E.Receipt
+instance ematchCreditCard :: EMatch "💳" where
+  ematch _ = Right E.creditCard
 
-instance matchChartIncreasingWithYen :: Match "💹" E.ChartIncreasingWithYen
+instance ematchReceipt :: EMatch "🧾" where
+  ematch _ = Right E.receipt
 
-instance matchEnvelope :: Match "✉" E.Envelope
+instance ematchChartIncreasingWithYen :: EMatch "💹" where
+  ematch _ = Right E.chartIncreasingWithYen
 
-instance matchEMail :: Match "📧" E.EMail
+instance ematchEnvelope :: EMatch "✉" where
+  ematch _ = Right E.envelope
 
-instance matchIncomingEnvelope :: Match "📨" E.IncomingEnvelope
+instance ematchEMail :: EMatch "📧" where
+  ematch _ = Right E.eMail
 
-instance matchEnvelopeWithArrow :: Match "📩" E.EnvelopeWithArrow
+instance ematchIncomingEnvelope :: EMatch "📨" where
+  ematch _ = Right E.incomingEnvelope
 
-instance matchOutboxTray :: Match "📤" E.OutboxTray
+instance ematchEnvelopeWithArrow :: EMatch "📩" where
+  ematch _ = Right E.envelopeWithArrow
 
-instance matchInboxTray :: Match "📥" E.InboxTray
+instance ematchOutboxTray :: EMatch "📤" where
+  ematch _ = Right E.outboxTray
 
-instance matchPackage :: Match "📦" E.Package
+instance ematchInboxTray :: EMatch "📥" where
+  ematch _ = Right E.inboxTray
 
-instance matchClosedMailboxWithRaisedFlag :: Match "📫" E.ClosedMailboxWithRaisedFlag
+instance ematchPackage :: EMatch "📦" where
+  ematch _ = Right E.package
 
-instance matchClosedMailboxWithLoweredFlag :: Match "📪" E.ClosedMailboxWithLoweredFlag
+instance ematchClosedMailboxWithRaisedFlag :: EMatch "📫" where
+  ematch _ = Right E.closedMailboxWithRaisedFlag
 
-instance matchOpenMailboxWithRaisedFlag :: Match "📬" E.OpenMailboxWithRaisedFlag
+instance ematchClosedMailboxWithLoweredFlag :: EMatch "📪" where
+  ematch _ = Right E.closedMailboxWithLoweredFlag
 
-instance matchOpenMailboxWithLoweredFlag :: Match "📭" E.OpenMailboxWithLoweredFlag
+instance ematchOpenMailboxWithRaisedFlag :: EMatch "📬" where
+  ematch _ = Right E.openMailboxWithRaisedFlag
 
-instance matchPostbox :: Match "📮" E.Postbox
+instance ematchOpenMailboxWithLoweredFlag :: EMatch "📭" where
+  ematch _ = Right E.openMailboxWithLoweredFlag
 
-instance matchBallotBoxWithBallot :: Match "🗳" E.BallotBoxWithBallot
+instance ematchPostbox :: EMatch "📮" where
+  ematch _ = Right E.postbox
 
-instance matchPencil :: Match "✏" E.Pencil
+instance ematchBallotBoxWithBallot :: EMatch "🗳" where
+  ematch _ = Right E.ballotBoxWithBallot
 
-instance matchBlackNib :: Match "✒" E.BlackNib
+instance ematchPencil :: EMatch "✏" where
+  ematch _ = Right E.pencil
 
-instance matchFountainPen :: Match "🖋" E.FountainPen
+instance ematchBlackNib :: EMatch "✒" where
+  ematch _ = Right E.blackNib
 
-instance matchPen :: Match "🖊" E.Pen
+instance ematchFountainPen :: EMatch "🖋" where
+  ematch _ = Right E.fountainPen
 
-instance matchPaintbrush :: Match "🖌" E.Paintbrush
+instance ematchPen :: EMatch "🖊" where
+  ematch _ = Right E.pen
 
-instance matchCrayon :: Match "🖍" E.Crayon
+instance ematchPaintbrush :: EMatch "🖌" where
+  ematch _ = Right E.paintbrush
 
-instance matchMemo :: Match "📝" E.Memo
+instance ematchCrayon :: EMatch "🖍" where
+  ematch _ = Right E.crayon
 
-instance matchBriefcase :: Match "💼" E.Briefcase
+instance ematchMemo :: EMatch "📝" where
+  ematch _ = Right E.memo
 
-instance matchFileFolder :: Match "📁" E.FileFolder
+instance ematchBriefcase :: EMatch "💼" where
+  ematch _ = Right E.briefcase
 
-instance matchOpenFileFolder :: Match "📂" E.OpenFileFolder
+instance ematchFileFolder :: EMatch "📁" where
+  ematch _ = Right E.fileFolder
 
-instance matchCardIndexDividers :: Match "🗂" E.CardIndexDividers
+instance ematchOpenFileFolder :: EMatch "📂" where
+  ematch _ = Right E.openFileFolder
 
-instance matchCalendar :: Match "📅" E.Calendar
+instance ematchCardIndexDividers :: EMatch "🗂" where
+  ematch _ = Right E.cardIndexDividers
 
-instance matchTearOffCalendar :: Match "📆" E.TearOffCalendar
+instance ematchCalendar :: EMatch "📅" where
+  ematch _ = Right E.calendar
 
-instance matchSpiralNotepad :: Match "🗒" E.SpiralNotepad
+instance ematchTearOffCalendar :: EMatch "📆" where
+  ematch _ = Right E.tearOffCalendar
 
-instance matchSpiralCalendar :: Match "🗓" E.SpiralCalendar
+instance ematchSpiralNotepad :: EMatch "🗒" where
+  ematch _ = Right E.spiralNotepad
 
-instance matchCardIndex :: Match "📇" E.CardIndex
+instance ematchSpiralCalendar :: EMatch "🗓" where
+  ematch _ = Right E.spiralCalendar
 
-instance matchChartIncreasing :: Match "📈" E.ChartIncreasing
+instance ematchCardIndex :: EMatch "📇" where
+  ematch _ = Right E.cardIndex
 
-instance matchChartDecreasing :: Match "📉" E.ChartDecreasing
+instance ematchChartIncreasing :: EMatch "📈" where
+  ematch _ = Right E.chartIncreasing
 
-instance matchBarChart :: Match "📊" E.BarChart
+instance ematchChartDecreasing :: EMatch "📉" where
+  ematch _ = Right E.chartDecreasing
 
-instance matchClipboard :: Match "📋" E.Clipboard
+instance ematchBarChart :: EMatch "📊" where
+  ematch _ = Right E.barChart
 
-instance matchPushpin :: Match "📌" E.Pushpin
+instance ematchClipboard :: EMatch "📋" where
+  ematch _ = Right E.clipboard
 
-instance matchRoundPushpin :: Match "📍" E.RoundPushpin
+instance ematchPushpin :: EMatch "📌" where
+  ematch _ = Right E.pushpin
 
-instance matchPaperclip :: Match "📎" E.Paperclip
+instance ematchRoundPushpin :: EMatch "📍" where
+  ematch _ = Right E.roundPushpin
 
-instance matchLinkedPaperclips :: Match "🖇" E.LinkedPaperclips
+instance ematchPaperclip :: EMatch "📎" where
+  ematch _ = Right E.paperclip
 
-instance matchStraightRuler :: Match "📏" E.StraightRuler
+instance ematchLinkedPaperclips :: EMatch "🖇" where
+  ematch _ = Right E.linkedPaperclips
 
-instance matchTriangularRuler :: Match "📐" E.TriangularRuler
+instance ematchStraightRuler :: EMatch "📏" where
+  ematch _ = Right E.straightRuler
 
-instance matchScissors :: Match "✂" E.Scissors
+instance ematchTriangularRuler :: EMatch "📐" where
+  ematch _ = Right E.triangularRuler
 
-instance matchCardFileBox :: Match "🗃" E.CardFileBox
+instance ematchScissors :: EMatch "✂" where
+  ematch _ = Right E.scissors
 
-instance matchFileCabinet :: Match "🗄" E.FileCabinet
+instance ematchCardFileBox :: EMatch "🗃" where
+  ematch _ = Right E.cardFileBox
 
-instance matchWastebasket :: Match "🗑" E.Wastebasket
+instance ematchFileCabinet :: EMatch "🗄" where
+  ematch _ = Right E.fileCabinet
 
-instance matchLocked :: Match "🔒" E.Locked
+instance ematchWastebasket :: EMatch "🗑" where
+  ematch _ = Right E.wastebasket
 
-instance matchUnlocked :: Match "🔓" E.Unlocked
+instance ematchLocked :: EMatch "🔒" where
+  ematch _ = Right E.locked
 
-instance matchLockedWithPen :: Match "🔏" E.LockedWithPen
+instance ematchUnlocked :: EMatch "🔓" where
+  ematch _ = Right E.unlocked
 
-instance matchLockedWithKey :: Match "🔐" E.LockedWithKey
+instance ematchLockedWithPen :: EMatch "🔏" where
+  ematch _ = Right E.lockedWithPen
 
-instance matchKey :: Match "🔑" E.Key
+instance ematchLockedWithKey :: EMatch "🔐" where
+  ematch _ = Right E.lockedWithKey
 
-instance matchOldKey :: Match "🗝" E.OldKey
+instance ematchKey :: EMatch "🔑" where
+  ematch _ = Right E.key
 
-instance matchHammer :: Match "🔨" E.Hammer
+instance ematchOldKey :: EMatch "🗝" where
+  ematch _ = Right E.oldKey
 
-instance matchAxe :: Match "🪓" E.Axe
+instance ematchHammer :: EMatch "🔨" where
+  ematch _ = Right E.hammer
 
-instance matchPick :: Match "⛏" E.Pick
+instance ematchAxe :: EMatch "🪓" where
+  ematch _ = Right E.axe
 
-instance matchHammerAndPick :: Match "⚒" E.HammerAndPick
+instance ematchPick :: EMatch "⛏" where
+  ematch _ = Right E.pick
 
-instance matchHammerAndWrench :: Match "🛠" E.HammerAndWrench
+instance ematchHammerAndPick :: EMatch "⚒" where
+  ematch _ = Right E.hammerAndPick
 
-instance matchDagger :: Match "🗡" E.Dagger
+instance ematchHammerAndWrench :: EMatch "🛠" where
+  ematch _ = Right E.hammerAndWrench
 
-instance matchCrossedSwords :: Match "⚔" E.CrossedSwords
+instance ematchDagger :: EMatch "🗡" where
+  ematch _ = Right E.dagger
 
-instance matchPistol :: Match "🔫" E.Pistol
+instance ematchCrossedSwords :: EMatch "⚔" where
+  ematch _ = Right E.crossedSwords
 
-instance matchBoomerang :: Match "🪃" E.Boomerang
+instance ematchPistol :: EMatch "🔫" where
+  ematch _ = Right E.pistol
 
-instance matchBowAndArrow :: Match "🏹" E.BowAndArrow
+instance ematchBoomerang :: EMatch "🪃" where
+  ematch _ = Right E.boomerang
 
-instance matchShield :: Match "🛡" E.Shield
+instance ematchBowAndArrow :: EMatch "🏹" where
+  ematch _ = Right E.bowAndArrow
 
-instance matchCarpentrySaw :: Match "🪚" E.CarpentrySaw
+instance ematchShield :: EMatch "🛡" where
+  ematch _ = Right E.shield
 
-instance matchWrench :: Match "🔧" E.Wrench
+instance ematchCarpentrySaw :: EMatch "🪚" where
+  ematch _ = Right E.carpentrySaw
 
-instance matchScrewdriver :: Match "🪛" E.Screwdriver
+instance ematchWrench :: EMatch "🔧" where
+  ematch _ = Right E.wrench
 
-instance matchNutAndBolt :: Match "🔩" E.NutAndBolt
+instance ematchScrewdriver :: EMatch "🪛" where
+  ematch _ = Right E.screwdriver
 
-instance matchGear :: Match "⚙" E.Gear
+instance ematchNutAndBolt :: EMatch "🔩" where
+  ematch _ = Right E.nutAndBolt
 
-instance matchClamp :: Match "🗜" E.Clamp
+instance ematchGear :: EMatch "⚙" where
+  ematch _ = Right E.gear
 
-instance matchBalanceScale :: Match "⚖" E.BalanceScale
+instance ematchClamp :: EMatch "🗜" where
+  ematch _ = Right E.clamp
 
-instance matchWhiteCane :: Match "🦯" E.WhiteCane
+instance ematchBalanceScale :: EMatch "⚖" where
+  ematch _ = Right E.balanceScale
 
-instance matchLink :: Match "🔗" E.Link
+instance ematchWhiteCane :: EMatch "🦯" where
+  ematch _ = Right E.whiteCane
 
-instance matchChains :: Match "⛓" E.Chains
+instance ematchLink :: EMatch "🔗" where
+  ematch _ = Right E.link
 
-instance matchHook :: Match "🪝" E.Hook
+instance ematchChains :: EMatch "⛓" where
+  ematch _ = Right E.chains
 
-instance matchToolbox :: Match "🧰" E.Toolbox
+instance ematchHook :: EMatch "🪝" where
+  ematch _ = Right E.hook
 
-instance matchMagnet :: Match "🧲" E.Magnet
+instance ematchToolbox :: EMatch "🧰" where
+  ematch _ = Right E.toolbox
 
-instance matchLadder :: Match "🪜" E.Ladder
+instance ematchMagnet :: EMatch "🧲" where
+  ematch _ = Right E.magnet
 
-instance matchAlembic :: Match "⚗" E.Alembic
+instance ematchLadder :: EMatch "🪜" where
+  ematch _ = Right E.ladder
 
-instance matchTestTube :: Match "🧪" E.TestTube
+instance ematchAlembic :: EMatch "⚗" where
+  ematch _ = Right E.alembic
 
-instance matchPetriDish :: Match "🧫" E.PetriDish
+instance ematchTestTube :: EMatch "🧪" where
+  ematch _ = Right E.testTube
 
-instance matchDna :: Match "🧬" E.Dna
+instance ematchPetriDish :: EMatch "🧫" where
+  ematch _ = Right E.petriDish
 
-instance matchMicroscope :: Match "🔬" E.Microscope
+instance ematchDna :: EMatch "🧬" where
+  ematch _ = Right E.dna
 
-instance matchTelescope :: Match "🔭" E.Telescope
+instance ematchMicroscope :: EMatch "🔬" where
+  ematch _ = Right E.microscope
 
-instance matchSatelliteAntenna :: Match "📡" E.SatelliteAntenna
+instance ematchTelescope :: EMatch "🔭" where
+  ematch _ = Right E.telescope
 
-instance matchSyringe :: Match "💉" E.Syringe
+instance ematchSatelliteAntenna :: EMatch "📡" where
+  ematch _ = Right E.satelliteAntenna
 
-instance matchDropOfBlood :: Match "🩸" E.DropOfBlood
+instance ematchSyringe :: EMatch "💉" where
+  ematch _ = Right E.syringe
 
-instance matchPill :: Match "💊" E.Pill
+instance ematchDropOfBlood :: EMatch "🩸" where
+  ematch _ = Right E.dropOfBlood
 
-instance matchAdhesiveBandage :: Match "🩹" E.AdhesiveBandage
+instance ematchPill :: EMatch "💊" where
+  ematch _ = Right E.pill
 
-instance matchStethoscope :: Match "🩺" E.Stethoscope
+instance ematchAdhesiveBandage :: EMatch "🩹" where
+  ematch _ = Right E.adhesiveBandage
 
-instance matchDoor :: Match "🚪" E.Door
+instance ematchStethoscope :: EMatch "🩺" where
+  ematch _ = Right E.stethoscope
 
-instance matchElevator :: Match "🛗" E.Elevator
+instance ematchDoor :: EMatch "🚪" where
+  ematch _ = Right E.door
 
-instance matchMirror :: Match "🪞" E.Mirror
+instance ematchElevator :: EMatch "🛗" where
+  ematch _ = Right E.elevator
 
-instance matchWindow :: Match "🪟" E.Window
+instance ematchMirror :: EMatch "🪞" where
+  ematch _ = Right E.mirror
 
-instance matchBed :: Match "🛏" E.Bed
+instance ematchWindow :: EMatch "🪟" where
+  ematch _ = Right E.window
 
-instance matchCouchAndLamp :: Match "🛋" E.CouchAndLamp
+instance ematchBed :: EMatch "🛏" where
+  ematch _ = Right E.bed
 
-instance matchChair :: Match "🪑" E.Chair
+instance ematchCouchAndLamp :: EMatch "🛋" where
+  ematch _ = Right E.couchAndLamp
 
-instance matchToilet :: Match "🚽" E.Toilet
+instance ematchChair :: EMatch "🪑" where
+  ematch _ = Right E.chair
 
-instance matchPlunger :: Match "🪠" E.Plunger
+instance ematchToilet :: EMatch "🚽" where
+  ematch _ = Right E.toilet
 
-instance matchShower :: Match "🚿" E.Shower
+instance ematchPlunger :: EMatch "🪠" where
+  ematch _ = Right E.plunger
 
-instance matchBathtub :: Match "🛁" E.Bathtub
+instance ematchShower :: EMatch "🚿" where
+  ematch _ = Right E.shower
 
-instance matchMouseTrap :: Match "🪤" E.MouseTrap
+instance ematchBathtub :: EMatch "🛁" where
+  ematch _ = Right E.bathtub
 
-instance matchRazor :: Match "🪒" E.Razor
+instance ematchMouseTrap :: EMatch "🪤" where
+  ematch _ = Right E.mouseTrap
 
-instance matchLotionBottle :: Match "🧴" E.LotionBottle
+instance ematchRazor :: EMatch "🪒" where
+  ematch _ = Right E.razor
 
-instance matchSafetyPin :: Match "🧷" E.SafetyPin
+instance ematchLotionBottle :: EMatch "🧴" where
+  ematch _ = Right E.lotionBottle
 
-instance matchBroom :: Match "🧹" E.Broom
+instance ematchSafetyPin :: EMatch "🧷" where
+  ematch _ = Right E.safetyPin
 
-instance matchBasket :: Match "🧺" E.Basket
+instance ematchBroom :: EMatch "🧹" where
+  ematch _ = Right E.broom
 
-instance matchRollOfPaper :: Match "🧻" E.RollOfPaper
+instance ematchBasket :: EMatch "🧺" where
+  ematch _ = Right E.basket
 
-instance matchBucket :: Match "🪣" E.Bucket
+instance ematchRollOfPaper :: EMatch "🧻" where
+  ematch _ = Right E.rollOfPaper
 
-instance matchSoap :: Match "🧼" E.Soap
+instance ematchBucket :: EMatch "🪣" where
+  ematch _ = Right E.bucket
 
-instance matchToothbrush :: Match "🪥" E.Toothbrush
+instance ematchSoap :: EMatch "🧼" where
+  ematch _ = Right E.soap
 
-instance matchSponge :: Match "🧽" E.Sponge
+instance ematchToothbrush :: EMatch "🪥" where
+  ematch _ = Right E.toothbrush
 
-instance matchFireExtinguisher :: Match "🧯" E.FireExtinguisher
+instance ematchSponge :: EMatch "🧽" where
+  ematch _ = Right E.sponge
 
-instance matchShoppingCart :: Match "🛒" E.ShoppingCart
+instance ematchFireExtinguisher :: EMatch "🧯" where
+  ematch _ = Right E.fireExtinguisher
 
-instance matchCigarette :: Match "🚬" E.Cigarette
+instance ematchShoppingCart :: EMatch "🛒" where
+  ematch _ = Right E.shoppingCart
 
-instance matchCoffin :: Match "⚰" E.Coffin
+instance ematchCigarette :: EMatch "🚬" where
+  ematch _ = Right E.cigarette
 
-instance matchHeadstone :: Match "🪦" E.Headstone
+instance ematchCoffin :: EMatch "⚰" where
+  ematch _ = Right E.coffin
 
-instance matchFuneralUrn :: Match "⚱" E.FuneralUrn
+instance ematchHeadstone :: EMatch "🪦" where
+  ematch _ = Right E.headstone
 
-instance matchMoai :: Match "🗿" E.Moai
+instance ematchFuneralUrn :: EMatch "⚱" where
+  ematch _ = Right E.funeralUrn
 
-instance matchPlacard :: Match "🪧" E.Placard
+instance ematchMoai :: EMatch "🗿" where
+  ematch _ = Right E.moai
 
-instance matchAtmSign :: Match "🏧" E.AtmSign
+instance ematchPlacard :: EMatch "🪧" where
+  ematch _ = Right E.placard
 
-instance matchLitterInBinSign :: Match "🚮" E.LitterInBinSign
+instance ematchAtmSign :: EMatch "🏧" where
+  ematch _ = Right E.atmSign
 
-instance matchPotableWater :: Match "🚰" E.PotableWater
+instance ematchLitterInBinSign :: EMatch "🚮" where
+  ematch _ = Right E.litterInBinSign
 
-instance matchWheelchairSymbol :: Match "♿" E.WheelchairSymbol
+instance ematchPotableWater :: EMatch "🚰" where
+  ematch _ = Right E.potableWater
 
-instance matchMenSRoom :: Match "🚹" E.MenSRoom
+instance ematchWheelchairSymbol :: EMatch "♿" where
+  ematch _ = Right E.wheelchairSymbol
 
-instance matchWomenSRoom :: Match "🚺" E.WomenSRoom
+instance ematchMenSRoom :: EMatch "🚹" where
+  ematch _ = Right E.menSRoom
 
-instance matchRestroom :: Match "🚻" E.Restroom
+instance ematchWomenSRoom :: EMatch "🚺" where
+  ematch _ = Right E.womenSRoom
 
-instance matchBabySymbol :: Match "🚼" E.BabySymbol
+instance ematchRestroom :: EMatch "🚻" where
+  ematch _ = Right E.restroom
 
-instance matchWaterCloset :: Match "🚾" E.WaterCloset
+instance ematchBabySymbol :: EMatch "🚼" where
+  ematch _ = Right E.babySymbol
 
-instance matchPassportControl :: Match "🛂" E.PassportControl
+instance ematchWaterCloset :: EMatch "🚾" where
+  ematch _ = Right E.waterCloset
 
-instance matchCustoms :: Match "🛃" E.Customs
+instance ematchPassportControl :: EMatch "🛂" where
+  ematch _ = Right E.passportControl
 
-instance matchBaggageClaim :: Match "🛄" E.BaggageClaim
+instance ematchCustoms :: EMatch "🛃" where
+  ematch _ = Right E.customs
 
-instance matchLeftLuggage :: Match "🛅" E.LeftLuggage
+instance ematchBaggageClaim :: EMatch "🛄" where
+  ematch _ = Right E.baggageClaim
 
-instance matchWarning :: Match "⚠" E.Warning
+instance ematchLeftLuggage :: EMatch "🛅" where
+  ematch _ = Right E.leftLuggage
 
-instance matchChildrenCrossing :: Match "🚸" E.ChildrenCrossing
+instance ematchWarning :: EMatch "⚠" where
+  ematch _ = Right E.warning
 
-instance matchNoEntry :: Match "⛔" E.NoEntry
+instance ematchChildrenCrossing :: EMatch "🚸" where
+  ematch _ = Right E.childrenCrossing
 
-instance matchProhibited :: Match "🚫" E.Prohibited
+instance ematchNoEntry :: EMatch "⛔" where
+  ematch _ = Right E.noEntry
 
-instance matchNoBicycles :: Match "🚳" E.NoBicycles
+instance ematchProhibited :: EMatch "🚫" where
+  ematch _ = Right E.prohibited
 
-instance matchNoSmoking :: Match "🚭" E.NoSmoking
+instance ematchNoBicycles :: EMatch "🚳" where
+  ematch _ = Right E.noBicycles
 
-instance matchNoLittering :: Match "🚯" E.NoLittering
+instance ematchNoSmoking :: EMatch "🚭" where
+  ematch _ = Right E.noSmoking
 
-instance matchNonPotableWater :: Match "🚱" E.NonPotableWater
+instance ematchNoLittering :: EMatch "🚯" where
+  ematch _ = Right E.noLittering
 
-instance matchNoPedestrians :: Match "🚷" E.NoPedestrians
+instance ematchNonPotableWater :: EMatch "🚱" where
+  ematch _ = Right E.nonPotableWater
 
-instance matchNoMobilePhones :: Match "📵" E.NoMobilePhones
+instance ematchNoPedestrians :: EMatch "🚷" where
+  ematch _ = Right E.noPedestrians
 
-instance matchNoOneUnderEighteen :: Match "🔞" E.NoOneUnderEighteen
+instance ematchNoMobilePhones :: EMatch "📵" where
+  ematch _ = Right E.noMobilePhones
 
-instance matchRadioactive :: Match "☢" E.Radioactive
+instance ematchNoOneUnderEighteen :: EMatch "🔞" where
+  ematch _ = Right E.noOneUnderEighteen
 
-instance matchBiohazard :: Match "☣" E.Biohazard
+instance ematchRadioactive :: EMatch "☢" where
+  ematch _ = Right E.radioactive
 
-instance matchUpArrow :: Match "⬆" E.UpArrow
+instance ematchBiohazard :: EMatch "☣" where
+  ematch _ = Right E.biohazard
 
-instance matchUpRightArrow :: Match "↗" E.UpRightArrow
+instance ematchUpArrow :: EMatch "⬆" where
+  ematch _ = Right E.upArrow
 
-instance matchRightArrow :: Match "➡" E.RightArrow
+instance ematchUpRightArrow :: EMatch "↗" where
+  ematch _ = Right E.upRightArrow
 
-instance matchDownRightArrow :: Match "↘" E.DownRightArrow
+instance ematchRightArrow :: EMatch "➡" where
+  ematch _ = Right E.rightArrow
 
-instance matchDownArrow :: Match "⬇" E.DownArrow
+instance ematchDownRightArrow :: EMatch "↘" where
+  ematch _ = Right E.downRightArrow
 
-instance matchDownLeftArrow :: Match "↙" E.DownLeftArrow
+instance ematchDownArrow :: EMatch "⬇" where
+  ematch _ = Right E.downArrow
 
-instance matchLeftArrow :: Match "⬅" E.LeftArrow
+instance ematchDownLeftArrow :: EMatch "↙" where
+  ematch _ = Right E.downLeftArrow
 
-instance matchUpLeftArrow :: Match "↖" E.UpLeftArrow
+instance ematchLeftArrow :: EMatch "⬅" where
+  ematch _ = Right E.leftArrow
 
-instance matchUpDownArrow :: Match "↕" E.UpDownArrow
+instance ematchUpLeftArrow :: EMatch "↖" where
+  ematch _ = Right E.upLeftArrow
 
-instance matchLeftRightArrow :: Match "↔" E.LeftRightArrow
+instance ematchUpDownArrow :: EMatch "↕" where
+  ematch _ = Right E.upDownArrow
 
-instance matchRightArrowCurvingLeft :: Match "↩" E.RightArrowCurvingLeft
+instance ematchLeftRightArrow :: EMatch "↔" where
+  ematch _ = Right E.leftRightArrow
 
-instance matchLeftArrowCurvingRight :: Match "↪" E.LeftArrowCurvingRight
+instance ematchRightArrowCurvingLeft :: EMatch "↩" where
+  ematch _ = Right E.rightArrowCurvingLeft
 
-instance matchRightArrowCurvingUp :: Match "⤴" E.RightArrowCurvingUp
+instance ematchLeftArrowCurvingRight :: EMatch "↪" where
+  ematch _ = Right E.leftArrowCurvingRight
 
-instance matchRightArrowCurvingDown :: Match "⤵" E.RightArrowCurvingDown
+instance ematchRightArrowCurvingUp :: EMatch "⤴" where
+  ematch _ = Right E.rightArrowCurvingUp
 
-instance matchClockwiseVerticalArrows :: Match "🔃" E.ClockwiseVerticalArrows
+instance ematchRightArrowCurvingDown :: EMatch "⤵" where
+  ematch _ = Right E.rightArrowCurvingDown
 
-instance matchCounterclockwiseArrowsButton :: Match "🔄" E.CounterclockwiseArrowsButton
+instance ematchClockwiseVerticalArrows :: EMatch "🔃" where
+  ematch _ = Right E.clockwiseVerticalArrows
 
-instance matchBackArrow :: Match "🔙" E.BackArrow
+instance ematchCounterclockwiseArrowsButton :: EMatch "🔄" where
+  ematch _ = Right E.counterclockwiseArrowsButton
 
-instance matchEndArrow :: Match "🔚" E.EndArrow
+instance ematchBackArrow :: EMatch "🔙" where
+  ematch _ = Right E.backArrow
 
-instance matchOnArrow :: Match "🔛" E.OnArrow
+instance ematchEndArrow :: EMatch "🔚" where
+  ematch _ = Right E.endArrow
 
-instance matchSoonArrow :: Match "🔜" E.SoonArrow
+instance ematchOnArrow :: EMatch "🔛" where
+  ematch _ = Right E.onArrow
 
-instance matchTopArrow :: Match "🔝" E.TopArrow
+instance ematchSoonArrow :: EMatch "🔜" where
+  ematch _ = Right E.soonArrow
 
-instance matchPlaceOfWorship :: Match "🛐" E.PlaceOfWorship
+instance ematchTopArrow :: EMatch "🔝" where
+  ematch _ = Right E.topArrow
 
-instance matchAtomSymbol :: Match "⚛" E.AtomSymbol
+instance ematchPlaceOfWorship :: EMatch "🛐" where
+  ematch _ = Right E.placeOfWorship
 
-instance matchOm :: Match "🕉" E.Om
+instance ematchAtomSymbol :: EMatch "⚛" where
+  ematch _ = Right E.atomSymbol
 
-instance matchStarOfDavid :: Match "✡" E.StarOfDavid
+instance ematchOm :: EMatch "🕉" where
+  ematch _ = Right E.om
 
-instance matchWheelOfDharma :: Match "☸" E.WheelOfDharma
+instance ematchStarOfDavid :: EMatch "✡" where
+  ematch _ = Right E.starOfDavid
 
-instance matchYinYang :: Match "☯" E.YinYang
+instance ematchWheelOfDharma :: EMatch "☸" where
+  ematch _ = Right E.wheelOfDharma
 
-instance matchLatinCross :: Match "✝" E.LatinCross
+instance ematchYinYang :: EMatch "☯" where
+  ematch _ = Right E.yinYang
 
-instance matchOrthodoxCross :: Match "☦" E.OrthodoxCross
+instance ematchLatinCross :: EMatch "✝" where
+  ematch _ = Right E.latinCross
 
-instance matchStarAndCrescent :: Match "☪" E.StarAndCrescent
+instance ematchOrthodoxCross :: EMatch "☦" where
+  ematch _ = Right E.orthodoxCross
 
-instance matchPeaceSymbol :: Match "☮" E.PeaceSymbol
+instance ematchStarAndCrescent :: EMatch "☪" where
+  ematch _ = Right E.starAndCrescent
 
-instance matchMenorah :: Match "🕎" E.Menorah
+instance ematchPeaceSymbol :: EMatch "☮" where
+  ematch _ = Right E.peaceSymbol
 
-instance matchDottedSixPointedStar :: Match "🔯" E.DottedSixPointedStar
+instance ematchMenorah :: EMatch "🕎" where
+  ematch _ = Right E.menorah
 
-instance matchAries :: Match "♈" E.Aries
+instance ematchDottedSixPointedStar :: EMatch "🔯" where
+  ematch _ = Right E.dottedSixPointedStar
 
-instance matchTaurus :: Match "♉" E.Taurus
+instance ematchAries :: EMatch "♈" where
+  ematch _ = Right E.aries
 
-instance matchGemini :: Match "♊" E.Gemini
+instance ematchTaurus :: EMatch "♉" where
+  ematch _ = Right E.taurus
 
-instance matchCancer :: Match "♋" E.Cancer
+instance ematchGemini :: EMatch "♊" where
+  ematch _ = Right E.gemini
 
-instance matchLeo :: Match "♌" E.Leo
+instance ematchCancer :: EMatch "♋" where
+  ematch _ = Right E.cancer
 
-instance matchVirgo :: Match "♍" E.Virgo
+instance ematchLeo :: EMatch "♌" where
+  ematch _ = Right E.leo
 
-instance matchLibra :: Match "♎" E.Libra
+instance ematchVirgo :: EMatch "♍" where
+  ematch _ = Right E.virgo
 
-instance matchScorpio :: Match "♏" E.Scorpio
+instance ematchLibra :: EMatch "♎" where
+  ematch _ = Right E.libra
 
-instance matchSagittarius :: Match "♐" E.Sagittarius
+instance ematchScorpio :: EMatch "♏" where
+  ematch _ = Right E.scorpio
 
-instance matchCapricorn :: Match "♑" E.Capricorn
+instance ematchSagittarius :: EMatch "♐" where
+  ematch _ = Right E.sagittarius
 
-instance matchAquarius :: Match "♒" E.Aquarius
+instance ematchCapricorn :: EMatch "♑" where
+  ematch _ = Right E.capricorn
 
-instance matchPisces :: Match "♓" E.Pisces
+instance ematchAquarius :: EMatch "♒" where
+  ematch _ = Right E.aquarius
 
-instance matchOphiuchus :: Match "⛎" E.Ophiuchus
+instance ematchPisces :: EMatch "♓" where
+  ematch _ = Right E.pisces
 
-instance matchShuffleTracksButton :: Match "🔀" E.ShuffleTracksButton
+instance ematchOphiuchus :: EMatch "⛎" where
+  ematch _ = Right E.ophiuchus
 
-instance matchRepeatButton :: Match "🔁" E.RepeatButton
+instance ematchShuffleTracksButton :: EMatch "🔀" where
+  ematch _ = Right E.shuffleTracksButton
 
-instance matchRepeatSingleButton :: Match "🔂" E.RepeatSingleButton
+instance ematchRepeatButton :: EMatch "🔁" where
+  ematch _ = Right E.repeatButton
 
-instance matchPlayButton :: Match "▶" E.PlayButton
+instance ematchRepeatSingleButton :: EMatch "🔂" where
+  ematch _ = Right E.repeatSingleButton
 
-instance matchFastForwardButton :: Match "⏩" E.FastForwardButton
+instance ematchPlayButton :: EMatch "▶" where
+  ematch _ = Right E.playButton
 
-instance matchNextTrackButton :: Match "⏭" E.NextTrackButton
+instance ematchFastForwardButton :: EMatch "⏩" where
+  ematch _ = Right E.fastForwardButton
 
-instance matchPlayOrPauseButton :: Match "⏯" E.PlayOrPauseButton
+instance ematchNextTrackButton :: EMatch "⏭" where
+  ematch _ = Right E.nextTrackButton
 
-instance matchReverseButton :: Match "◀" E.ReverseButton
+instance ematchPlayOrPauseButton :: EMatch "⏯" where
+  ematch _ = Right E.playOrPauseButton
 
-instance matchFastReverseButton :: Match "⏪" E.FastReverseButton
+instance ematchReverseButton :: EMatch "◀" where
+  ematch _ = Right E.reverseButton
 
-instance matchLastTrackButton :: Match "⏮" E.LastTrackButton
+instance ematchFastReverseButton :: EMatch "⏪" where
+  ematch _ = Right E.fastReverseButton
 
-instance matchUpwardsButton :: Match "🔼" E.UpwardsButton
+instance ematchLastTrackButton :: EMatch "⏮" where
+  ematch _ = Right E.lastTrackButton
 
-instance matchFastUpButton :: Match "⏫" E.FastUpButton
+instance ematchUpwardsButton :: EMatch "🔼" where
+  ematch _ = Right E.upwardsButton
 
-instance matchDownwardsButton :: Match "🔽" E.DownwardsButton
+instance ematchFastUpButton :: EMatch "⏫" where
+  ematch _ = Right E.fastUpButton
 
-instance matchFastDownButton :: Match "⏬" E.FastDownButton
+instance ematchDownwardsButton :: EMatch "🔽" where
+  ematch _ = Right E.downwardsButton
 
-instance matchPauseButton :: Match "⏸" E.PauseButton
+instance ematchFastDownButton :: EMatch "⏬" where
+  ematch _ = Right E.fastDownButton
 
-instance matchStopButton :: Match "⏹" E.StopButton
+instance ematchPauseButton :: EMatch "⏸" where
+  ematch _ = Right E.pauseButton
 
-instance matchRecordButton :: Match "⏺" E.RecordButton
+instance ematchStopButton :: EMatch "⏹" where
+  ematch _ = Right E.stopButton
 
-instance matchEjectButton :: Match "⏏" E.EjectButton
+instance ematchRecordButton :: EMatch "⏺" where
+  ematch _ = Right E.recordButton
 
-instance matchCinema :: Match "🎦" E.Cinema
+instance ematchEjectButton :: EMatch "⏏" where
+  ematch _ = Right E.ejectButton
 
-instance matchDimButton :: Match "🔅" E.DimButton
+instance ematchCinema :: EMatch "🎦" where
+  ematch _ = Right E.cinema
 
-instance matchBrightButton :: Match "🔆" E.BrightButton
+instance ematchDimButton :: EMatch "🔅" where
+  ematch _ = Right E.dimButton
 
-instance matchAntennaBars :: Match "📶" E.AntennaBars
+instance ematchBrightButton :: EMatch "🔆" where
+  ematch _ = Right E.brightButton
 
-instance matchVibrationMode :: Match "📳" E.VibrationMode
+instance ematchAntennaBars :: EMatch "📶" where
+  ematch _ = Right E.antennaBars
 
-instance matchMobilePhoneOff :: Match "📴" E.MobilePhoneOff
+instance ematchVibrationMode :: EMatch "📳" where
+  ematch _ = Right E.vibrationMode
 
-instance matchFemaleSign :: Match "♀" E.FemaleSign
+instance ematchMobilePhoneOff :: EMatch "📴" where
+  ematch _ = Right E.mobilePhoneOff
 
-instance matchMaleSign :: Match "♂" E.MaleSign
+instance ematchFemaleSign :: EMatch "♀" where
+  ematch _ = Right E.femaleSign
 
-instance matchTransgenderSymbol :: Match "⚧" E.TransgenderSymbol
+instance ematchMaleSign :: EMatch "♂" where
+  ematch _ = Right E.maleSign
 
-instance matchMultiply :: Match "✖" E.Multiply
+instance ematchTransgenderSymbol :: EMatch "⚧" where
+  ematch _ = Right E.transgenderSymbol
 
-instance matchPlus :: Match "➕" E.Plus
+instance ematchMultiply :: EMatch "✖" where
+  ematch _ = Right E.multiply
 
-instance matchMinus :: Match "➖" E.Minus
+instance ematchPlus :: EMatch "➕" where
+  ematch _ = Right E.plus
 
-instance matchDivide :: Match "➗" E.Divide
+instance ematchMinus :: EMatch "➖" where
+  ematch _ = Right E.minus
 
-instance matchInfinity :: Match "♾" E.Infinity
+instance ematchDivide :: EMatch "➗" where
+  ematch _ = Right E.divide
 
-instance matchDoubleExclamationMark :: Match "‼" E.DoubleExclamationMark
+instance ematchInfinity :: EMatch "♾" where
+  ematch _ = Right E.infinity
 
-instance matchExclamationQuestionMark :: Match "⁉" E.ExclamationQuestionMark
+instance ematchDoubleExclamationMark :: EMatch "‼" where
+  ematch _ = Right E.doubleExclamationMark
 
-instance matchQuestionMark :: Match "❓" E.QuestionMark
+instance ematchExclamationQuestionMark :: EMatch "⁉" where
+  ematch _ = Right E.exclamationQuestionMark
 
-instance matchWhiteQuestionMark :: Match "❔" E.WhiteQuestionMark
+instance ematchQuestionMark :: EMatch "❓" where
+  ematch _ = Right E.questionMark
 
-instance matchWhiteExclamationMark :: Match "❕" E.WhiteExclamationMark
+instance ematchWhiteQuestionMark :: EMatch "❔" where
+  ematch _ = Right E.whiteQuestionMark
 
-instance matchExclamationMark :: Match "❗" E.ExclamationMark
+instance ematchWhiteExclamationMark :: EMatch "❕" where
+  ematch _ = Right E.whiteExclamationMark
 
-instance matchWavyDash :: Match "〰" E.WavyDash
+instance ematchExclamationMark :: EMatch "❗" where
+  ematch _ = Right E.exclamationMark
 
-instance matchCurrencyExchange :: Match "💱" E.CurrencyExchange
+instance ematchWavyDash :: EMatch "〰" where
+  ematch _ = Right E.wavyDash
 
-instance matchHeavyDollarSign :: Match "💲" E.HeavyDollarSign
+instance ematchCurrencyExchange :: EMatch "💱" where
+  ematch _ = Right E.currencyExchange
 
-instance matchMedicalSymbol :: Match "⚕" E.MedicalSymbol
+instance ematchHeavyDollarSign :: EMatch "💲" where
+  ematch _ = Right E.heavyDollarSign
 
-instance matchRecyclingSymbol :: Match "♻" E.RecyclingSymbol
+instance ematchMedicalSymbol :: EMatch "⚕" where
+  ematch _ = Right E.medicalSymbol
 
-instance matchFleurDeLis :: Match "⚜" E.FleurDeLis
+instance ematchRecyclingSymbol :: EMatch "♻" where
+  ematch _ = Right E.recyclingSymbol
 
-instance matchTridentEmblem :: Match "🔱" E.TridentEmblem
+instance ematchFleurDeLis :: EMatch "⚜" where
+  ematch _ = Right E.fleurDeLis
 
-instance matchNameBadge :: Match "📛" E.NameBadge
+instance ematchTridentEmblem :: EMatch "🔱" where
+  ematch _ = Right E.tridentEmblem
 
-instance matchJapaneseSymbolForBeginner :: Match "🔰" E.JapaneseSymbolForBeginner
+instance ematchNameBadge :: EMatch "📛" where
+  ematch _ = Right E.nameBadge
 
-instance matchHollowRedCircle :: Match "⭕" E.HollowRedCircle
+instance ematchJapaneseSymbolForBeginner :: EMatch "🔰" where
+  ematch _ = Right E.japaneseSymbolForBeginner
 
-instance matchCheckMarkButton :: Match "✅" E.CheckMarkButton
+instance ematchHollowRedCircle :: EMatch "⭕" where
+  ematch _ = Right E.hollowRedCircle
 
-instance matchCheckBoxWithCheck :: Match "☑" E.CheckBoxWithCheck
+instance ematchCheckMarkButton :: EMatch "✅" where
+  ematch _ = Right E.checkMarkButton
 
-instance matchCheckMark :: Match "✔" E.CheckMark
+instance ematchCheckBoxWithCheck :: EMatch "☑" where
+  ematch _ = Right E.checkBoxWithCheck
 
-instance matchCrossMark :: Match "❌" E.CrossMark
+instance ematchCheckMark :: EMatch "✔" where
+  ematch _ = Right E.checkMark
 
-instance matchCrossMarkButton :: Match "❎" E.CrossMarkButton
+instance ematchCrossMark :: EMatch "❌" where
+  ematch _ = Right E.crossMark
 
-instance matchCurlyLoop :: Match "➰" E.CurlyLoop
+instance ematchCrossMarkButton :: EMatch "❎" where
+  ematch _ = Right E.crossMarkButton
 
-instance matchDoubleCurlyLoop :: Match "➿" E.DoubleCurlyLoop
+instance ematchCurlyLoop :: EMatch "➰" where
+  ematch _ = Right E.curlyLoop
 
-instance matchPartAlternationMark :: Match "〽" E.PartAlternationMark
+instance ematchDoubleCurlyLoop :: EMatch "➿" where
+  ematch _ = Right E.doubleCurlyLoop
 
-instance matchEightSpokedAsterisk :: Match "✳" E.EightSpokedAsterisk
+instance ematchPartAlternationMark :: EMatch "〽" where
+  ematch _ = Right E.partAlternationMark
 
-instance matchEightPointedStar :: Match "✴" E.EightPointedStar
+instance ematchEightSpokedAsterisk :: EMatch "✳" where
+  ematch _ = Right E.eightSpokedAsterisk
 
-instance matchSparkle :: Match "❇" E.Sparkle
+instance ematchEightPointedStar :: EMatch "✴" where
+  ematch _ = Right E.eightPointedStar
 
-instance matchCopyright :: Match "©" E.Copyright
+instance ematchSparkle :: EMatch "❇" where
+  ematch _ = Right E.sparkle
 
-instance matchRegistered :: Match "®" E.Registered
+instance ematchCopyright :: EMatch "©" where
+  ematch _ = Right E.copyright
 
-instance matchTradeMark :: Match "™" E.TradeMark
+instance ematchRegistered :: EMatch "®" where
+  ematch _ = Right E.registered
 
-instance matchKeycap10 :: Match "🔟" E.Keycap10
+instance ematchTradeMark :: EMatch "™" where
+  ematch _ = Right E.tradeMark
 
-instance matchInputLatinUppercase :: Match "🔠" E.InputLatinUppercase
+instance ematchKeycap10 :: EMatch "🔟" where
+  ematch _ = Right E.keycap10
 
-instance matchInputLatinLowercase :: Match "🔡" E.InputLatinLowercase
+instance ematchInputLatinUppercase :: EMatch "🔠" where
+  ematch _ = Right E.inputLatinUppercase
 
-instance matchInputNumbers :: Match "🔢" E.InputNumbers
+instance ematchInputLatinLowercase :: EMatch "🔡" where
+  ematch _ = Right E.inputLatinLowercase
 
-instance matchInputSymbols :: Match "🔣" E.InputSymbols
+instance ematchInputNumbers :: EMatch "🔢" where
+  ematch _ = Right E.inputNumbers
 
-instance matchInputLatinLetters :: Match "🔤" E.InputLatinLetters
+instance ematchInputSymbols :: EMatch "🔣" where
+  ematch _ = Right E.inputSymbols
 
-instance matchAButtonBloodType :: Match "🅰" E.AButtonBloodType
+instance ematchInputLatinLetters :: EMatch "🔤" where
+  ematch _ = Right E.inputLatinLetters
 
-instance matchAbButtonBloodType :: Match "🆎" E.AbButtonBloodType
+instance ematchAButtonBloodType :: EMatch "🅰" where
+  ematch _ = Right E.aButtonBloodType
 
-instance matchBButtonBloodType :: Match "🅱" E.BButtonBloodType
+instance ematchAbButtonBloodType :: EMatch "🆎" where
+  ematch _ = Right E.abButtonBloodType
 
-instance matchClButton :: Match "🆑" E.ClButton
+instance ematchBButtonBloodType :: EMatch "🅱" where
+  ematch _ = Right E.bButtonBloodType
 
-instance matchCoolButton :: Match "🆒" E.CoolButton
+instance ematchClButton :: EMatch "🆑" where
+  ematch _ = Right E.clButton
 
-instance matchFreeButton :: Match "🆓" E.FreeButton
+instance ematchCoolButton :: EMatch "🆒" where
+  ematch _ = Right E.coolButton
 
-instance matchInformation :: Match "ℹ" E.Information
+instance ematchFreeButton :: EMatch "🆓" where
+  ematch _ = Right E.freeButton
 
-instance matchIdButton :: Match "🆔" E.IdButton
+instance ematchInformation :: EMatch "ℹ" where
+  ematch _ = Right E.information
 
-instance matchCircledM :: Match "Ⓜ" E.CircledM
+instance ematchIdButton :: EMatch "🆔" where
+  ematch _ = Right E.idButton
 
-instance matchNewButton :: Match "🆕" E.NewButton
+instance ematchCircledM :: EMatch "Ⓜ" where
+  ematch _ = Right E.circledM
 
-instance matchNgButton :: Match "🆖" E.NgButton
+instance ematchNewButton :: EMatch "🆕" where
+  ematch _ = Right E.newButton
 
-instance matchOButtonBloodType :: Match "🅾" E.OButtonBloodType
+instance ematchNgButton :: EMatch "🆖" where
+  ematch _ = Right E.ngButton
 
-instance matchOkButton :: Match "🆗" E.OkButton
+instance ematchOButtonBloodType :: EMatch "🅾" where
+  ematch _ = Right E.oButtonBloodType
 
-instance matchPButton :: Match "🅿" E.PButton
+instance ematchOkButton :: EMatch "🆗" where
+  ematch _ = Right E.okButton
 
-instance matchSosButton :: Match "🆘" E.SosButton
+instance ematchPButton :: EMatch "🅿" where
+  ematch _ = Right E.pButton
 
-instance matchUpButton :: Match "🆙" E.UpButton
+instance ematchSosButton :: EMatch "🆘" where
+  ematch _ = Right E.sosButton
 
-instance matchVsButton :: Match "🆚" E.VsButton
+instance ematchUpButton :: EMatch "🆙" where
+  ematch _ = Right E.upButton
 
-instance matchJapaneseHereButton :: Match "🈁" E.JapaneseHereButton
+instance ematchVsButton :: EMatch "🆚" where
+  ematch _ = Right E.vsButton
 
-instance matchJapaneseServiceChargeButton :: Match "🈂" E.JapaneseServiceChargeButton
+instance ematchJapaneseHereButton :: EMatch "🈁" where
+  ematch _ = Right E.japaneseHereButton
 
-instance matchJapaneseMonthlyAmountButton :: Match "🈷" E.JapaneseMonthlyAmountButton
+instance ematchJapaneseServiceChargeButton :: EMatch "🈂" where
+  ematch _ = Right E.japaneseServiceChargeButton
 
-instance matchJapaneseNotFreeOfChargeButton :: Match "🈶" E.JapaneseNotFreeOfChargeButton
+instance ematchJapaneseMonthlyAmountButton :: EMatch "🈷" where
+  ematch _ = Right E.japaneseMonthlyAmountButton
 
-instance matchJapaneseReservedButton :: Match "🈯" E.JapaneseReservedButton
+instance ematchJapaneseNotFreeOfChargeButton :: EMatch "🈶" where
+  ematch _ = Right E.japaneseNotFreeOfChargeButton
 
-instance matchJapaneseBargainButton :: Match "🉐" E.JapaneseBargainButton
+instance ematchJapaneseReservedButton :: EMatch "🈯" where
+  ematch _ = Right E.japaneseReservedButton
 
-instance matchJapaneseDiscountButton :: Match "🈹" E.JapaneseDiscountButton
+instance ematchJapaneseBargainButton :: EMatch "🉐" where
+  ematch _ = Right E.japaneseBargainButton
 
-instance matchJapaneseFreeOfChargeButton :: Match "🈚" E.JapaneseFreeOfChargeButton
+instance ematchJapaneseDiscountButton :: EMatch "🈹" where
+  ematch _ = Right E.japaneseDiscountButton
 
-instance matchJapaneseProhibitedButton :: Match "🈲" E.JapaneseProhibitedButton
+instance ematchJapaneseFreeOfChargeButton :: EMatch "🈚" where
+  ematch _ = Right E.japaneseFreeOfChargeButton
 
-instance matchJapaneseAcceptableButton :: Match "🉑" E.JapaneseAcceptableButton
+instance ematchJapaneseProhibitedButton :: EMatch "🈲" where
+  ematch _ = Right E.japaneseProhibitedButton
 
-instance matchJapaneseApplicationButton :: Match "🈸" E.JapaneseApplicationButton
+instance ematchJapaneseAcceptableButton :: EMatch "🉑" where
+  ematch _ = Right E.japaneseAcceptableButton
 
-instance matchJapanesePassingGradeButton :: Match "🈴" E.JapanesePassingGradeButton
+instance ematchJapaneseApplicationButton :: EMatch "🈸" where
+  ematch _ = Right E.japaneseApplicationButton
 
-instance matchJapaneseVacancyButton :: Match "🈳" E.JapaneseVacancyButton
+instance ematchJapanesePassingGradeButton :: EMatch "🈴" where
+  ematch _ = Right E.japanesePassingGradeButton
 
-instance matchJapaneseCongratulationsButton :: Match "㊗" E.JapaneseCongratulationsButton
+instance ematchJapaneseVacancyButton :: EMatch "🈳" where
+  ematch _ = Right E.japaneseVacancyButton
 
-instance matchJapaneseSecretButton :: Match "㊙" E.JapaneseSecretButton
+instance ematchJapaneseCongratulationsButton :: EMatch "㊗" where
+  ematch _ = Right E.japaneseCongratulationsButton
 
-instance matchJapaneseOpenForBusinessButton :: Match "🈺" E.JapaneseOpenForBusinessButton
+instance ematchJapaneseSecretButton :: EMatch "㊙" where
+  ematch _ = Right E.japaneseSecretButton
 
-instance matchJapaneseNoVacancyButton :: Match "🈵" E.JapaneseNoVacancyButton
+instance ematchJapaneseOpenForBusinessButton :: EMatch "🈺" where
+  ematch _ = Right E.japaneseOpenForBusinessButton
 
-instance matchRedCircle :: Match "🔴" E.RedCircle
+instance ematchJapaneseNoVacancyButton :: EMatch "🈵" where
+  ematch _ = Right E.japaneseNoVacancyButton
 
-instance matchOrangeCircle :: Match "🟠" E.OrangeCircle
+instance ematchRedCircle :: EMatch "🔴" where
+  ematch _ = Right E.redCircle
 
-instance matchYellowCircle :: Match "🟡" E.YellowCircle
+instance ematchOrangeCircle :: EMatch "🟠" where
+  ematch _ = Right E.orangeCircle
 
-instance matchGreenCircle :: Match "🟢" E.GreenCircle
+instance ematchYellowCircle :: EMatch "🟡" where
+  ematch _ = Right E.yellowCircle
 
-instance matchBlueCircle :: Match "🔵" E.BlueCircle
+instance ematchGreenCircle :: EMatch "🟢" where
+  ematch _ = Right E.greenCircle
 
-instance matchPurpleCircle :: Match "🟣" E.PurpleCircle
+instance ematchBlueCircle :: EMatch "🔵" where
+  ematch _ = Right E.blueCircle
 
-instance matchBrownCircle :: Match "🟤" E.BrownCircle
+instance ematchPurpleCircle :: EMatch "🟣" where
+  ematch _ = Right E.purpleCircle
 
-instance matchBlackCircle :: Match "⚫" E.BlackCircle
+instance ematchBrownCircle :: EMatch "🟤" where
+  ematch _ = Right E.brownCircle
 
-instance matchWhiteCircle :: Match "⚪" E.WhiteCircle
+instance ematchBlackCircle :: EMatch "⚫" where
+  ematch _ = Right E.blackCircle
 
-instance matchRedSquare :: Match "🟥" E.RedSquare
+instance ematchWhiteCircle :: EMatch "⚪" where
+  ematch _ = Right E.whiteCircle
 
-instance matchOrangeSquare :: Match "🟧" E.OrangeSquare
+instance ematchRedSquare :: EMatch "🟥" where
+  ematch _ = Right E.redSquare
 
-instance matchYellowSquare :: Match "🟨" E.YellowSquare
+instance ematchOrangeSquare :: EMatch "🟧" where
+  ematch _ = Right E.orangeSquare
 
-instance matchGreenSquare :: Match "🟩" E.GreenSquare
+instance ematchYellowSquare :: EMatch "🟨" where
+  ematch _ = Right E.yellowSquare
 
-instance matchBlueSquare :: Match "🟦" E.BlueSquare
+instance ematchGreenSquare :: EMatch "🟩" where
+  ematch _ = Right E.greenSquare
 
-instance matchPurpleSquare :: Match "🟪" E.PurpleSquare
+instance ematchBlueSquare :: EMatch "🟦" where
+  ematch _ = Right E.blueSquare
 
-instance matchBrownSquare :: Match "🟫" E.BrownSquare
+instance ematchPurpleSquare :: EMatch "🟪" where
+  ematch _ = Right E.purpleSquare
 
-instance matchBlackLargeSquare :: Match "⬛" E.BlackLargeSquare
+instance ematchBrownSquare :: EMatch "🟫" where
+  ematch _ = Right E.brownSquare
 
-instance matchWhiteLargeSquare :: Match "⬜" E.WhiteLargeSquare
+instance ematchBlackLargeSquare :: EMatch "⬛" where
+  ematch _ = Right E.blackLargeSquare
 
-instance matchBlackMediumSquare :: Match "◼" E.BlackMediumSquare
+instance ematchWhiteLargeSquare :: EMatch "⬜" where
+  ematch _ = Right E.whiteLargeSquare
 
-instance matchWhiteMediumSquare :: Match "◻" E.WhiteMediumSquare
+instance ematchBlackMediumSquare :: EMatch "◼" where
+  ematch _ = Right E.blackMediumSquare
 
-instance matchBlackMediumSmallSquare :: Match "◾" E.BlackMediumSmallSquare
+instance ematchWhiteMediumSquare :: EMatch "◻" where
+  ematch _ = Right E.whiteMediumSquare
 
-instance matchWhiteMediumSmallSquare :: Match "◽" E.WhiteMediumSmallSquare
+instance ematchBlackMediumSmallSquare :: EMatch "◾" where
+  ematch _ = Right E.blackMediumSmallSquare
 
-instance matchBlackSmallSquare :: Match "▪" E.BlackSmallSquare
+instance ematchWhiteMediumSmallSquare :: EMatch "◽" where
+  ematch _ = Right E.whiteMediumSmallSquare
 
-instance matchWhiteSmallSquare :: Match "▫" E.WhiteSmallSquare
+instance ematchBlackSmallSquare :: EMatch "▪" where
+  ematch _ = Right E.blackSmallSquare
 
-instance matchLargeOrangeDiamond :: Match "🔶" E.LargeOrangeDiamond
+instance ematchWhiteSmallSquare :: EMatch "▫" where
+  ematch _ = Right E.whiteSmallSquare
 
-instance matchLargeBlueDiamond :: Match "🔷" E.LargeBlueDiamond
+instance ematchLargeOrangeDiamond :: EMatch "🔶" where
+  ematch _ = Right E.largeOrangeDiamond
 
-instance matchSmallOrangeDiamond :: Match "🔸" E.SmallOrangeDiamond
+instance ematchLargeBlueDiamond :: EMatch "🔷" where
+  ematch _ = Right E.largeBlueDiamond
 
-instance matchSmallBlueDiamond :: Match "🔹" E.SmallBlueDiamond
+instance ematchSmallOrangeDiamond :: EMatch "🔸" where
+  ematch _ = Right E.smallOrangeDiamond
 
-instance matchRedTrianglePointedUp :: Match "🔺" E.RedTrianglePointedUp
+instance ematchSmallBlueDiamond :: EMatch "🔹" where
+  ematch _ = Right E.smallBlueDiamond
 
-instance matchRedTrianglePointedDown :: Match "🔻" E.RedTrianglePointedDown
+instance ematchRedTrianglePointedUp :: EMatch "🔺" where
+  ematch _ = Right E.redTrianglePointedUp
 
-instance matchDiamondWithADot :: Match "💠" E.DiamondWithADot
+instance ematchRedTrianglePointedDown :: EMatch "🔻" where
+  ematch _ = Right E.redTrianglePointedDown
 
-instance matchRadioButton :: Match "🔘" E.RadioButton
+instance ematchDiamondWithADot :: EMatch "💠" where
+  ematch _ = Right E.diamondWithADot
 
-instance matchWhiteSquareButton :: Match "🔳" E.WhiteSquareButton
+instance ematchRadioButton :: EMatch "🔘" where
+  ematch _ = Right E.radioButton
 
-instance matchBlackSquareButton :: Match "🔲" E.BlackSquareButton
+instance ematchWhiteSquareButton :: EMatch "🔳" where
+  ematch _ = Right E.whiteSquareButton
 
-instance matchChequeredFlag :: Match "🏁" E.ChequeredFlag
+instance ematchBlackSquareButton :: EMatch "🔲" where
+  ematch _ = Right E.blackSquareButton
 
-instance matchTriangularFlag :: Match "🚩" E.TriangularFlag
+instance ematchChequeredFlag :: EMatch "🏁" where
+  ematch _ = Right E.chequeredFlag
 
-instance matchCrossedFlags :: Match "🎌" E.CrossedFlags
+instance ematchTriangularFlag :: EMatch "🚩" where
+  ematch _ = Right E.triangularFlag
 
-instance matchBlackFlag :: Match "🏴" E.BlackFlag
+instance ematchCrossedFlags :: EMatch "🎌" where
+  ematch _ = Right E.crossedFlags
 
-instance matchWhiteFlag :: Match "🏳" E.WhiteFlag
+instance ematchBlackFlag :: EMatch "🏴" where
+  ematch _ = Right E.blackFlag
+
+instance ematchWhiteFlag :: EMatch "🏳" where
+  ematch _ = Right E.whiteFlag
