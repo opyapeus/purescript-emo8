@@ -28,23 +28,23 @@ import Prim.Row as R
 import Record as Record
 
 getMap ::
-  forall dr sr dr'.
-  Newtype dr { | dr' } =>
-  ({ | dr' } -> EmojiMap) -> Update dr sr EmojiMap
+  forall dt st dr.
+  Newtype dt { | dr } =>
+  ({ | dr } -> EmojiMap) -> Update dt st EmojiMap
 getMap f = pure <<< f <<< unwrap =<< getDraw
 
 getMapAll ::
-  forall dr sr dr'.
-  Newtype dr { | dr' } =>
-  Update dr sr { | dr' }
+  forall dt st dr.
+  Newtype dt { | dr } =>
+  Update dt st { | dr }
 getMapAll = pure <<< unwrap =<< getDraw
 
 setMap ::
-  forall dr sr dr' s tail.
-  Newtype dr { | dr' } =>
+  forall dt st dr s tail.
+  Newtype dt { | dr } =>
   IsSymbol s =>
-  R.Cons s EmojiMap tail dr' =>
-  SProxy s -> EmojiMap -> Update dr sr Unit
+  R.Cons s EmojiMap tail dr =>
+  SProxy s -> EmojiMap -> Update dt st Unit
 setMap _ m = do
   d <- getDraw
   let
@@ -52,17 +52,17 @@ setMap _ m = do
   putDraw $ mapN f d
 
 setMapAll ::
-  forall dr sr dr'.
-  Newtype dr { | dr' } =>
-  { | dr' } -> Update dr sr Unit
+  forall dt st dr.
+  Newtype dt { | dr } =>
+  { | dr } -> Update dt st Unit
 setMapAll = putDraw <<< wrap
 
 modMap ::
-  forall dr sr dr' s tail.
-  Newtype dr { | dr' } =>
+  forall dt st dr s tail.
+  Newtype dt { | dr } =>
   IsSymbol s =>
-  R.Cons s EmojiMap tail dr' =>
-  SProxy s -> (EmojiMap -> EmojiMap) -> Update dr sr Unit
+  R.Cons s EmojiMap tail dr =>
+  SProxy s -> (EmojiMap -> EmojiMap) -> Update dt st Unit
 modMap _ f = do
   d <- getDraw
   let
@@ -70,29 +70,29 @@ modMap _ f = do
   putDraw $ mapN f' d
 
 modMapAll ::
-  forall dr sr dr'.
-  Newtype dr { | dr' } =>
-  ({ | dr' } -> { | dr' }) -> Update dr sr Unit
+  forall dt st dr.
+  Newtype dt { | dr } =>
+  ({ | dr } -> { | dr }) -> Update dt st Unit
 modMapAll f = putDraw <<< mapN f =<< getDraw
 
 getScore ::
-  forall dr sr sr'.
-  Newtype sr { | sr' } =>
-  ({ | sr' } -> Score) -> Update dr sr Score
+  forall dt st sr.
+  Newtype st { | sr } =>
+  ({ | sr } -> Score) -> Update dt st Score
 getScore f = pure <<< f <<< unwrap =<< getSound
 
 getScoreAll ::
-  forall dr sr sr'.
-  Newtype sr { | sr' } =>
-  Update dr sr { | sr' }
+  forall dt st sr.
+  Newtype st { | sr } =>
+  Update dt st { | sr }
 getScoreAll = pure <<< unwrap =<< getSound
 
 setScore ::
-  forall dr sr sr' s tail.
-  Newtype sr { | sr' } =>
+  forall dt st sr s tail.
+  Newtype st { | sr } =>
   IsSymbol s =>
-  R.Cons s Score tail sr' =>
-  SProxy s -> Score -> Update dr sr Unit
+  R.Cons s Score tail sr =>
+  SProxy s -> Score -> Update dt st Unit
 setScore _ m = do
   d <- getSound
   let
@@ -100,17 +100,17 @@ setScore _ m = do
   putSound $ mapN f d
 
 setScoreAll ::
-  forall dr sr sr'.
-  Newtype sr { | sr' } =>
-  { | sr' } -> Update dr sr Unit
+  forall dt st sr.
+  Newtype st { | sr } =>
+  { | sr } -> Update dt st Unit
 setScoreAll = putSound <<< wrap
 
 modScore ::
-  forall dr sr sr' s tail.
-  Newtype sr { | sr' } =>
+  forall dt st sr s tail.
+  Newtype st { | sr } =>
   IsSymbol s =>
-  R.Cons s Score tail sr' =>
-  SProxy s -> (Score -> Score) -> Update dr sr Unit
+  R.Cons s Score tail sr =>
+  SProxy s -> (Score -> Score) -> Update dt st Unit
 modScore _ f = do
   d <- getSound
   let
@@ -118,26 +118,26 @@ modScore _ f = do
   putSound $ mapN f' d
 
 modScoreAll ::
-  forall dr sr sr'.
-  Newtype sr { | sr' } =>
-  ({ | sr' } -> { | sr' }) -> Update dr sr Unit
+  forall dt st sr.
+  Newtype st { | sr } =>
+  ({ | sr } -> { | sr }) -> Update dt st Unit
 modScoreAll f = putSound <<< mapN f =<< getSound
 
 ---
-isOutOfCanvas :: forall dr sr. Size -> X -> Y -> Update dr sr Boolean
+isOutOfCanvas :: forall dt st. Size -> X -> Y -> Update dt st Boolean
 isOutOfCanvas size x y = do
   conf <- getConfig
   pure $ C.isOutOfCanvas conf.canvasSize size x y
 
-isCollideCanvas :: forall dr sr. Size -> X -> Y -> Update dr sr Boolean
+isCollideCanvas :: forall dt st. Size -> X -> Y -> Update dt st Boolean
 isCollideCanvas size x y = do
   conf <- getConfig
   pure $ C.isCollideCanvas conf.canvasSize size x y
 
 isCollideMap ::
-  forall dr sr dr'.
-  Newtype dr { | dr' } =>
-  ({ | dr' } -> EmojiMap) -> Size -> Walls -> Size -> X -> Y -> Update dr sr Boolean
+  forall dt st dr.
+  Newtype dt { | dr } =>
+  ({ | dr } -> EmojiMap) -> Size -> Walls -> Size -> X -> Y -> Update dt st Boolean
 isCollideMap f ms walls size x y = do
   m <- getMap f
   pure $ C.isCollideMap m ms walls size x y

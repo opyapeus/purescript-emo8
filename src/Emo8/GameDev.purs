@@ -20,10 +20,10 @@ import Foreign (MultipleErrors)
 import Foreign.Generic (class Decode, class Encode, decodeJSON, encodeJSON)
 
 class
-  ( Game s dr sr
+  ( Game s dt st
   , Encode s
   , Decode s
-  ) <= GameDev s dr sr | s -> dr sr where
+  ) <= GameDev s dt st | s -> dt st where
   saveLocal :: s -> L.List LocalKey
 
 data LoadError
@@ -34,14 +34,14 @@ instance showLoadError :: Show LoadError where
   show (DecodeError es) = show es
   show (KeyNotFoundError s) = show s
 
-saveState :: forall s dr sr. GameDev s dr sr => s -> Effect Unit
+saveState :: forall s dt st. GameDev s dt st => s -> Effect Unit
 saveState s = for_ keys \k -> setItem k json
   where
   keys = saveLocal s
 
   json = encodeJSON s
 
-loadStateWithDefault :: forall s dr sr. GameDev s dr sr => s -> LocalKey -> Effect s
+loadStateWithDefault :: forall s dt st. GameDev s dt st => s -> LocalKey -> Effect s
 loadStateWithDefault s key = do
   es <- loadState key
   case es of
@@ -54,7 +54,7 @@ loadStateWithDefault s key = do
         KeyNotFoundError e -> log e
       pure s
 
-loadState :: forall s dr sr. GameDev s dr sr => LocalKey -> Effect (Either LoadError s)
+loadState :: forall s dt st. GameDev s dt st => LocalKey -> Effect (Either LoadError s)
 loadState key = do
   mJson <- getItem key
   pure

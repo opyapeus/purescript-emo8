@@ -34,37 +34,37 @@ import Signal (foldp, runSignal, sampleOn)
 import Signal.DOM (animationFrame)
 
 emo8 ::
-  forall s dr sr.
-  Game s dr sr =>
-  s -> dr -> sr -> Config -> Effect Unit
+  forall s dt st.
+  Game s dt st =>
+  s -> dt -> st -> Config -> Effect Unit
 emo8 = emo8F run
 
 emo8Dev ::
-  forall s dr sr.
-  GameDev s dr sr =>
-  s -> dr -> sr -> Config -> Effect Unit
+  forall s dt st.
+  GameDev s dt st =>
+  s -> dt -> st -> Config -> Effect Unit
 emo8Dev = emo8F runDev
 
 emo8F ::
-  forall s dr sr.
-  Game s dr sr =>
-  (CanvasElement -> s -> dr -> sr -> Config -> Effect Unit) ->
-  s -> dr -> sr -> Config -> Effect Unit
-emo8F f s r sr conf = do
+  forall s dt st.
+  Game s dt st =>
+  (CanvasElement -> s -> dt -> st -> Config -> Effect Unit) ->
+  s -> dt -> st -> Config -> Effect Unit
+emo8F f s dr sr conf = do
   mc <- getCanvasElementById canvasId
   case mc of
     Nothing -> error "no canvas"
     Just c -> do
       setCanvasWidth c (toNumber conf.canvasSize.width)
       setCanvasHeight c (toNumber conf.canvasSize.height)
-      f c s r sr conf
+      f c s dr sr conf
   where
   canvasId = "emo8"
 
 run ::
-  forall s dr sr.
-  Game s dr sr =>
-  CanvasElement -> s -> dr -> sr -> Config -> Effect Unit
+  forall s dt st.
+  Game s dt st =>
+  CanvasElement -> s -> dt -> st -> Config -> Effect Unit
 run c state dr sr conf = do
   dctx <- getContext2D c
   sctx <- newAudioContext
@@ -107,9 +107,9 @@ run c state dr sr conf = do
         biStateSig
 
 runDev ::
-  forall s dr sr.
-  GameDev s dr sr =>
-  CanvasElement -> s -> dr -> sr -> Config -> Effect Unit
+  forall s dt st.
+  GameDev s dt st =>
+  CanvasElement -> s -> dt -> st -> Config -> Effect Unit
 runDev c state dr sr conf = do
   dctx <- getContext2D c
   sctx <- newAudioContext
@@ -134,19 +134,19 @@ runDev c state dr sr conf = do
   devF (Tuple s _) = saveState s
 
 updateF ::
-  forall s dr sr.
-  Game s dr sr =>
-  Input -> StateRes s dr sr -> StateRes s dr sr
+  forall s dt st.
+  Game s dt st =>
+  Input -> StateRes s dt st -> StateRes s dt st
 updateF i (Tuple s r) = runUpdate (update i s) r
 
 drawF ::
-  forall s dr sr.
-  Game s dr sr =>
-  Context2D -> Config -> StateRes s dr sr -> Effect Unit
+  forall s dt st.
+  Game s dt st =>
+  Context2D -> Config -> StateRes s dt st -> Effect Unit
 drawF ctx conf (Tuple s (Resource r)) = runDraw (draw s) { ctx: ctx, resource: r.draw, canvasSize: conf.canvasSize }
 
 soundF ::
-  forall s dr sr.
-  Game s dr sr =>
-  AudioContext -> Ref (Map.Map Score (L.List OscillatorNode)) -> StateRes s dr sr -> Effect Unit
+  forall s dt st.
+  Game s dt st =>
+  AudioContext -> Ref (Map.Map Score (L.List OscillatorNode)) -> StateRes s dt st -> Effect Unit
 soundF ctx ref (Tuple s (Resource r)) = runSound (sound s) { ctx: ctx, resource: r.sound, ref: ref }

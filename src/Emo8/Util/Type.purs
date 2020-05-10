@@ -5,5 +5,5 @@ module Emo8.Util.Type
 import Data.Tuple (Tuple)
 import Emo8.Data.Update (Resource)
 
-type StateRes s sr dr
-  = Tuple s (Resource sr dr)
+type StateRes s dt st
+  = Tuple s (Resource dt st)

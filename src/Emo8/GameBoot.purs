@@ -27,7 +27,7 @@ import Emo8.Util.Resource (EmptyMap)
 import Math (cos, pi, sin)
 
 class
-  Game s dr sr <= GameBoot s dr sr | s -> dr sr where
+  Game s dt st <= GameBoot s dt st | s -> dt st where
   finished :: s -> Boolean
 
 data State

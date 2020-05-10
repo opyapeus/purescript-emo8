@@ -30,21 +30,21 @@ import Emo8.Parser.Type (Score)
 import Emo8.Type (Tempo)
 import Emo8.Util.List (zipWithMaybeA)
 
-type Sound' r
-  = Sound (SoundContext r)
+type Sound' st
+  = Sound (SoundContext st)
 
 -- REVIEW: State instead of Ref?
-type SoundContext r
+type SoundContext st
   = { ctx :: AudioContext
-    , resource :: r
+    , resource :: st
     , ref :: Ref.Ref (Map.Map Score (L.List OscillatorNode))
     }
 
 -- TODO: Map key type
 play ::
-  forall r r'.
-  Newtype r { | r' } =>
-  ({ | r' } -> Score) -> Tone -> Tempo -> Sound' r Unit
+  forall st sr.
+  Newtype st { | sr } =>
+  ({ | sr } -> Score) -> Tone -> Tempo -> Sound' st Unit
 play f tone tempo = do
   r <- Reader.ask
   let
@@ -96,17 +96,17 @@ play f tone tempo = do
   maxNotes = fromMaybe L.Nil <<< maximum
 
 play' ::
-  forall r r'.
-  Newtype r { | r' } =>
-  ({ | r' } -> Score) -> Tone -> Tempo -> Sound' r Unit
+  forall st sr.
+  Newtype st { | sr } =>
+  ({ | sr } -> Score) -> Tone -> Tempo -> Sound' st Unit
 play' f tone tempo = do
   stop f
   play f tone tempo
 
 stop ::
-  forall r r'.
-  Newtype r { | r' } =>
-  ({ | r' } -> Score) -> Sound' r Unit
+  forall st sr.
+  Newtype st { | sr } =>
+  ({ | sr } -> Score) -> Sound' st Unit
 stop f = do
   r <- Reader.ask
   let

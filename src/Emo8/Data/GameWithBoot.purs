@@ -17,12 +17,12 @@ instance bifunctorGameWithBoot :: Bifunctor GameWithBoot where
   bimap f g (GameWithBoot a b) = GameWithBoot (f a) (g b)
 
 switchOp ::
-  forall s dr sr s' dr' sr'.
-  Game s dr sr =>
-  GameBoot s' dr' sr' =>
-  (StateRes s dr sr -> Effect Unit) ->
-  (StateRes s' dr' sr' -> Effect Unit) ->
-  Signal (GameWithBoot (StateRes s dr sr) (StateRes s' dr' sr')) -> Signal (Effect Unit)
+  forall s dt st s' dt' st'.
+  Game s dt st =>
+  GameBoot s' dt' st' =>
+  (StateRes s dt st -> Effect Unit) ->
+  (StateRes s' dt' st' -> Effect Unit) ->
+  Signal (GameWithBoot (StateRes s dt st) (StateRes s' dt' st')) -> Signal (Effect Unit)
 switchOp op op' =
   map \(GameWithBoot st st'@(Tuple s' _)) ->
     if finished s' then
@@ -31,12 +31,12 @@ switchOp op op' =
       op' st'
 
 switchFoldOp ::
-  forall s dr sr s' dr' sr'.
-  Game s dr sr =>
-  GameBoot s' dr' sr' =>
-  (Input -> StateRes s dr sr -> StateRes s dr sr) ->
-  (Input -> StateRes s' dr' sr' -> StateRes s' dr' sr') ->
-  Input -> GameWithBoot (StateRes s dr sr) (StateRes s' dr' sr') -> GameWithBoot (StateRes s dr sr) (StateRes s' dr' sr')
+  forall s dt st s' dt' st'.
+  Game s dt st =>
+  GameBoot s' dt' st' =>
+  (Input -> StateRes s dt st -> StateRes s dt st) ->
+  (Input -> StateRes s' dt' st' -> StateRes s' dt' st') ->
+  Input -> GameWithBoot (StateRes s dt st) (StateRes s' dt' st') -> GameWithBoot (StateRes s dt st) (StateRes s' dt' st')
 switchFoldOp op op' i st@(GameWithBoot _ (Tuple s' _)) =
   if finished s' then
     lmap (op i) st

@@ -9,24 +9,24 @@ import Data.Newtype (class Newtype, unwrap)
 import Effect (Effect)
 import Effect.Class (class MonadEffect)
 
-newtype Sound r a
-  = Sound (ReaderT r Effect a)
+newtype Sound st a
+  = Sound (ReaderT st Effect a)
 
-derive instance newtypeSound :: Newtype (Sound r a) _
+derive instance newtypeSound :: Newtype (Sound st a) _
 
-derive newtype instance functorSound :: Functor (Sound r)
+derive newtype instance functorSound :: Functor (Sound st)
 
-derive newtype instance applySound :: Apply (Sound r)
+derive newtype instance applySound :: Apply (Sound st)
 
-derive newtype instance applicativeSound :: Applicative (Sound r)
+derive newtype instance applicativeSound :: Applicative (Sound st)
 
-derive newtype instance bindSound :: Bind (Sound r)
+derive newtype instance bindSound :: Bind (Sound st)
 
-derive newtype instance monadSound :: Monad (Sound r)
+derive newtype instance monadSound :: Monad (Sound st)
 
-derive newtype instance monadAskSound :: MonadAsk r (Sound r)
+derive newtype instance monadAskSound :: MonadAsk st (Sound st)
 
-derive newtype instance monadEffectSound :: MonadEffect (Sound r)
+derive newtype instance monadEffectSound :: MonadEffect (Sound st)
 
-runSound :: forall r a. Sound r a -> r -> Effect a
+runSound :: forall st a. Sound st a -> st -> Effect a
 runSound = runReaderT <<< unwrap

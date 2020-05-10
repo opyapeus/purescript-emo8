@@ -15,54 +15,54 @@ import Data.Newtype (class Newtype, unwrap)
 import Data.Tuple (Tuple)
 import Emo8.Type (Config)
 
-newtype Update dr sr a
-  = Update (State (Resource dr sr) a)
+newtype Update dt st a
+  = Update (State (Resource dt st) a)
 
-derive instance newtypeUpdate :: Newtype (Update dr sr a) _
+derive instance newtypeUpdate :: Newtype (Update dt st a) _
 
-derive newtype instance functorUpdate :: Functor (Update dr sr)
+derive newtype instance functorUpdate :: Functor (Update dt st)
 
-derive newtype instance applyUpdate :: Apply (Update dr sr)
+derive newtype instance applyUpdate :: Apply (Update dt st)
 
-derive newtype instance applicativeUpdate :: Applicative (Update dr sr)
+derive newtype instance applicativeUpdate :: Applicative (Update dt st)
 
-derive newtype instance bindUpdate :: Bind (Update dr sr)
+derive newtype instance bindUpdate :: Bind (Update dt st)
 
-derive newtype instance monadUpdate :: Monad (Update dr sr)
+derive newtype instance monadUpdate :: Monad (Update dt st)
 
-derive newtype instance monadStateUpdate :: MonadState (Resource dr sr) (Update dr sr)
+derive newtype instance monadStateUpdate :: MonadState (Resource dt st) (Update dt st)
 
-runUpdate :: forall dr sr s. Update dr sr s -> (Resource dr sr) -> Tuple s (Resource dr sr)
+runUpdate :: forall dt st s. Update dt st s -> (Resource dt st) -> Tuple s (Resource dt st)
 runUpdate = runState <<< unwrap
 
-newtype Resource dr sr
+newtype Resource dt st
   = Resource
-  { draw :: dr
-  , sound :: sr
+  { draw :: dt
+  , sound :: st
   , config :: Config
   }
 
-getDraw :: forall dr sr. Update dr sr dr
+getDraw :: forall dt st. Update dt st dt
 getDraw = do
   Resource r <- get
   pure r.draw
 
-putDraw :: forall dr sr. dr -> Update dr sr Unit
+putDraw :: forall dt st. dt -> Update dt st Unit
 putDraw d = do
   Resource r <- get
   put <<< Resource $ r { draw = d }
 
-getSound :: forall dr sr. Update dr sr sr
+getSound :: forall dt st. Update dt st st
 getSound = do
   Resource r <- get
   pure r.sound
 
-putSound :: forall dr sr. sr -> Update dr sr Unit
+putSound :: forall dt st. st -> Update dt st Unit
 putSound s = do
   Resource r <- get
   put <<< Resource $ r { sound = s }
 
-getConfig :: forall dr sr. Update dr sr Config
+getConfig :: forall dt st. Update dt st Config
 getConfig = do
   Resource r <- get
   pure r.config

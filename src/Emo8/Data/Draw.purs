@@ -9,24 +9,24 @@ import Data.Newtype (class Newtype, unwrap)
 import Effect (Effect)
 import Effect.Class (class MonadEffect)
 
-newtype Draw r a
-  = Draw (ReaderT r Effect a)
+newtype Draw dt a
+  = Draw (ReaderT dt Effect a)
 
-derive instance newtypeDraw :: Newtype (Draw r a) _
+derive instance newtypeDraw :: Newtype (Draw dt a) _
 
-derive newtype instance functorDraw :: Functor (Draw r)
+derive newtype instance functorDraw :: Functor (Draw dt)
 
-derive newtype instance applyDraw :: Apply (Draw r)
+derive newtype instance applyDraw :: Apply (Draw dt)
 
-derive newtype instance applicativeDraw :: Applicative (Draw r)
+derive newtype instance applicativeDraw :: Applicative (Draw dt)
 
-derive newtype instance bindDraw :: Bind (Draw r)
+derive newtype instance bindDraw :: Bind (Draw dt)
 
-derive newtype instance monadDraw :: Monad (Draw r)
+derive newtype instance monadDraw :: Monad (Draw dt)
 
-derive newtype instance monadAskDraw :: MonadAsk r (Draw r)
+derive newtype instance monadAskDraw :: MonadAsk dt (Draw dt)
 
-derive newtype instance monadEffectDraw :: MonadEffect (Draw r)
+derive newtype instance monadEffectDraw :: MonadEffect (Draw dt)
 
-runDraw :: forall r a. Draw r a -> r -> Effect a
+runDraw :: forall dt a. Draw dt a -> dt -> Effect a
 runDraw = runReaderT <<< unwrap

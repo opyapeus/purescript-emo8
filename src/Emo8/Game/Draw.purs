@@ -26,16 +26,16 @@ import Emo8.Type (Rect, Size, X, Y, Angle)
 import Graphics.Canvas (Context2D, fillRect, fillText, restore, rotate, save, scale, setFillStyle, setFont, translate)
 import Math (pi)
 
-type Draw' r
-  = Draw (DrawContext r)
+type Draw' dt
+  = Draw (DrawContext dt)
 
-type DrawContext r
+type DrawContext dt
   = { ctx :: Context2D
-    , resource :: r
+    , resource :: dt
     , canvasSize :: Rect
     }
 
-cls :: forall r. Color -> Draw' r Unit
+cls :: forall dt. Color -> Draw' dt Unit
 cls c = do
   r <- Reader.ask
   localDraw r.ctx \ctx -> do
@@ -47,7 +47,7 @@ cls c = do
       , height: toNumber r.canvasSize.height
       }
 
-emo :: forall r. Emoji -> Size -> X -> Y -> Draw' r Unit
+emo :: forall dt. Emoji -> Size -> X -> Y -> Draw' dt Unit
 emo e size x y = do
   r <- Reader.ask
   let
@@ -60,7 +60,7 @@ emo e size x y = do
 
   x' = toNumber x
 
-emo' :: forall r. Emoji -> Size -> X -> Y -> Draw' r Unit
+emo' :: forall dt. Emoji -> Size -> X -> Y -> Draw' dt Unit
 emo' e size x y = do
   r <- Reader.ask
   let
@@ -77,7 +77,7 @@ emo' e size x y = do
 
   x' = toNumber x
 
-emor :: forall r. Angle -> Emoji -> Size -> X -> Y -> Draw' r Unit
+emor :: forall dt. Angle -> Emoji -> Size -> X -> Y -> Draw' dt Unit
 emor deg e size x y = do
   r <- Reader.ask
   let
@@ -96,7 +96,7 @@ emor deg e size x y = do
 
   rad = 2.0 * pi * toNumber deg / 360.0
 
-emor' :: forall r. Angle -> Emoji -> Size -> X -> Y -> Draw' r Unit
+emor' :: forall dt. Angle -> Emoji -> Size -> X -> Y -> Draw' dt Unit
 emor' deg e size x y = do
   r <- Reader.ask
   let
@@ -117,9 +117,9 @@ emor' deg e size x y = do
   rad = 2.0 * pi * toNumber deg / 360.0
 
 emap ::
-  forall r a.
-  Newtype r { | a } =>
-  ({ | a } -> EmojiMap) -> Size -> X -> Y -> Draw' r Unit
+  forall dt dr.
+  Newtype dt { | dr } =>
+  ({ | dr } -> EmojiMap) -> Size -> X -> Y -> Draw' dt Unit
 emap f size x y = do
   r <- Reader.ask
   let
@@ -149,7 +149,7 @@ emap f size x y = do
 
   posX i = x' + toNumber i * size'
 
-localDraw :: forall r. Context2D -> (Context2D -> Effect Unit) -> Draw r Unit
+localDraw :: forall dt. Context2D -> (Context2D -> Effect Unit) -> Draw dt Unit
 localDraw ctx op =
   liftEffect do
     save ctx
