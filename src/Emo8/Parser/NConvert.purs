@@ -1,29 +1,45 @@
 module Emo8.Parser.NConvert
   ( class NConvert
-  , class Match
+  , nconvert
+  , class NMatch
+  , nmatch
   ) where
 
-import Emo8.Parser.NList (NCons, NNil, kind NList)
-import Emo8.Parser.Note
-import Emo8.Parser.SpecChar (Return, Space)
+import Prelude (($))
+import Data.Either (Either(..))
+import Data.List as L
+import Data.Symbol (SProxy(..))
+import Emo8.Parser.Type (IsNote(..), NoEmoji(..), Result)
 import Prim.Symbol as S
 
-class NConvert (s :: Symbol) (nl :: NList) | s -> nl
+class NConvert (s :: Symbol) where
+  nconvert :: SProxy s -> L.List (Result IsNote)
 
-instance nConvertNil :: NConvert "" NNil
+instance nConvertNil :: NConvert "" where
+  nconvert _ = L.Nil
 else instance nConvertCons ::
   ( S.Cons head tail union
-  , NConvert tail nl
-  , Match head out
+  , NConvert tail
+  , NMatch head
   ) =>
-  NConvert union (NCons out nl)
+  NConvert union where
+  nconvert _ = L.Cons (nmatch headP) $ nconvert tailP
+    where
+    headP = SProxy :: SProxy head
 
-class Match (s :: Symbol) (n :: Note) | s -> n
+    tailP = SProxy :: SProxy tail
 
-instance matchSpace :: Match " " (Rest Space)
+class NMatch (s :: Symbol) where
+  nmatch :: SProxy s -> Result IsNote
 
-instance matchReturn :: Match "\n" (Rest Return)
+instance nmatchSpace :: NMatch " " where
+  nmatch _ = Left Space
 
-instance matchN :: Match "🎹" Note
+instance nmatchReturn :: NMatch "\n" where
+  nmatch _ = Left Return
 
-instance matchV :: Match "🈳" Vacancy
+instance nmatchN :: NMatch "🎹" where
+  nmatch _ = Right N
+
+instance nmatchV :: NMatch "🈳" where
+  nmatch _ = Right V

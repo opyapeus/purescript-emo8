@@ -11,11 +11,9 @@ import Data.Tuple (Tuple(..), fst)
 import Emo8.Data.Emoji as E
 import Emo8.Data.Note as N
 import Emo8.Parser.EConvert (class EConvert, econvert)
-import Emo8.Parser.NConstraint (class ExtractNR, class UpToFiveNote)
-import Emo8.Parser.NConvert (class NConvert)
-import Emo8.Parser.NList (NLProxy(..))
-import Emo8.Parser.NTo (class NTo, IsNote(..), nto)
-import Emo8.Parser.Type (NoEmoji(..), Result)
+import Emo8.Parser.NConstraint (class NConstraint)
+import Emo8.Parser.NConvert (class NConvert, nconvert)
+import Emo8.Parser.Type (IsNote(..), NoEmoji(..), Result)
 
 class Parser (s :: Symbol) a where
   parse :: SProxy s -> a
@@ -31,10 +29,8 @@ instance parseEmojiMap ::
     res = econvert (SProxy :: SProxy s)
 
 instance parseScore ::
-  ( NConvert s nl
-  , NTo nl
-  , ExtractNR nl ll
-  , UpToFiveNote ll
+  ( NConvert s
+  , NConstraint s
   ) =>
   Parser s (L.List (L.List N.Note)) where
   parse _ =
@@ -43,8 +39,9 @@ instance parseScore ::
       <<< L.filter (notEq L.Nil)
       $ go res L.Nil
     where
-    res = nto (NLProxy :: NLProxy nl)
+    res = nconvert (SProxy :: SProxy s)
 
+    -- NOTE: it supposed to be the same length of candidates as UpToElevenLength
     pickIsNote :: L.List IsNote -> L.List N.Note
     pickIsNote = map fst <<< L.filter pick <<< L.zip N.candidates
       where

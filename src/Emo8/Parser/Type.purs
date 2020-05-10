@@ -15,6 +15,12 @@ data NoEmoji
 
 derive instance eqNoEmoji :: Eq NoEmoji
 
+data IsNote
+  = N
+  | V
+
+derive instance eqIsNote :: Eq IsNote
+
 type EmojiMap
   = L.List (L.List E.Emoji)
 
