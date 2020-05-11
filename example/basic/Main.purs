@@ -83,7 +83,7 @@ instance gameState ::
     -- next y, dy
     canJump <- isCollide state.x (state.y - gravity)
     let
-      isJump = canJump && (catchInput state.prevInput input).isUp
+      isJump = canJump && isCatchWASD
 
       ddy = if isJump then 25 else 0
 
@@ -123,6 +123,10 @@ instance gameState ::
           , frame = state.frame + 1
           }
     where
+    catch = (catchInput state.prevInput input)
+
+    isCatchWASD = catch.isW || catch.isA || catch.isS || catch.isD
+
     isCollide :: X -> Y -> Update DR SR Boolean
     isCollide x y = do
       isMapColl <- isCollideMap _.stage mapSize walls emoSize x y
