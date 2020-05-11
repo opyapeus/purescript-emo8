@@ -11,6 +11,7 @@
     "example:bundle:hello": "run-s example:bundle:hello:*",
     "example:build:hello": "spago build --path example/hello/Main.purs",
     "example:build:basic": "spago build --path example/basic/Main.purs",
+    "example:build:emodius": "spago build --path \"example/emodius/**/*.purs\"",
     "dev": "parcel serve asset/index.html"
   },
   "devDependencies": {

@@ -1,5 +1,6 @@
 module Emo8.Util.Input
   ( noInput
+  , everyInput
   , catchInput
   , releaseInput
   , anyInput
@@ -18,6 +19,18 @@ noInput =
   , isA: false
   , isS: false
   , isD: false
+  }
+
+everyInput :: Input
+everyInput =
+  { isUp: true
+  , isLeft: true
+  , isDown: true
+  , isRight: true
+  , isW: true
+  , isA: true
+  , isS: true
+  , isD: true
   }
 
 catchInput :: Input -> Input -> Input
