@@ -23,6 +23,7 @@ import Emo8.Game.Sound (play')
 import Emo8.Parser (parse)
 import Emo8.Parser.Type (Score)
 import Emo8.Type (Rect)
+import Emo8.Util.Input (anyInput, catchInput, noInput)
 import Emo8.Util.Resource (EmptyMap)
 import Math (cos, pi, sin)
 
@@ -63,7 +64,7 @@ type Polar
 instance gameState :: Game State EmptyMap SR where
   update i st@(State s)
     | finished st = pure st
-    | isCatchAny s.prevInput i =
+    | anyInput (catchInput s.prevInput i) =
       pure <<< State
         $ s
             { timeToFinish = initialTime
@@ -143,18 +144,6 @@ initialState r =
     , y: (r.height - size) / 2
     }
 
-noInput :: Input
-noInput =
-  { isUp: false
-  , isLeft: false
-  , isDown: false
-  , isRight: false
-  , isW: false
-  , isA: false
-  , isS: false
-  , isD: false
-  }
-
 polToPos :: Polar -> Position
 polToPos pol =
   { x: floor $ pol.radius * cos (toRadian pol.theta)
@@ -162,17 +151,6 @@ polToPos pol =
   }
   where
   toRadian = (*) pi <<< flip (/) 180.0
-
-isCatchAny :: Input -> Input -> Boolean
-isCatchAny pi i =
-  (i.isUp && not pi.isUp)
-    || (i.isLeft && not pi.isLeft)
-    || (i.isDown && not pi.isDown)
-    || (i.isRight && not pi.isRight)
-    || (i.isW && not pi.isW)
-    || (i.isA && not pi.isA)
-    || (i.isS && not pi.isS)
-    || (i.isD && not pi.isD)
 
 initialTime :: Int
 initialTime = 120

@@ -22,6 +22,7 @@ import Emo8.GameDev (class GameDev, loadStateWithDefault)
 import Emo8.Parser (parse)
 import Emo8.Parser.Type (EmojiMap, Score)
 import Emo8.Type (X, Y, Size)
+import Emo8.Util.Input (catchInput, noInput)
 import Foreign.Generic (class Decode, class Encode, defaultOptions, genericDecode, genericEncode)
 
 data State
@@ -82,7 +83,7 @@ instance gameState ::
     -- next y, dy
     canJump <- isCollide state.x (state.y - gravity)
     let
-      isJump = canJump && isUpCatch
+      isJump = canJump && (catchInput state.prevInput input).isUp
 
       ddy = if isJump then 25 else 0
 
@@ -122,10 +123,6 @@ instance gameState ::
           , frame = state.frame + 1
           }
     where
-    isUpCatch
-      | input.isUp, not state.prevInput.isUp = true
-      | otherwise = false
-
     isCollide :: X -> Y -> Update DR SR Boolean
     isCollide x y = do
       isMapColl <- isCollideMap _.stage mapSize walls emoSize x y
@@ -173,18 +170,6 @@ gravity = 2
 
 walls :: L.List E.Emoji
 walls = L.fromFoldable [ E.japaneseNoVacancyButton ] -- 🈵
-
-noInput :: Input
-noInput =
-  { isUp: false
-  , isLeft: false
-  , isDown: false
-  , isRight: false
-  , isW: false
-  , isA: false
-  , isS: false
-  , isD: false
-  }
 
 main :: Effect Unit
 main = do
