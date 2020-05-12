@@ -16,13 +16,13 @@ import Effect.Class.Console (error)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
 import Emo8.Data.Draw (runDraw)
-import Emo8.Data.GameWithBoot (GameWithBoot(..), switchFoldOp, switchOp)
 import Emo8.Data.Input (Input)
 import Emo8.Data.Sound (runSound)
 import Emo8.Data.Update (Resource(..), runUpdate)
 import Emo8.Game (class Game, draw, sound, update)
 import Emo8.GameBoot as B
 import Emo8.GameDev (class GameDev, saveState)
+import Emo8.GameWithBoot (GameWithBoot(..), switchFoldOp, switchOp)
 import Emo8.Input (poll)
 import Emo8.Input.Merged (mkInput)
 import Emo8.Parser.Type (Score)
@@ -79,32 +79,17 @@ run c state dr sr conf = do
 
     resource = Resource { draw: dr, sound: sr, config: conf }
 
-    bootResource = Resource { draw: emptyMap, sound: B.sr, config: conf }
+    bootResource = Resource { draw: emptyMap, sound: B.bootSound, config: conf }
 
     init = Tuple state resource
 
-    bootInit = Tuple (B.initialState conf.canvasSize) bootResource
+    bootInit = Tuple (B.initialBootState conf.canvasSize) bootResource
 
     biState = GameWithBoot init bootInit
 
-    biStateSig =
-      foldp
-        ( switchFoldOp
-            updateF
-            updateF
-        )
-        biState
-        sig
-  runSignal
-    $ switchOp
-        (drawF dctx conf)
-        (drawF dctx conf)
-        biStateSig
-  runSignal
-    $ switchOp
-        (soundF sctx ref)
-        (soundF sctx ref)
-        biStateSig
+    biStateSig = foldp (switchFoldOp updateF updateF) biState sig
+  runSignal $ switchOp (drawF dctx conf) (drawF dctx conf) <$> biStateSig
+  runSignal $ switchOp (soundF sctx ref) (soundF sctx ref) <$> biStateSig
 
 runDev ::
   forall s dt st.

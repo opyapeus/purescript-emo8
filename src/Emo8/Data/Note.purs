@@ -1,7 +1,7 @@
 module Emo8.Data.Note
   ( Note(..)
   , toFreq
-  , candidates
+  , notes
   ) where
 
 import Prelude
@@ -27,7 +27,7 @@ derive instance eqNote :: Eq Note
 derive instance ordNote :: Ord Note
 
 toFreq :: Note -> Number
-toFreq A4 = 440.0
+toFreq A4 = 440.000
 
 toFreq AS4 = 466.164
 
@@ -53,8 +53,8 @@ toFreq GS5 = 830.609
 
 toFreq A5 = 880.000
 
-candidates :: List Note
-candidates =
+notes :: List Note
+notes =
   fromFoldable
     [ A4
     , AS4

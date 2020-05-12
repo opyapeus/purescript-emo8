@@ -1,10 +1,10 @@
 module Emo8.GameBoot
   ( class GameBoot
   , finished
-  , State
-  , initialState
-  , SR
-  , sr
+  , BootState
+  , initialBootState
+  , BootSoundRes
+  , bootSound
   ) where
 
 import Prelude
@@ -31,8 +31,8 @@ class
   Game s dt st <= GameBoot s dt st | s -> dt st where
   finished :: s -> Boolean
 
-data State
-  = State
+data BootState
+  = BootState
     { infSize :: Int
     , infPos :: Position
     , infEmoji :: E.Emoji
@@ -46,12 +46,10 @@ data State
     , frame :: Int
     }
 
-newtype SR
-  = SR
-  { beep :: Score
-  }
+newtype BootSoundRes
+  = BootSoundRes { beep :: Score }
 
-derive instance newtypeSR :: Newtype SR _
+derive instance newtypeBootSoundRes :: Newtype BootSoundRes _
 
 type Position
   = { x :: Int, y :: Int }
@@ -61,11 +59,11 @@ type Polar
     , theta :: Number
     }
 
-instance gameState :: Game State EmptyMap SR where
-  update i st@(State s)
+instance gameBootState :: Game BootState EmptyMap BootSoundRes where
+  update i st@(BootState s)
     | finished st = pure st
     | anyInput (catchInput s.prevInput i) =
-      pure <<< State
+      pure <<< BootState
         $ s
             { timeToFinish = initialTime
             , bgColor = pickedColor
@@ -86,7 +84,7 @@ instance gameState :: Game State EmptyMap SR where
         | mod s.frame 20 == 0 = E.zanyFace
         | otherwise = E.infinity
     | otherwise =
-      pure <<< State
+      pure <<< BootState
         $ s
             { timeToFinish = s.timeToFinish - 1
             , rotation = nextRot
@@ -99,7 +97,7 @@ instance gameState :: Game State EmptyMap SR where
           s.rotation - 1.0
         else
           s.rotation + 1.0
-  draw (State s) = do
+  draw (BootState s) = do
     cls s.bgColor
     emo s.infEmoji s.infSize s.infPos.x s.infPos.y
     for_ moves \move ->
@@ -108,16 +106,16 @@ instance gameState :: Game State EmptyMap SR where
     rotations = (+) s.rotation <<< toNumber <<< (*) 45 <$> 0 .. 7
 
     moves = map polToPos <<< map { radius: toNumber s.infSize, theta: _ } $ rotations
-  sound (State s) = do
+  sound (BootState s) = do
     when (s.timeToFinish == initialTime)
       $ play' _.beep Sawtooth 20
 
-instance gameBootState :: GameBoot State EmptyMap SR where
-  finished (State s) = s.timeToFinish <= 0
+instance gameBootBootState :: GameBoot BootState EmptyMap BootSoundRes where
+  finished (BootState s) = s.timeToFinish <= 0
 
-initialState :: Rect -> State
-initialState r =
-  State
+initialBootState :: Rect -> BootState
+initialBootState r =
+  BootState
     { infSize: infSize
     , infPos: basePos infSize
     , infEmoji: E.infinity
@@ -155,15 +153,16 @@ polToPos pol =
 initialTime :: Int
 initialTime = 120
 
-sr :: SR
-sr = SR $ { beep: parse s0 }
+bootSound :: BootSoundRes
+bootSound = BootSoundRes { beep: beepScore }
 
-s0 ::
-  SProxy
-    """
+beepScore :: Score
+beepScore = parse (SProxy :: SProxy Beep)
+
+type Beep
+  = """
   🎹🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
   🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🎹
   🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🎹
   🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🎹
-    """
-s0 = SProxy
+  """

@@ -90,6 +90,8 @@ foreign import data LNil :: LList
 
 foreign import data LCons :: Label -> LList -> LList
 
+infixr 6 type LCons as :
+
 class ExtractNR (nl :: NList) (ll :: LList) | nl -> ll
 
 instance extractNRNil :: ExtractNR NNil LNil
@@ -108,25 +110,25 @@ instance upToThreeNoteNil :: UpToThreeNote LNil
 
 instance upToThreeNoteConsN ::
   UpToThreeNote ll =>
-  UpToThreeNote (LCons N ll)
+  UpToThreeNote (N : ll)
 
 instance upToThreeNoteCons1 ::
   UpToThreeNote ll =>
-  UpToThreeNote (LCons S (LCons N ll))
+  UpToThreeNote (S : N : ll)
 
 instance upToThreeNoteCons2 ::
   UpToThreeNote ll =>
-  UpToThreeNote (LCons S (LCons S (LCons N ll)))
+  UpToThreeNote (S : S : N : ll)
 
 instance upToThreeNoteCons3 ::
   UpToThreeNote ll =>
-  UpToThreeNote (LCons S (LCons S (LCons S (LCons N ll))))
+  UpToThreeNote (S : S : S : N : ll)
 
 instance upToThreeNoteConsMore ::
   ( UpToThreeNote ll
   , TE.Fail (TE.Text "The maximum note count is 3 per line.")
   ) =>
-  UpToThreeNote (LCons S (LCons S (LCons S (LCons S ll))))
+  UpToThreeNote (S : S : S : S : ll)
 
 class ExtractNVR (nl :: NList) (ll :: LList) | nl -> ll
 
@@ -146,54 +148,54 @@ instance upToElevenLengthNil :: UpToElevenLength LNil
 
 instance upToElevenLengthConsN ::
   UpToElevenLength ll =>
-  UpToElevenLength (LCons N ll)
+  UpToElevenLength (N : ll)
 
 instance upToElevenLengthCons1 ::
   UpToElevenLength ll =>
-  UpToElevenLength (LCons S (LCons N ll))
+  UpToElevenLength (S : N : ll)
 
 instance upToElevenLengthCons2 ::
   UpToElevenLength ll =>
-  UpToElevenLength (LCons S (LCons S (LCons N ll)))
+  UpToElevenLength (S : S : N : ll)
 
 instance upToElevenLengthCons3 ::
   UpToElevenLength ll =>
-  UpToElevenLength (LCons S (LCons S (LCons S (LCons N ll))))
+  UpToElevenLength (S : S : S : N : ll)
 
 instance upToElevenLengthCons4 ::
   UpToElevenLength ll =>
-  UpToElevenLength (LCons S (LCons S (LCons S (LCons S (LCons N ll)))))
+  UpToElevenLength (S : S : S : S : N : ll)
 
 instance upToElevenLengthCons5 ::
   UpToElevenLength ll =>
-  UpToElevenLength (LCons S (LCons S (LCons S (LCons S (LCons S (LCons N ll))))))
+  UpToElevenLength (S : S : S : S : S : N : ll)
 
 instance upToElevenLengthCons6 ::
   UpToElevenLength ll =>
-  UpToElevenLength (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons N ll)))))))
+  UpToElevenLength (S : S : S : S : S : S : N : ll)
 
 instance upToElevenLengthCons7 ::
   UpToElevenLength ll =>
-  UpToElevenLength (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons N ll))))))))
+  UpToElevenLength (S : S : S : S : S : S : S : N : ll)
 
 instance upToElevenLengthCons8 ::
   UpToElevenLength ll =>
-  UpToElevenLength (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons N ll)))))))))
+  UpToElevenLength (S : S : S : S : S : S : S : S : N : ll)
 
 instance upToElevenLengthCons9 ::
   UpToElevenLength ll =>
-  UpToElevenLength (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons N ll))))))))))
+  UpToElevenLength (S : S : S : S : S : S : S : S : S : N : ll)
 
 instance upToElevenLengthCons10 ::
   UpToElevenLength ll =>
-  UpToElevenLength (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons N ll)))))))))))
+  UpToElevenLength (S : S : S : S : S : S : S : S : S : S : N : ll)
 
 instance upToElevenLengthCons11 ::
   UpToElevenLength ll =>
-  UpToElevenLength (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons N ll))))))))))))
+  UpToElevenLength (S : S : S : S : S : S : S : S : S : S : S : N : ll)
 
 instance upToElevenLengthConsMore ::
   ( UpToElevenLength ll
   , TE.Fail (TE.Text "The maximum score length is 11 per line.")
   ) =>
-  UpToElevenLength (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S (LCons S ll))))))))))))
+  UpToElevenLength (S : S : S : S : S : S : S : S : S : S : S : S : ll)

@@ -41,9 +41,9 @@ instance parseScore ::
     where
     res = nconvert (SProxy :: SProxy s)
 
-    -- NOTE: it supposed to be the same length of candidates as UpToElevenLength
+    -- NOTE: it supposed to be the same length of notes as UpToElevenLength
     pickIsNote :: L.List IsNote -> L.List N.Note
-    pickIsNote = map fst <<< L.filter pick <<< L.zip N.candidates
+    pickIsNote = map fst <<< L.filter pick <<< L.zip N.notes
       where
       pick (Tuple _ N) = true
 

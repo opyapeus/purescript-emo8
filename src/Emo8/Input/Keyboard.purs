@@ -4,14 +4,14 @@ module Emo8.Input.Keyboard
 
 import Prelude
 import Data.Newtype (class Newtype)
-import Emo8.Data.Input (InputRow)
+import Emo8.Data.Input as T
 import Emo8.Data.Key (Key(..), keyToCodeNum)
 import Emo8.Input (class Input)
 import Record.Extra (mapRecord, sequenceRecord)
 import Signal.DOM (keyPressed)
 
 newtype Keyboard
-  = Keyboard { | InputRow }
+  = Keyboard T.Input
 
 derive instance newtypeKeyboard :: Newtype Keyboard _
 

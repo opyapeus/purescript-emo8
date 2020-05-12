@@ -134,10 +134,8 @@ emap f size x y = do
       ( \row es ->
           traverseWithIndex_
             ( \col e ->
-                if e == japaneseVacancyButton then
-                  pure unit
-                else
-                  fillText c (show e) (posX col) (posY row)
+                when (e /= japaneseVacancyButton)
+                  $ fillText c (show e) (posX col) (posY row)
             )
             es
       )
