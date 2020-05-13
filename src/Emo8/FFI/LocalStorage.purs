@@ -9,6 +9,7 @@ import Prelude
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 
+-- | Local storage key type to save the game state for emo8 development mode. 
 newtype LocalKey
   = LocalKey String
 

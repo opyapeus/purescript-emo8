@@ -6,6 +6,7 @@ module Emo8.Data.Tone
 
 import Audio.WebAudio.Oscillator as O
 
+-- | Emo8 tone type which supports OscillatorNode's basic wave types (WebAudioAPI).
 data Tone
   = Sine
   | Square

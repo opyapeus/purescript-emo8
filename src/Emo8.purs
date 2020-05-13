@@ -33,12 +33,14 @@ import Graphics.Canvas (CanvasElement, Context2D, getCanvasElementById, getConte
 import Signal (foldp, runSignal, sampleOn)
 import Signal.DOM (animationFrame)
 
+-- | Run the emo8 game. 
 emo8 ::
   forall s dt st.
   Game s dt st =>
   s -> dt -> st -> Config -> Effect Unit
 emo8 = emo8F run
 
+-- | Run the emo8 game in development mode.
 emo8Dev ::
   forall s dt st.
   GameDev s dt st =>

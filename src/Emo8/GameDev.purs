@@ -1,8 +1,8 @@
 module Emo8.GameDev
   ( class GameDev
+  , loadStateWithDefault
   , saveLocal
   , saveState
-  , loadStateWithDefault
   ) where
 
 import Prelude
@@ -19,6 +19,9 @@ import Emo8.Game (class Game)
 import Foreign (MultipleErrors)
 import Foreign.Generic (class Decode, class Encode, decodeJSON, encodeJSON)
 
+-- | Emo8 game develepment mode class.
+-- |
+-- | You can save the state to localstrage and visualize it by defining `Encode` and `Decode` instance of the state type.
 class
   ( Game s dt st
   , Encode s
@@ -34,13 +37,6 @@ instance showLoadError :: Show LoadError where
   show (DecodeError es) = show es
   show (KeyNotFoundError s) = show s
 
-saveState :: forall s dt st. GameDev s dt st => s -> Effect Unit
-saveState s = for_ keys \k -> setItem k json
-  where
-  keys = saveLocal s
-
-  json = encodeJSON s
-
 loadStateWithDefault :: forall s dt st. GameDev s dt st => s -> LocalKey -> Effect s
 loadStateWithDefault s key = do
   es <- loadState key
@@ -53,6 +49,13 @@ loadStateWithDefault s key = do
         DecodeError me -> log $ show me
         KeyNotFoundError e -> log e
       pure s
+
+saveState :: forall s dt st. GameDev s dt st => s -> Effect Unit
+saveState s = for_ keys \k -> setItem k json
+  where
+  keys = saveLocal s
+
+  json = encodeJSON s
 
 loadState :: forall s dt st. GameDev s dt st => LocalKey -> Effect (Either LoadError s)
 loadState key = do

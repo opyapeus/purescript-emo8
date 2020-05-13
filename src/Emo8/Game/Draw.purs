@@ -1,5 +1,6 @@
 module Emo8.Game.Draw
-  ( DrawContext
+  ( Draw'
+  , DrawContext
   , cls
   , emo
   , emo'
@@ -26,6 +27,7 @@ import Emo8.Type (Rect, Size, X, Y, Angle)
 import Graphics.Canvas (Context2D, fillRect, fillText, restore, rotate, save, scale, setFillStyle, setFont, translate)
 import Math (pi)
 
+-- | Emo8 draw monad which does some draw operations.
 type Draw' dt
   = Draw (DrawContext dt)
 
@@ -35,6 +37,7 @@ type DrawContext dt
     , canvasSize :: Rect
     }
 
+-- | Fill the entire canvas with the specified color.
 cls :: forall dt. Color -> Draw' dt Unit
 cls c = do
   r <- Reader.ask
@@ -47,6 +50,9 @@ cls c = do
       , height: toNumber r.canvasSize.height
       }
 
+-- | Draw the emoji with the specified emoji, size, x and y.
+-- |
+-- | The origin of x and y is the bottom left.
 emo :: forall dt. Emoji -> Size -> X -> Y -> Draw' dt Unit
 emo e size x y = do
   r <- Reader.ask
@@ -60,6 +66,7 @@ emo e size x y = do
 
   x' = toNumber x
 
+-- | The mirror version of `emo`.
 emo' :: forall dt. Emoji -> Size -> X -> Y -> Draw' dt Unit
 emo' e size x y = do
   r <- Reader.ask
@@ -77,6 +84,7 @@ emo' e size x y = do
 
   x' = toNumber x
 
+-- | The rotation version of `emo`.
 emor :: forall dt. Angle -> Emoji -> Size -> X -> Y -> Draw' dt Unit
 emor deg e size x y = do
   r <- Reader.ask
@@ -96,6 +104,7 @@ emor deg e size x y = do
 
   rad = 2.0 * pi * toNumber deg / 360.0
 
+-- | The mirror version of `emor`.
 emor' :: forall dt. Angle -> Emoji -> Size -> X -> Y -> Draw' dt Unit
 emor' deg e size x y = do
   r <- Reader.ask
@@ -116,6 +125,9 @@ emor' deg e size x y = do
 
   rad = 2.0 * pi * toNumber deg / 360.0
 
+-- | Draw the emoji map with the specified accessor, size, x and y.
+-- |
+-- | The size is one of the emojis'.
 emap ::
   forall dt dr.
   Newtype dt { | dr } =>

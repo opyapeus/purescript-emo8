@@ -7,6 +7,7 @@ module Emo8.Data.Note
 import Prelude
 import Data.List (List, fromFoldable)
 
+-- | Emo8 note type which supports the scales from A4 (440Hz) to A5 (880Hz).
 data Note
   = A4
   | AS4

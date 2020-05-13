@@ -1,5 +1,6 @@
 module Emo8.Game.Sound
-  ( SoundContext
+  ( Sound'
+  , SoundContext
   , play
   , play'
   , stop
@@ -30,6 +31,7 @@ import Emo8.Parser.Type (Score)
 import Emo8.Type (Tempo)
 import Emo8.Util.List (zipWithMaybeA)
 
+-- | Emo8 sound monad which does some sound operations.
 type Sound' st
   = Sound (SoundContext st)
 
@@ -41,6 +43,9 @@ type SoundContext st
     }
 
 -- TODO: Map key type
+-- | Play the score with the specified accessor, tone and tempo.
+-- | 
+-- | The operation is ignored until the score being stopped.
 play ::
   forall st sr.
   Newtype st { | sr } =>
@@ -95,6 +100,7 @@ play f tone tempo = do
 
   maxNotes = fromMaybe L.Nil <<< maximum
 
+-- | `play` the score after `stop`.
 play' ::
   forall st sr.
   Newtype st { | sr } =>
@@ -103,6 +109,7 @@ play' f tone tempo = do
   stop f
   play f tone tempo
 
+-- | Stop playing with the specified score accessor.
 stop ::
   forall st sr.
   Newtype st { | sr } =>

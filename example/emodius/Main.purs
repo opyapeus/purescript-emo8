@@ -19,10 +19,9 @@ import Emo8.Data.Color as C
 import Emo8.Data.Draw (Draw)
 import Emo8.Data.Emoji as E
 import Emo8.Data.Input (Input)
-import Emo8.Data.Update (Update)
 import Emo8.Game (class Game)
 import Emo8.Game.Draw (DrawContext, cls, emap, emo, emor, emor')
-import Emo8.Game.Update (isCollideMap)
+import Emo8.Game.Update (Update', isCollideMap)
 import Emo8.Parser.Type (EmojiMap)
 import Emo8.Type (X)
 import Emo8.Util.Config (defaultConfig)
@@ -199,7 +198,7 @@ drawScrollMap distance = do
     base = num * mapWidth
 
 -- TODO: readable
-isCollideScrollMap :: forall a. Object a => Int -> a -> Update DR EmptyScore Boolean
+isCollideScrollMap :: forall a. Object a => Int -> a -> Update' DR EmptyScore Boolean
 isCollideScrollMap distance o =
   (\a b c d -> a || b || c || d)
     <$> collCond _.stage1 0 distance
@@ -207,7 +206,7 @@ isCollideScrollMap distance o =
     <*> collCond _.stage3 2 distance
     <*> collCond _.stage4 3 distance
   where
-  collCond :: ({ | DRRow } -> EmojiMap) -> Int -> X -> Update DR EmptyScore Boolean
+  collCond :: ({ | DRRow } -> EmojiMap) -> Int -> X -> Update' DR EmptyScore Boolean
   collCond f num d = do
     if (base - mapSize * mapTileInMonitor <= d && d < base + mapWidth) then
       isCollideMap f mapSize walls (size o) ((position o).x + (d - base)) (position o).y

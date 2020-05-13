@@ -12,12 +12,11 @@ import Emo8.Data.Color as C
 import Emo8.Data.Emoji as E
 import Emo8.Data.Input (Input)
 import Emo8.Data.Tone (Tone(..))
-import Emo8.Data.Update (Update)
 import Emo8.FFI.LocalStorage (LocalKey(..))
 import Emo8.Game (class Game)
 import Emo8.Game.Draw (cls, emap, emo, emo')
 import Emo8.Game.Sound (play')
-import Emo8.Game.Update (isCollideCanvas, isCollideMap)
+import Emo8.Game.Update (Update', isCollideCanvas, isCollideMap)
 import Emo8.GameDev (class GameDev, loadStateWithDefault)
 import Emo8.Parser (parse)
 import Emo8.Parser.Type (EmojiMap, Score)
@@ -127,7 +126,7 @@ instance gameState ::
 
     isCatchWASD = catch.isW || catch.isA || catch.isS || catch.isD
 
-    isCollide :: X -> Y -> Update DR SR Boolean
+    isCollide :: X -> Y -> Update' DR SR Boolean
     isCollide x y = do
       isMapColl <- isCollideMap _.stage mapSize walls emoSize x y
       isCanvasColl <- isCollideCanvas emoSize x y

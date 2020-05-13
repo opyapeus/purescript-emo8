@@ -15,12 +15,29 @@ import Emo8.Parser.NConstraint (class NConstraint)
 import Emo8.Parser.NConvert (class NConvert, nconvert)
 import Emo8.Parser.Type (IsNote(..), NoEmoji(..), Result)
 
+-- | Emo8 emoji parser class.
 class Parser (s :: Symbol) a where
-  parse :: SProxy s -> a
+  -- | It parse `Symbol` type as `EmojiMap` or `Score` value.
+  parse :: SProxy s -> L.List (L.List a)
 
+-- | Example
+-- | ```
+-- | mountFuji :: EmojiMap
+-- | mountFuji = parse (SProxy :: SProxy Fuji)
+-- |
+-- | type Fuji
+-- |   = """
+-- |   🈳🈳🈳🈳🈳🈳🈳🈳🈳
+-- |   🈳⛅🈳🈳🎌🈳🈳🌧🈳
+-- |   🈳🈳🈳🌳🗻🌳🈳🈳🈳
+-- |   🈳🈳🌳🗻🗻🗻🌳🈳🈳
+-- |   🈳🌳🗻🗻🗻🗻🗻🌳🈳
+-- |   🌳🗻🗻🗻🗻🗻🗻🗻🌳
+-- |   """
+-- | ```
 instance parseEmojiMap ::
   EConvert s =>
-  Parser s (L.List (L.List E.Emoji)) where
+  Parser s E.Emoji where
   parse _ =
     map L.reverse
       <<< L.filter (notEq L.Nil)
@@ -28,11 +45,24 @@ instance parseEmojiMap ::
     where
     res = econvert (SProxy :: SProxy s)
 
+-- | Example
+-- | ```
+-- | beep :: Score
+-- | beep = parse (SProxy :: SProxy NHK)
+-- |
+-- | type NHK
+-- |   = """
+-- |   🎹🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+-- |   🎹🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+-- |   🎹🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+-- |   🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🎹
+-- |   """
+-- | ```
 instance parseScore ::
   ( NConvert s
   , NConstraint s
   ) =>
-  Parser s (L.List (L.List N.Note)) where
+  Parser s N.Note where
   parse _ =
     map pickIsNote
       <<< map L.reverse
