@@ -2,10 +2,9 @@ module Helper where
 
 import Prelude
 import Class.Object (class Object, position, size)
-import Constants (mapSize)
+import Constants (canvasSize)
 import Data.Player (Player(..))
 import Emo8.Game.Update (Update', isCollideCanvas)
-import Emo8.Util.Config (defaultConfig)
 
 beInMonitor :: forall a dt st. Object a => a -> Player -> Update' dt st Player
 beInMonitor p np@(Player ns) = do
@@ -14,12 +13,12 @@ beInMonitor p np@(Player ns) = do
   let
     npx = case isCollX, (npos.x < pos.x) of
       true, true -> 0
-      true, false -> defaultConfig.canvasSize.width - size'
+      true, false -> canvasSize.width - size'
       _, _ -> npos.x
   let
     npy = case isCollY, (npos.y < pos.y) of
       true, true -> 0
-      true, false -> defaultConfig.canvasSize.height - size'
+      true, false -> canvasSize.height - size'
       _, _ -> npos.y
   pure <<< Player $ ns { pos = { x: npx, y: npy } }
   where
@@ -28,12 +27,3 @@ beInMonitor p np@(Player ns) = do
   pos = position p
 
   npos = position np
-
-mapTileWidth :: Int
-mapTileWidth = 64
-
-mapWidth :: Int
-mapWidth = mapSize * mapTileWidth
-
-mapTileInMonitor :: Int
-mapTileInMonitor = defaultConfig.canvasSize.width / mapSize

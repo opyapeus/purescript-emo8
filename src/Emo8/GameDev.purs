@@ -10,7 +10,6 @@ import Control.Monad.Except (runExcept)
 import Data.Bifunctor (lmap)
 import Data.Either (Either(..))
 import Data.Foldable (for_)
-import Data.List as L
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Class.Console (log)
@@ -27,7 +26,7 @@ class
   , Encode s
   , Decode s
   ) <= GameDev s dt st | s -> dt st where
-  saveLocal :: s -> L.List LocalKey
+  saveLocal :: s -> Array LocalKey
 
 data LoadError
   = DecodeError MultipleErrors

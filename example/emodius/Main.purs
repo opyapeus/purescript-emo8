@@ -4,7 +4,7 @@ import Prelude
 import Asset (map0, map1, map2, map3, walls)
 import Class.Object (class Object, draw, position, size)
 import Collision (isCollideObjects, isOutOfWorld)
-import Constants (mapSize, speed)
+import Constants (canvasSize, mapSize, speed)
 import Data.Array (any, filter, partition)
 import Data.Bullet (Bullet, updateBullet)
 import Data.Enemy (Enemy(..), addEnemyBullet, emergeTable, updateEnemy)
@@ -23,11 +23,9 @@ import Emo8.Game (class Game)
 import Emo8.Game.Draw (DrawContext, cls, emap, emo, emor, emor')
 import Emo8.Game.Update (Update', isCollideMap)
 import Emo8.Parser.Type (EmojiMap)
-import Emo8.Type (X)
-import Emo8.Util.Config (defaultConfig)
 import Emo8.Util.Input (anyInput, catchInput, everyInput)
 import Emo8.Util.Resource (EmptyScore, emptyScore)
-import Helper (beInMonitor, mapTileInMonitor, mapWidth)
+import Helper (beInMonitor)
 
 data State
   = TitleState
@@ -172,45 +170,76 @@ initialState = TitleState { prevInput: everyInput }
 
 main :: Effect Unit
 main = do
-  let
-    dr =
-      DR
-        { stage1: map0
-        , stage2: map1
-        , stage3: map2
-        , stage4: map3
-        }
-  emo8 initialState dr emptyScore defaultConfig
+  emo8 initialState dr emptyScore conf
+  where
+  dr =
+    DR
+      { stage1: map0
+      , stage2: map1
+      , stage3: map2
+      , stage4: map3
+      }
+
+  conf = { canvasSize: canvasSize }
 
 -- TODO: readable
 drawScrollMap :: Int -> Draw (DrawContext DR) Unit
-drawScrollMap distance = do
-  drawCond _.stage1 0 distance
-  drawCond _.stage2 1 distance
-  drawCond _.stage3 2 distance
-  drawCond _.stage4 3 distance
+drawScrollMap d = do
+  when (mapCond.s1 d)
+    $ emapF _.stage1 0
+  when (mapCond.s2 d)
+    $ emapF _.stage2 2048
+  when (mapCond.s3 d)
+    $ emapF _.stage3 4096
+  when (mapCond.s4 d)
+    $ emapF _.stage4 6144
   where
-  drawCond :: ({ | DRRow } -> EmojiMap) -> Int -> X -> Draw (DrawContext DR) Unit
-  drawCond f num d = do
-    when (base - mapSize * mapTileInMonitor <= d && d < base + mapWidth)
-      $ emap f mapSize (base - d) 0
-    where
-    base = num * mapWidth
+  emapF a bias =
+    emap
+      a
+      mapSize
+      (bias - d)
+      0
 
 -- TODO: readable
 isCollideScrollMap :: forall a. Object a => Int -> a -> Update' DR EmptyScore Boolean
-isCollideScrollMap distance o =
-  (\a b c d -> a || b || c || d)
-    <$> collCond _.stage1 0 distance
-    <*> collCond _.stage2 1 distance
-    <*> collCond _.stage3 2 distance
-    <*> collCond _.stage4 3 distance
+isCollideScrollMap d o = do
+  s1 <-
+    whenF (mapCond.s1 d)
+      $ isCollF _.stage1 0
+  s2 <-
+    whenF (mapCond.s2 d)
+      $ isCollF _.stage2 2048
+  s3 <-
+    whenF (mapCond.s3 d)
+      $ isCollF _.stage3 4096
+  s4 <-
+    whenF (mapCond.s4 d)
+      $ isCollF _.stage4 6144
+  pure $ s1 || s2 || s3 || s4
   where
-  collCond :: ({ | DRRow } -> EmojiMap) -> Int -> X -> Update' DR EmptyScore Boolean
-  collCond f num d = do
-    if (base - mapSize * mapTileInMonitor <= d && d < base + mapWidth) then
-      isCollideMap f mapSize walls (size o) ((position o).x + (d - base)) (position o).y
-    else
-      pure false
-    where
-    base = num * mapWidth
+  whenF true m = m
+
+  whenF false _ = pure false
+
+  isCollF a bias =
+    isCollideMap
+      a
+      mapSize
+      walls
+      (size o)
+      ((position o).x + (d - bias))
+      (position o).y
+
+mapCond ::
+  { s1 :: Int -> Boolean
+  , s2 :: Int -> Boolean
+  , s3 :: Int -> Boolean
+  , s4 :: Int -> Boolean
+  }
+mapCond =
+  { s1: \d -> d < 2048
+  , s2: \d -> 2048 - canvasSize.width <= d && d < 4096
+  , s3: \d -> 4096 - canvasSize.width <= d && d < 6144
+  , s4: \d -> 6144 - canvasSize.width <= d && d < 8192
+  }

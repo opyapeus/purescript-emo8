@@ -2,12 +2,11 @@ module Data.Enemy where
 
 import Prelude
 import Class.Object (class ObjectDraw, class Object, position, size)
-import Constants (emoSize, speed)
+import Constants (canvasSize, emoSize, speed)
 import Data.EnemyBullet (EnemyBullet(..))
 import Data.Player (Player(..))
 import Emo8.Data.Emoji as E
 import Emo8.Game.Draw (emo)
-import Emo8.Util.Config (defaultConfig)
 import Types (Pos)
 
 data Enemy
@@ -60,7 +59,7 @@ updateEnemy (Player p) (Rex s) =
 
 updateEnemy _ (Oct s) = Oct $ s { pos { x = s.pos.x + dx } }
   where
-  dx = if s.pos.x > defaultConfig.canvasSize.width / 2 then -speed else 0
+  dx = if s.pos.x > canvasSize.width / 2 then -speed else 0
 
 addEnemyBullet :: Player -> Enemy -> Array EnemyBullet
 addEnemyBullet _ (Moi s) = if mod s.cnt 16 == 0 then [ NormalBull { pos: s.pos } ] else []
@@ -78,51 +77,51 @@ diffVec a b = { x: (position a).x - (position b).x, y: (position a).y - (positio
 
 emergeTable :: Int -> Array Enemy
 emergeTable = case _ of
-  200 -> [ Invader { pos: { x: defaultConfig.canvasSize.width, y: 250 } } ]
+  200 -> [ Invader { pos: { x: canvasSize.width, y: 250 } } ]
   250 ->
-    [ Invader { pos: { x: defaultConfig.canvasSize.width, y: 400 } }
-    , Invader { pos: { x: defaultConfig.canvasSize.width, y: 150 } }
+    [ Invader { pos: { x: canvasSize.width, y: 400 } }
+    , Invader { pos: { x: canvasSize.width, y: 150 } }
     ]
-  700 -> [ Invader { pos: { x: defaultConfig.canvasSize.width, y: 250 } } ]
+  700 -> [ Invader { pos: { x: canvasSize.width, y: 250 } } ]
   750 ->
-    [ Invader { pos: { x: defaultConfig.canvasSize.width, y: 400 } }
-    , Invader { pos: { x: defaultConfig.canvasSize.width, y: 150 } }
+    [ Invader { pos: { x: canvasSize.width, y: 400 } }
+    , Invader { pos: { x: canvasSize.width, y: 150 } }
     ]
   1250 ->
-    [ Invader { pos: { x: defaultConfig.canvasSize.width, y: 250 } }
-    , Invader { pos: { x: defaultConfig.canvasSize.width, y: 350 } }
-    , Invader { pos: { x: defaultConfig.canvasSize.width, y: 450 } }
-    , Invader { pos: { x: defaultConfig.canvasSize.width, y: 150 } }
-    , Invader { pos: { x: defaultConfig.canvasSize.width, y: 50 } }
+    [ Invader { pos: { x: canvasSize.width, y: 250 } }
+    , Invader { pos: { x: canvasSize.width, y: 350 } }
+    , Invader { pos: { x: canvasSize.width, y: 450 } }
+    , Invader { pos: { x: canvasSize.width, y: 150 } }
+    , Invader { pos: { x: canvasSize.width, y: 50 } }
     ]
-  -- second: 4096
-  2000 -> [ Bee { pos: { x: defaultConfig.canvasSize.width, y: 400 } } ]
-  2250 -> [ Bee { pos: { x: defaultConfig.canvasSize.width, y: 250 } } ]
-  2500 -> [ Bee { pos: { x: defaultConfig.canvasSize.width, y: 100 } } ]
+  -- second: 2048
+  2000 -> [ Bee { pos: { x: canvasSize.width, y: 400 } } ]
+  2250 -> [ Bee { pos: { x: canvasSize.width, y: 250 } } ]
+  2500 -> [ Bee { pos: { x: canvasSize.width, y: 100 } } ]
   3000 ->
-    [ Bee { pos: { x: defaultConfig.canvasSize.width, y: 400 } }
-    , Bee { pos: { x: defaultConfig.canvasSize.width, y: 250 } }
-    , Bee { pos: { x: defaultConfig.canvasSize.width, y: 100 } }
+    [ Bee { pos: { x: canvasSize.width, y: 400 } }
+    , Bee { pos: { x: canvasSize.width, y: 250 } }
+    , Bee { pos: { x: canvasSize.width, y: 100 } }
     ]
   3250 ->
-    [ Bee { pos: { x: defaultConfig.canvasSize.width, y: 450 } }
-    , Bee { pos: { x: defaultConfig.canvasSize.width, y: 300 } }
-    , Bee { pos: { x: defaultConfig.canvasSize.width, y: 150 } }
+    [ Bee { pos: { x: canvasSize.width, y: 450 } }
+    , Bee { pos: { x: canvasSize.width, y: 300 } }
+    , Bee { pos: { x: canvasSize.width, y: 150 } }
     ]
-  -- third: 8192
-  4000 -> [ Rex { pos: { x: defaultConfig.canvasSize.width, y: emoSize }, cnt: 0 } ]
-  4250 -> [ Rex { pos: { x: defaultConfig.canvasSize.width, y: emoSize }, cnt: 0 } ]
-  5000 -> [ Rex { pos: { x: defaultConfig.canvasSize.width, y: emoSize }, cnt: 0 } ]
-  5250 -> [ Rex { pos: { x: defaultConfig.canvasSize.width, y: emoSize }, cnt: 0 } ]
-  -- forth: 12288
-  6000 -> [ Moi { pos: { x: defaultConfig.canvasSize.width, y: 250 }, cnt: 0 } ]
-  6250 -> [ Moi { pos: { x: defaultConfig.canvasSize.width, y: 400 }, cnt: 0 } ]
-  6500 -> [ Moi { pos: { x: defaultConfig.canvasSize.width, y: 100 }, cnt: 0 } ]
+  -- third: 4096
+  4000 -> [ Rex { pos: { x: canvasSize.width, y: emoSize }, cnt: 0 } ]
+  4250 -> [ Rex { pos: { x: canvasSize.width, y: emoSize }, cnt: 0 } ]
+  5000 -> [ Rex { pos: { x: canvasSize.width, y: emoSize }, cnt: 0 } ]
+  5250 -> [ Rex { pos: { x: canvasSize.width, y: emoSize }, cnt: 0 } ]
+  -- forth: 6144
+  6000 -> [ Moi { pos: { x: canvasSize.width, y: 250 }, cnt: 0 } ]
+  6250 -> [ Moi { pos: { x: canvasSize.width, y: 400 }, cnt: 0 } ]
+  6500 -> [ Moi { pos: { x: canvasSize.width, y: 100 }, cnt: 0 } ]
   7000 ->
-    [ Moi { pos: { x: defaultConfig.canvasSize.width, y: 250 }, cnt: 0 }
-    , Moi { pos: { x: defaultConfig.canvasSize.width, y: 400 }, cnt: 0 }
-    , Moi { pos: { x: defaultConfig.canvasSize.width, y: 100 }, cnt: 0 }
+    [ Moi { pos: { x: canvasSize.width, y: 250 }, cnt: 0 }
+    , Moi { pos: { x: canvasSize.width, y: 400 }, cnt: 0 }
+    , Moi { pos: { x: canvasSize.width, y: 100 }, cnt: 0 }
     ]
-  -- fifth: 16384
-  8000 -> [ Oct { pos: { x: defaultConfig.canvasSize.width, y: 250 } } ]
+  -- fifth: 8192
+  8000 -> [ Oct { pos: { x: canvasSize.width, y: 250 } } ]
   _ -> []

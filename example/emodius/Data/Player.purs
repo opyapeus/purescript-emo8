@@ -2,12 +2,11 @@ module Data.Player where
 
 import Prelude
 import Class.Object (class Object, class ObjectDraw, position, size)
-import Constants (emoSize)
+import Constants (canvasSize, emoSize)
 import Data.Bullet (Bullet(..))
 import Emo8.Data.Emoji as E
 import Emo8.Data.Input (Input)
 import Emo8.Game.Draw (emo', emor')
-import Emo8.Util.Config (defaultConfig)
 import Types (Pos)
 
 data Player
@@ -83,7 +82,7 @@ initialPlayer =
   Player
     { pos:
         { x: 0
-        , y: defaultConfig.canvasSize.height / 2
+        , y: canvasSize.height / 2
         }
     , energy: 30
     , appear: Stable

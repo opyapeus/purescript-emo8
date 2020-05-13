@@ -1,7 +1,6 @@
 module Asset where
 
 import Prelude
-import Data.List as L
 import Data.Symbol (SProxy(..))
 import Emo8.Data.Emoji as E
 import Emo8.Parser (parse)
@@ -11,16 +10,15 @@ import Emo8.Util.List ((<<>>))
 
 walls :: Walls
 walls =
-  L.fromFoldable
-    [ E.waterWave -- 🌊
-    , E.evergreenTree -- 🌲
-    , E.deciduousTree -- 🌳
-    , E.mountain -- ⛰
-    , E.mountFuji -- 🗻
-    , E.cloudWithLightning -- 🌩
-    , E.tornado -- 🌪
-    , E.fire -- 🔥
-    ]
+  [ E.waterWave -- 🌊
+  , E.evergreenTree -- 🌲
+  , E.deciduousTree -- 🌳
+  , E.mountain -- ⛰
+  , E.mountFuji -- 🗻
+  , E.cloudWithLightning -- 🌩
+  , E.tornado -- 🌪
+  , E.fire -- 🔥
+  ]
 
 map0 :: EmojiMap
 map0 = parse (SProxy :: SProxy M0)

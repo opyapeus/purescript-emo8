@@ -9,7 +9,6 @@ module Emo8.Type
   , Walls
   ) where
 
-import Data.List as L
 import Emo8.Data.Emoji (Emoji)
 
 type Tempo
@@ -37,4 +36,4 @@ type Rect
     }
 
 type Walls
-  = L.List Emoji
+  = Array Emoji

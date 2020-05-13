@@ -1,8 +1,8 @@
 module Main where
 
 import Prelude
+import Data.Array (catMaybes)
 import Data.Generic.Rep (class Generic)
-import Data.List as L
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
 import Data.Symbol (SProxy(..))
@@ -22,7 +22,8 @@ import Emo8.Parser (parse)
 import Emo8.Parser.Type (EmojiMap, Score)
 import Emo8.Type (X, Y, Size)
 import Emo8.Util.Input (catchInput, noInput)
-import Foreign.Generic (class Decode, class Encode, defaultOptions, genericDecode, genericEncode)
+import Emo8.Util.State (defaultDecode, defaultEncode)
+import Foreign.Generic (class Decode, class Encode)
 
 data State
   = State
@@ -37,11 +38,11 @@ data State
 
 derive instance genericState :: Generic State _
 
-instance decodeState :: Decode State where
-  decode = genericDecode defaultOptions
-
 instance encodeState :: Encode State where
-  encode = genericEncode defaultOptions
+  encode = defaultEncode
+
+instance decodeState :: Decode State where
+  decode = defaultDecode
 
 data Appear
   = LeftWalk
@@ -52,10 +53,10 @@ data Appear
 derive instance genericAppear :: Generic Appear _
 
 instance encodeAppear :: Encode Appear where
-  encode = genericEncode defaultOptions
+  encode = defaultEncode
 
 instance decodeAppear :: Decode Appear where
-  decode = genericDecode defaultOptions
+  decode = defaultDecode
 
 newtype DR
   = DR
@@ -147,11 +148,10 @@ instance gameState ::
 
 instance gameDevState :: GameDev State DR SR where
   saveLocal (State s) =
-    L.catMaybes
-      $ L.fromFoldable
-          [ if mod s.frame 60 == 0 then Just localKeys.per60frame else Nothing
-          , if s.isJump then Just localKeys.jumped else Nothing
-          ]
+    catMaybes
+      [ if mod s.frame 60 == 0 then Just localKeys.per60frame else Nothing
+      , if s.isJump then Just localKeys.jumped else Nothing
+      ]
 
 localKeys ::
   { jumped :: LocalKey
@@ -171,41 +171,41 @@ mapSize = 32
 gravity :: Int
 gravity = 2
 
-walls :: L.List E.Emoji
-walls = L.fromFoldable [ E.japaneseNoVacancyButton ] -- 🈵
+walls :: Array E.Emoji
+walls = [ E.japaneseNoVacancyButton ] -- 🈵
 
 main :: Effect Unit
 main = do
-  let
-    dr =
-      DR
-        { stage: parse (SProxy :: SProxy Stage)
-        }
-
-    sr =
-      SR
-        { jump: parse (SProxy :: SProxy Jump)
-        }
-
-    initialState =
-      State
-        { x: 256
-        , y: mapSize
-        , dy: 0
-        , isJump: false
-        , appear: LeftWalk
-        , prevInput: noInput
-        , frame: 0
-        }
-
-    conf =
-      { canvasSize:
-          { width: 512
-          , height: 512
-          }
-      }
   s <- loadStateWithDefault initialState localKeys.jumped
   emo8Dev s dr sr conf
+  where
+  dr =
+    DR
+      { stage: parse (SProxy :: SProxy Stage)
+      }
+
+  sr =
+    SR
+      { jump: parse (SProxy :: SProxy Jump)
+      }
+
+  initialState =
+    State
+      { x: 256
+      , y: mapSize
+      , dy: 0
+      , isJump: false
+      , appear: LeftWalk
+      , prevInput: noInput
+      , frame: 0
+      }
+
+  conf =
+    { canvasSize:
+        { width: 512
+        , height: 512
+        }
+    }
 
 type Stage
   = """
@@ -225,7 +225,7 @@ type Stage
   🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
   🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
   🈵🈵🈵🈵🈵🈵🈵🈵🈵🈵🈵🈵🈵🈵🈵🈵
-    """
+  """
 
 type Jump
   = """
@@ -240,4 +240,4 @@ type Jump
   🈳🈳🈳🈳🈳🈳🈳🈳🎹🈳🈳
   🈳🈳🈳🈳🈳🈳🈳🈳🈳🎹🈳
   🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🎹
-    """
+  """
