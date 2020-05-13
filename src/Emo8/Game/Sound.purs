@@ -22,7 +22,7 @@ import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Newtype (class Newtype, unwrap)
 import Data.Traversable (traverse)
 import Effect.Class (liftEffect)
-import Effect.Class.Console (error, log)
+import Effect.Class.Console (error)
 import Effect.Ref as Ref
 import Emo8.Data.Note (toFreq)
 import Emo8.Data.Sound (Sound)
@@ -57,17 +57,17 @@ play f tone tempo = do
   liftEffect do
     m <- Ref.read r.ref
     case Map.lookup score m of
-      Just _ -> log "resume"
+      -- resume
+      Just _ -> pure unit
+      -- create new
       Nothing -> do
         now <- currentTime r.ctx
         g <- createGain r.ctx
         dest <- destination r.ctx
         connect g dest
-        oscs <- prepareOscillators r.ctx g score
-        ---
         gainP <- gain g
         void $ setValueAtTime (defaultGain tone) now gainP
-        ---
+        oscs <- prepareOscillators r.ctx g score
         freqParams <- traverse frequency oscs
         forWithIndex_ score \i ->
           zipWithMaybeA
@@ -77,14 +77,14 @@ play f tone tempo = do
                 Nothing, _ -> error "unreachable"
             )
             freqParams
+        -- NOTE: set end to terminate score
         let
           len = L.length score
         void $ setValueAtTime 0.0 (startTime now len) gainP
+        -- start sound
         traverse_ (startOscillator now) oscs
-        ---
+        -- save ref
         Ref.write (Map.singleton score oscs) r.ref
-        ---
-        log "beep"
   where
   pitch = 1.0 / toNumber tempo
 
@@ -121,11 +121,14 @@ stop f = do
   liftEffect do
     m <- Ref.read r.ref
     case Map.lookup score m of
+      -- delete existing
       Just oscs -> do
         now <- currentTime r.ctx
+        -- stop sound
         traverse_ (stopOscillator now) oscs
         let
           nm = Map.delete score m
+        -- save ref
         Ref.write nm r.ref
-        log "stop"
-      Nothing -> log "no osc"
+      -- nothing to delete
+      Nothing -> pure unit
