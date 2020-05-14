@@ -1,5 +1,8 @@
 # Emo8
 
+[![Build status](https://travis-ci.org/opyapeus/purescript-emo8.svg?branch=master)](https://travis-ci.org/opyapeus/purescript-emo8)
+[![purescript-emo8 on Pursuit](https://pursuit.purescript.org/packages/purescript-emo8/badge)](https://pursuit.purescript.org/packages/purescript-emo8)
+
 An unique functional 2D game engine that can create games with only emoji.
 
 [ [日本語](README.ja.md) ]

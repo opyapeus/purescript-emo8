@@ -1,5 +1,8 @@
 # Emo8
 
+[![Build status](https://travis-ci.org/opyapeus/purescript-emo8.svg?branch=master)](https://travis-ci.org/opyapeus/purescript-emo8)
+[![purescript-emo8 on Pursuit](https://pursuit.purescript.org/packages/purescript-emo8/badge)](https://pursuit.purescript.org/packages/purescript-emo8)
+
 絵文字だけでゲームが作れるユニークな関数型2Dゲームエンジン
 
 [ [English](README.md) ]
