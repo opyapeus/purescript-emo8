@@ -3,12 +3,9 @@ module Test.Main where
 import Prelude
 
 import Effect (Effect)
-import Test.ParseSound (parseSoundTest)
-import Test.RawSemigroup (rawSemigroupTest)
-import Test.Unit.Main (runTest)
+import Effect.Class.Console (log)
 
 main :: Effect Unit
-main =
-  runTest do
-    parseSoundTest
-    rawSemigroupTest
+main = do
+  log "🍝"
+  log "You should add some tests."

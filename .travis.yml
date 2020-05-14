@@ -1,11 +1,8 @@
-node_js:
-  - "node"
 language: node_js
+node_js:
+  - node
 install:
   - yarn
-  - yarn postinstall
 script:
   - yarn build
-  - yarn test
-  - yarn example
-  - yarn doc
+  - yarn bundle:example

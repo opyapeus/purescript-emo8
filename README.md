@@ -1,64 +1,53 @@
-# EMO8
+# Emo8
 
-[![Build status](https://travis-ci.org/opyapeus/purescript-emo8.svg?branch=master)](https://travis-ci.org/opyapeus/purescript-emo8)
-
-A functional 2D game engine that can create emoji games.
-
-※ It's still a beta version.
+An unique functional 2D game engine that can create games with only emoji.
 
 [ [日本語](README.ja.md) ]
 
 ![emo8](emo8.jpg)
 ![emodius](https://opyapeus.github.io/emo8/img/emodius-half.gif)
 
-## Recommended For The Person 
+## This Library Is For Someone Who...
 
-- Who want to make simple games in functional language
-- Who thinks it is troublesome to prepare game materials
-- Who want to distribute the game easily
-- *Who want a start to learn purescript*
-
-### Why PureScript?
-
-Because it is a functional language that can write programs with good expression and good readabilities.
-It is also compiled into JavaScript and easy to distribute.
-
-|            | Expressive power  | Ease of distribution                |
-| ---------- | ----------------- | ----------------------------------- |
-| Haskell    | ○                 | △ (Hard to convert into JavaScript) |
-| Elm        | △ (No type class) | ○                                   |
-| PureScript | ○                 | ○                                   |
+- Thinks only emoji is interesting!
+- Wants to share the game easily
+- Wants to write a clear program using PureScript
 
 ### Why Emoji?
 
-Because it is the materials that everyone can use easily on the Web.
-In addition, I think that the limited materials stimulate your imagination like playing with the LEGO block.
+- Familiar materials that can be used anywhere
+- Create games like assembling LEGO blocks
+- Interesting that there are restrictions like [PICO-8](https://www.lexaloffle.com/pico-8.php)
 
-This library is made with inspiration form [PICO-8](https://www.lexaloffle.com/pico-8.php).
-PICO-8 also has severe restrictions, but I think that it will make the game making fun.
+### Why PureScript?
 
-## Play Now!
+|            | Language abstraction | Distributability |
+| ---------- | -------------------- | ---------------- |
+| PureScript | ○                    | ○                |
+| Haskell    | ○                    | △ ※1             |
+| Elm        | △ ※2                 | ○                |
 
-You can play sample programs on the web.
+- ※1: Hard to convert into JavaScript
+- ※2: No type classes
 
-- [EMO8 GAMES](https://opyapeus.github.io/emo8/index.html)
+## Feature
 
-## Specification
-
-- Display: variable size (recommended 256px~1024px)
-- Background Color: HTML Named Color 140 colors
-- Emoji: Unicode Emoji - [Supported Emojis](docs/emoji.md)
-- Input: 8 buttons（up down left right 4 buttons x 2）
-- Map: No limit Emoji map - [Map Edit](docs/usage.md#map-edit)
-- Sound: 4 channels Emoji score - [Sound Edit](docs/usage.md#sound-edit)
-- Language: [PureScript](http://www.purescript.org/)
-- Compiled File Volume: about 500KB~1MB
-- Frame Rate: about 60 FPS
-- Operating Environment: web browser
+|                       |                                                |
+| --------------------- | ---------------------------------------------- |
+| Screen Size           | Variable 256px~1024px（reasonable）            |
+| Background Color      | 140 colors（HTML named colors）                |
+| Material              | Unicode Emoji v13.0 （Single code point only） |
+| Controller            | 8 buttons（up down left bottom ×2）            |
+| Map                   | Map made of Emoji                              |
+| Sound                 | Sound made of Emoji                            |
+| Language              | PureScript                                     |
+| Output File Volume    | ~1MB（reasonable）                             |
+| Frame Rate            | About 60 FPS（requestAnimationFrame）          |
+| Operating Environment | Web browser                                    |
 
 ## Controller
 
-- Keyboard
+### Keyboard Input
 
 ```
  /¯¯¯\_/¯¯¯\
@@ -68,7 +57,7 @@ You can play sample programs on the web.
  \___/¯\___/
 ```
 
-- Touch Screen (Swipe)
+### Screen Swipe
 
 ```
 |¯¯¯¯¯¯¯¯|¯¯¯¯¯¯¯¯|
@@ -78,61 +67,62 @@ You can play sample programs on the web.
 |________|________|
 ```
 
-## Sample Programs
+## Resource Editor
 
-Clone this repository first.
-`yarn` is required.
+### Map
 
-### Install
+```
+🈳🈳🈳🈳🈳🈳🈳🈳🈳
+🈳⛅🈳🈳🎌🈳🈳🌧🈳
+🈳🈳🈳🌳🗻🌳🈳🈳🈳
+🈳🈳🌳🗻🗻🗻🌳🈳🈳
+🈳🌳🗻🗻🗻🗻🗻🌳🈳
+🌳🗻🗻🗻🗻🗻🗻🗻🌳
+```
 
-```sh
+### Sound
+
+
+```
+🎹🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+🎹🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+🎹🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳
+🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🎹
+```
+
+## Sample Program
+
+See [example](example) for the implementation.
+
+```
 yarn
-yarn postinstall
 ```
 
-### Build
+### Output File
 
-```sh
+```
+yarn bundle:example
+```
+
+```
+open dist/example/hello/index.html
+open dist/example/basic/index.html
+open dist/example/emodius/index.html
+```
+
+### Development
+
+```
 yarn build
-yarn example
 ```
 
-### Start (Open html in browser)
-
-```sh
-open dist/hello/index.html
-open dist/basic/index.html
-open dist/emodius/index.html
-open dist/nekof/index.html
+```
+yarn dev
 ```
 
-## Simple Manual
-
-- [Usage](docs/usage.md)
-
-## Useful Game Development Template
-
-- [EMO8 Builder](https://github.com/opyapeus/emo8-builder)
-
-## API Documentation
-
-- [Module documentation on Pursuit](https://pursuit.purescript.org/packages/purescript-emo8/)
-
-## Under Developing
-
-- [ ] Interpreter which executes code on the web
-- [ ] Improve performance
-
-## Wait And See
+## Known Issue
 
 - emoji rotate (45°, 135°, 225°, 315°) problem on canvas [Why won't emojis render when rotated to 45 (or 315) degrees?](https://stackoverflow.com/questions/39749540/why-wont-emojis-render-when-rotated-to-45-or-315-degrees)
-- default emoji presentation [CSS Fonts Module Level 4 - Editor’s Draft, 17 August 2018](https://drafts.csswg.org/css-fonts-4/#font-variant-emoji-prop)
-
-## Contribution
-
-Please wait as it is still a beta version.
-If you find improvements please give me an issue.
-Thank you.
 
 ## License
 
