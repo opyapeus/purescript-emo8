@@ -89,6 +89,11 @@
 🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🎹
 ```
 
+## マニュアル
+
+- [Usage Overview](doc/usage.md)
+- [Module documentation on Pursuit](https://pursuit.purescript.org/packages/purescript-emo8)
+
 ## サンプルプログラム
 
 実装例は [example](example) を見てください。

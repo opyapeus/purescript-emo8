@@ -90,6 +90,11 @@ An unique functional 2D game engine that can create games with only emoji.
 🈳🈳🈳🈳🈳🈳🈳🈳🈳🈳🎹
 ```
 
+## Manual
+
+- [Usage Overview](doc/usage.md)
+- [Module documentation on Pursuit](https://pursuit.purescript.org/packages/purescript-emo8)
+
 ## Sample Program
 
 See [example](example) for the implementation.
