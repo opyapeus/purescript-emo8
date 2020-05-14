@@ -1,0 +1,32 @@
+{
+  "name": "purescript-emo8",
+  "license": [
+    "MIT"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/opyapeus/purescript-emo8"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-canvas": "^v4.0.0",
+    "purescript-console": "^v4.4.0",
+    "purescript-effect": "^v2.0.1",
+    "purescript-foreign-generic": "^v10.0.0",
+    "purescript-lists": "^v5.4.1",
+    "purescript-psci-support": "^v4.0.0",
+    "purescript-record": "^v2.0.2",
+    "purescript-record-extra": "^v3.0.1",
+    "purescript-refs": "^v4.1.0",
+    "purescript-signal": "^v10.1.0",
+    "purescript-transformers": "^v4.2.0",
+    "purescript-typelevel-prelude": "^v5.0.2",
+    "purescript-webaudio": "^v0.2.1",
+    "purescript-web-events": "^2.0.1"
+  }
+}
