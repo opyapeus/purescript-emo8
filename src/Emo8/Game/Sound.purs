@@ -1,5 +1,5 @@
 module Emo8.Game.Sound
-  ( Sound'
+  ( Sound
   , SoundContext
   , play
   , play'
@@ -24,15 +24,15 @@ import Effect.Class (liftEffect)
 import Effect.Class.Console (error)
 import Effect.Ref as Ref
 import Emo8.Data.Note (toFreq)
-import Emo8.Data.Sound (Sound)
+import Emo8.Data.Sound (SoundR)
 import Emo8.Data.Tone (Tone, defaultGain, toOscType)
 import Emo8.Parser.Type (Score)
 import Emo8.Type (Tempo)
 import Emo8.Util.List (zipWithMaybeA)
 
--- | Emo8 sound monad which does some sound operations.
-type Sound'
-  = Sound SoundContext
+-- | Emo8 sound monad which runs some sound operations.
+type Sound
+  = SoundR SoundContext
 
 -- REVIEW: State instead of Ref?
 type SoundContext
@@ -41,10 +41,10 @@ type SoundContext
     }
 
 -- TODO: Map key type
--- | Play the score with the specified accessor, tone and tempo.
+-- | Play the score with the specified the score, tone and tempo.
 -- | 
 -- | The operation is ignored until the score being stopped.
-play :: Score -> Tone -> Tempo -> Sound' Unit
+play :: Score -> Tone -> Tempo -> Sound Unit
 play score tone tempo = do
   r <- Reader.ask
   liftEffect do
@@ -94,13 +94,13 @@ play score tone tempo = do
   maxNotes = fromMaybe L.Nil <<< maximum
 
 -- | `play` the score after `stop`.
-play' :: Score -> Tone -> Tempo -> Sound' Unit
+play' :: Score -> Tone -> Tempo -> Sound Unit
 play' score tone tempo = do
   stop score
   play score tone tempo
 
--- | Stop playing with the specified score accessor.
-stop :: Score -> Sound' Unit
+-- | Stop playing with the specified score.
+stop :: Score -> Sound Unit
 stop score = do
   r <- Reader.ask
   liftEffect do

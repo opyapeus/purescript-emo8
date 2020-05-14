@@ -58,6 +58,7 @@ isCollideMap m ms walls size x y = f
 
   isWall Nothing = false
 
+-- | Check if the two objects collide.
 isCollide :: Size -> X -> Y -> Size -> X -> Y -> Boolean
 isCollide sizeA xA yA sizeB xB yB
   | xA < xB + sizeB

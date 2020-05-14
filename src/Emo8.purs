@@ -14,10 +14,10 @@ import Effect (Effect)
 import Effect.Class.Console (error)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
-import Emo8.Data.Draw (runDraw)
+import Emo8.Data.Draw (runDrawR)
 import Emo8.Data.Input (Input)
-import Emo8.Data.Sound (runSound)
-import Emo8.Data.Update (runUpdate)
+import Emo8.Data.Sound (runSoundR)
+import Emo8.Data.Update (runUpdateR)
 import Emo8.Game (class Game, draw, sound, update)
 import Emo8.GameBoot as B
 import Emo8.GameDev (class GameDev, saveState)
@@ -128,16 +128,16 @@ updateF ::
   forall s.
   Game s =>
   Rect -> Input -> s -> s
-updateF rect i s = runUpdate (update i s) { canvasSize: rect }
+updateF rect i s = runUpdateR (update i s) { canvasSize: rect }
 
 drawF ::
   forall s.
   Game s =>
   Context2D -> Rect -> s -> Effect Unit
-drawF ctx rect s = runDraw (draw s) { ctx: ctx, canvasSize: rect }
+drawF ctx rect s = runDrawR (draw s) { ctx: ctx, canvasSize: rect }
 
 soundF ::
   forall s.
   Game s =>
   AudioContext -> Ref (Map.Map Score (L.List OscillatorNode)) -> s -> Effect Unit
-soundF ctx ref s = runSound (sound s) { ctx: ctx, ref: ref }
+soundF ctx ref s = runSoundR (sound s) { ctx: ctx, ref: ref }

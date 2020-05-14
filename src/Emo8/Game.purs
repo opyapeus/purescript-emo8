@@ -7,24 +7,19 @@ module Emo8.Game
 
 import Prelude
 import Emo8.Data.Input (Input)
-import Emo8.Game.Draw (Draw')
-import Emo8.Game.Sound (Sound')
-import Emo8.Game.Update (Update')
+import Emo8.Game.Draw (Draw)
+import Emo8.Game.Sound (Sound)
+import Emo8.Game.Update (Update)
 
 -- | Emo8 basic game class.
 -- |
 -- | Update, draw, sound functions are called in order each frames.
 -- |
 -- | - `s` is a game state type
--- | - `dt` is a draw resouce type
--- | - `st` is a sound resouce type
 class Game s where
   -- | It takes input and current state and should return next state.
-  -- | You can read and write (optional) draw and sound resources in Update monad.
-  update :: Input -> s -> Update' s
-  -- | It takes next state and does some draw operations.
-  -- | You can read draw resources in Draw monad.
-  draw :: s -> Draw' Unit
-  -- | It takes next state and does some sound operations.
-  -- | You can read sound resources in Sound monad.
-  sound :: s -> Sound' Unit
+  update :: Input -> s -> Update s
+  -- | It takes next state and runs some draw operations.
+  draw :: s -> Draw Unit
+  -- | It takes next state and runs some sound operations.
+  sound :: s -> Sound Unit

@@ -1,6 +1,6 @@
 module Emo8.Data.Sound
-  ( Sound
-  , runSound
+  ( SoundR
+  , runSoundR
   ) where
 
 import Prelude
@@ -9,24 +9,24 @@ import Data.Newtype (class Newtype, unwrap)
 import Effect (Effect)
 import Effect.Class (class MonadEffect)
 
-newtype Sound st a
-  = Sound (ReaderT st Effect a)
+newtype SoundR st a
+  = SoundR (ReaderT st Effect a)
 
-derive instance newtypeSound :: Newtype (Sound st a) _
+derive instance newtypeSoundR :: Newtype (SoundR st a) _
 
-derive newtype instance functorSound :: Functor (Sound st)
+derive newtype instance functorSoundR :: Functor (SoundR st)
 
-derive newtype instance applySound :: Apply (Sound st)
+derive newtype instance applySoundR :: Apply (SoundR st)
 
-derive newtype instance applicativeSound :: Applicative (Sound st)
+derive newtype instance applicativeSoundR :: Applicative (SoundR st)
 
-derive newtype instance bindSound :: Bind (Sound st)
+derive newtype instance bindSoundR :: Bind (SoundR st)
 
-derive newtype instance monadSound :: Monad (Sound st)
+derive newtype instance monadSoundR :: Monad (SoundR st)
 
-derive newtype instance monadAskSound :: MonadAsk st (Sound st)
+derive newtype instance monadAskSoundR :: MonadAsk st (SoundR st)
 
-derive newtype instance monadEffectSound :: MonadEffect (Sound st)
+derive newtype instance monadEffectSoundR :: MonadEffect (SoundR st)
 
-runSound :: forall st a. Sound st a -> st -> Effect a
-runSound = runReaderT <<< unwrap
+runSoundR :: forall st a. SoundR st a -> st -> Effect a
+runSoundR = runReaderT <<< unwrap

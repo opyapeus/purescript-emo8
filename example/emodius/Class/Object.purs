@@ -1,7 +1,7 @@
 module Class.Object where
 
 import Prelude
-import Emo8.Game.Draw (Draw')
+import Emo8.Game.Draw (Draw)
 import Types (Pos)
 
 class Object s where
@@ -10,4 +10,4 @@ class Object s where
 
 class
   Object s <= ObjectDraw s where
-  draw :: s -> Draw' Unit
+  draw :: s -> Draw Unit

@@ -1,5 +1,5 @@
 module Emo8.Game.Draw
-  ( Draw'
+  ( Draw
   , DrawContext
   , cls
   , emo
@@ -18,7 +18,7 @@ import Data.String (joinWith)
 import Effect (Effect)
 import Effect.Class (liftEffect)
 import Emo8.Data.Color (Color)
-import Emo8.Data.Draw (Draw)
+import Emo8.Data.Draw (DrawR)
 import Emo8.Data.Emoji (Emoji, japaneseVacancyButton)
 import Emo8.FFI.TextBaseline (TextBaseline(..), setTextBaseline)
 import Emo8.Parser.Type (EmojiMap)
@@ -26,9 +26,9 @@ import Emo8.Type (Rect, Size, X, Y, Angle)
 import Graphics.Canvas (Context2D, fillRect, fillText, restore, rotate, save, scale, setFillStyle, setFont, translate)
 import Math (pi)
 
--- | Emo8 draw monad which does some draw operations.
-type Draw'
-  = Draw DrawContext
+-- | Emo8 draw monad which runs some draw operations.
+type Draw
+  = DrawR DrawContext
 
 type DrawContext
   = { ctx :: Context2D
@@ -36,7 +36,7 @@ type DrawContext
     }
 
 -- | Fill the entire canvas with the specified color.
-cls :: Color -> Draw' Unit
+cls :: Color -> Draw Unit
 cls c = do
   r <- Reader.ask
   localDraw r.ctx \ctx -> do
@@ -51,7 +51,7 @@ cls c = do
 -- | Draw the emoji with the specified emoji, size, x and y.
 -- |
 -- | The origin of x and y is the bottom left.
-emo :: Emoji -> Size -> X -> Y -> Draw' Unit
+emo :: Emoji -> Size -> X -> Y -> Draw Unit
 emo e size x y = do
   r <- Reader.ask
   let
@@ -65,7 +65,7 @@ emo e size x y = do
   x' = toNumber x
 
 -- | The mirror version of `emo`.
-emo' :: Emoji -> Size -> X -> Y -> Draw' Unit
+emo' :: Emoji -> Size -> X -> Y -> Draw Unit
 emo' e size x y = do
   r <- Reader.ask
   let
@@ -83,7 +83,7 @@ emo' e size x y = do
   x' = toNumber x
 
 -- | The rotation version of `emo`.
-emor :: Angle -> Emoji -> Size -> X -> Y -> Draw' Unit
+emor :: Angle -> Emoji -> Size -> X -> Y -> Draw Unit
 emor deg e size x y = do
   r <- Reader.ask
   let
@@ -103,7 +103,7 @@ emor deg e size x y = do
   rad = 2.0 * pi * toNumber deg / 360.0
 
 -- | The mirror version of `emor`.
-emor' :: Angle -> Emoji -> Size -> X -> Y -> Draw' Unit
+emor' :: Angle -> Emoji -> Size -> X -> Y -> Draw Unit
 emor' deg e size x y = do
   r <- Reader.ask
   let
@@ -123,10 +123,10 @@ emor' deg e size x y = do
 
   rad = 2.0 * pi * toNumber deg / 360.0
 
--- | Draw the emoji map with the specified accessor, size, x and y.
+-- | Draw the emoji map with the specified emoji map, size, x and y.
 -- |
 -- | The size is one of the emojis'.
-emap :: EmojiMap -> Size -> X -> Y -> Draw' Unit
+emap :: EmojiMap -> Size -> X -> Y -> Draw Unit
 emap em size x y = do
   r <- Reader.ask
   let
@@ -154,7 +154,7 @@ emap em size x y = do
 
   posX i = x' + toNumber i * size'
 
-localDraw :: Context2D -> (Context2D -> Effect Unit) -> Draw' Unit
+localDraw :: Context2D -> (Context2D -> Effect Unit) -> Draw Unit
 localDraw ctx op =
   liftEffect do
     save ctx

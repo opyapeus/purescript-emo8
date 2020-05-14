@@ -1,6 +1,6 @@
 module Emo8.Data.Draw
-  ( Draw
-  , runDraw
+  ( DrawR
+  , runDrawR
   ) where
 
 import Prelude
@@ -9,24 +9,24 @@ import Data.Newtype (class Newtype, unwrap)
 import Effect (Effect)
 import Effect.Class (class MonadEffect)
 
-newtype Draw dt a
-  = Draw (ReaderT dt Effect a)
+newtype DrawR dt a
+  = DrawR (ReaderT dt Effect a)
 
-derive instance newtypeDraw :: Newtype (Draw dt a) _
+derive instance newtypeDrawR :: Newtype (DrawR dt a) _
 
-derive newtype instance functorDraw :: Functor (Draw dt)
+derive newtype instance functorDrawR :: Functor (DrawR dt)
 
-derive newtype instance applyDraw :: Apply (Draw dt)
+derive newtype instance applyDrawR :: Apply (DrawR dt)
 
-derive newtype instance applicativeDraw :: Applicative (Draw dt)
+derive newtype instance applicativeDrawR :: Applicative (DrawR dt)
 
-derive newtype instance bindDraw :: Bind (Draw dt)
+derive newtype instance bindDrawR :: Bind (DrawR dt)
 
-derive newtype instance monadDraw :: Monad (Draw dt)
+derive newtype instance monadDrawR :: Monad (DrawR dt)
 
-derive newtype instance monadAskDraw :: MonadAsk dt (Draw dt)
+derive newtype instance monadAskDrawR :: MonadAsk dt (DrawR dt)
 
-derive newtype instance monadEffectDraw :: MonadEffect (Draw dt)
+derive newtype instance monadEffectDrawR :: MonadEffect (DrawR dt)
 
-runDraw :: forall dt a. Draw dt a -> dt -> Effect a
-runDraw = runReaderT <<< unwrap
+runDrawR :: forall dt a. DrawR dt a -> dt -> Effect a
+runDrawR = runReaderT <<< unwrap
