@@ -4,7 +4,6 @@ import Prelude
 import Data.Array (catMaybes)
 import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
-import Data.Newtype (class Newtype)
 import Data.Symbol (SProxy(..))
 import Effect (Effect)
 import Emo8 (emo8Dev)
@@ -16,11 +15,12 @@ import Emo8.FFI.LocalStorage (LocalKey(..))
 import Emo8.Game (class Game)
 import Emo8.Game.Draw (cls, emap, emo, emo')
 import Emo8.Game.Sound (play')
-import Emo8.Game.Update (Update', isCollideCanvas, isCollideMap)
+import Emo8.Game.Update (Update', isCollideCanvas)
 import Emo8.GameDev (class GameDev, loadStateWithDefault)
 import Emo8.Parser (parse)
 import Emo8.Parser.Type (EmojiMap, Score)
 import Emo8.Type (X, Y, Size)
+import Emo8.Util.Collide (isCollideMap)
 import Emo8.Util.Input (catchInput, noInput)
 import Emo8.Util.State (defaultDecode, defaultEncode)
 import Foreign.Generic (class Decode, class Encode)
@@ -58,22 +58,8 @@ instance encodeAppear :: Encode Appear where
 instance decodeAppear :: Decode Appear where
   decode = defaultDecode
 
-newtype DR
-  = DR
-  { stage :: EmojiMap
-  }
-
-derive instance newtypeDR :: Newtype DR _
-
-newtype SR
-  = SR
-  { jump :: Score
-  }
-
-derive instance newtypeSR :: Newtype SR _
-
 instance gameState ::
-  Game State DR SR where
+  Game State where
   update input (State state) = do
     let
       nx = case input.isLeft, input.isRight of
@@ -127,14 +113,15 @@ instance gameState ::
 
     isCatchWASD = catch.isW || catch.isA || catch.isS || catch.isD
 
-    isCollide :: X -> Y -> Update' DR SR Boolean
+    isCollide :: X -> Y -> Update' Boolean
     isCollide x y = do
-      isMapColl <- isCollideMap _.stage mapSize walls emoSize x y
+      let
+        isMapColl = isCollideMap stage mapSize walls emoSize x y
       isCanvasColl <- isCollideCanvas emoSize x y
       pure $ isMapColl || isCanvasColl
   draw (State state) = do
     cls C.silver
-    emap _.stage emoSize 0 0
+    emap stage emoSize 0 0
     emoF emoSize state.x state.y
     where
     emoF = case state.appear of
@@ -144,9 +131,9 @@ instance gameState ::
       RightRun -> emo' E.personRunning
   sound (State state) = do
     when state.isJump
-      $ play' _.jump Sawtooth 64
+      $ play' jump Sawtooth 64
 
-instance gameDevState :: GameDev State DR SR where
+instance gameDevState :: GameDev State where
   saveLocal (State s) =
     catMaybes
       [ if mod s.frame 60 == 0 then Just localKeys.per60frame else Nothing
@@ -177,18 +164,8 @@ walls = [ E.japaneseNoVacancyButton ] -- 🈵
 main :: Effect Unit
 main = do
   s <- loadStateWithDefault initialState localKeys.jumped
-  emo8Dev s dr sr conf
+  emo8Dev s conf
   where
-  dr =
-    DR
-      { stage: parse (SProxy :: SProxy Stage)
-      }
-
-  sr =
-    SR
-      { jump: parse (SProxy :: SProxy Jump)
-      }
-
   initialState =
     State
       { x: 256
@@ -206,6 +183,12 @@ main = do
         , height: 512
         }
     }
+
+stage :: EmojiMap
+stage = parse (SProxy :: SProxy Stage)
+
+jump :: Score
+jump = parse (SProxy :: SProxy Jump)
 
 type Stage
   = """

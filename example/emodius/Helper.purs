@@ -6,7 +6,7 @@ import Constants (canvasSize)
 import Data.Player (Player(..))
 import Emo8.Game.Update (Update', isCollideCanvas)
 
-beInMonitor :: forall a dt st. Object a => a -> Player -> Update' dt st Player
+beInMonitor :: forall a. Object a => a -> Player -> Update' Player
 beInMonitor p np@(Player ns) = do
   isCollX <- isCollideCanvas size' npos.x pos.y
   isCollY <- isCollideCanvas size' pos.x npos.y

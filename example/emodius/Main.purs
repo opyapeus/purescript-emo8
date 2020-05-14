@@ -1,7 +1,7 @@
 module Main where
 
 import Prelude
-import Asset (map0, map1, map2, map3, walls)
+import Asset (stage1, stage2, stage3, stage4, walls)
 import Class.Object (class Object, draw, position, size)
 import Collision (isCollideObjects, isOutOfWorld)
 import Constants (canvasSize, mapSize, speed)
@@ -10,21 +10,17 @@ import Data.Bullet (Bullet, updateBullet)
 import Data.Enemy (Enemy(..), addEnemyBullet, emergeTable, updateEnemy)
 import Data.EnemyBullet (EnemyBullet, updateEnemyBullet)
 import Data.Foldable (traverse_)
-import Data.Newtype (class Newtype)
 import Data.Particle (Particle, initParticle, updateParticle)
 import Data.Player (Player, addBullet, initialPlayer, updatePlayer)
 import Effect (Effect)
 import Emo8 (emo8)
 import Emo8.Data.Color as C
-import Emo8.Data.Draw (Draw)
 import Emo8.Data.Emoji as E
 import Emo8.Data.Input (Input)
 import Emo8.Game (class Game)
-import Emo8.Game.Draw (DrawContext, cls, emap, emo, emor, emor')
-import Emo8.Game.Update (Update', isCollideMap)
-import Emo8.Parser.Type (EmojiMap)
+import Emo8.Game.Draw (Draw', cls, emap, emo, emor, emor')
+import Emo8.Util.Collide (isCollideMap)
 import Emo8.Util.Input (anyInput, catchInput, everyInput)
-import Emo8.Util.Resource (EmptyScore, emptyScore)
 import Helper (beInMonitor)
 
 data State
@@ -43,19 +39,7 @@ data State
     , enemyBullets :: Array EnemyBullet
     }
 
-newtype DR
-  = DR { | DRRow }
-
-type DRRow
-  = ( stage1 :: EmojiMap
-    , stage2 :: EmojiMap
-    , stage3 :: EmojiMap
-    , stage4 :: EmojiMap
-    )
-
-derive instance newtypeDR :: Newtype DR _
-
-instance gameState :: Game State DR EmptyScore where
+instance gameState :: Game State where
   update input (TitleState s) = pure $ if anyInput (catchInput s.prevInput input) then initialPlayState else TitleState { prevInput: input }
   update input (OverState s) = pure $ if anyInput (catchInput s.prevInput input) then initialState else OverState { prevInput: input }
   update input (ClearState s) = pure $ if anyInput (catchInput s.prevInput input) then initialState else ClearState { prevInput: input }
@@ -72,8 +56,9 @@ instance gameState :: Game State DR EmptyScore where
 
       nenemyBullets = map updateEnemyBullet s.enemyBullets
     -- player collision
-    isMapColl <- isCollideScrollMap s.distance np
     let
+      isMapColl = isCollideScrollMap s.distance np
+
       isEnemyColl = any (isCollideObjects np) nenemies
 
       isEnemyBulletColl = any (isCollideObjects np) nenemyBullets
@@ -170,29 +155,21 @@ initialState = TitleState { prevInput: everyInput }
 
 main :: Effect Unit
 main = do
-  emo8 initialState dr emptyScore conf
+  emo8 initialState conf
   where
-  dr =
-    DR
-      { stage1: map0
-      , stage2: map1
-      , stage3: map2
-      , stage4: map3
-      }
-
   conf = { canvasSize: canvasSize }
 
 -- TODO: readable
-drawScrollMap :: Int -> Draw (DrawContext DR) Unit
+drawScrollMap :: Int -> Draw' Unit
 drawScrollMap d = do
   when (mapCond.s1 d)
-    $ emapF _.stage1 0
+    $ emapF stage1 0
   when (mapCond.s2 d)
-    $ emapF _.stage2 2048
+    $ emapF stage2 2048
   when (mapCond.s3 d)
-    $ emapF _.stage3 4096
+    $ emapF stage3 4096
   when (mapCond.s4 d)
-    $ emapF _.stage4 6144
+    $ emapF stage4 6144
   where
   emapF a bias =
     emap
@@ -202,26 +179,27 @@ drawScrollMap d = do
       0
 
 -- TODO: readable
-isCollideScrollMap :: forall a. Object a => Int -> a -> Update' DR EmptyScore Boolean
-isCollideScrollMap d o = do
-  s1 <-
-    whenF (mapCond.s1 d)
-      $ isCollF _.stage1 0
-  s2 <-
-    whenF (mapCond.s2 d)
-      $ isCollF _.stage2 2048
-  s3 <-
-    whenF (mapCond.s3 d)
-      $ isCollF _.stage3 4096
-  s4 <-
-    whenF (mapCond.s4 d)
-      $ isCollF _.stage4 6144
-  pure $ s1 || s2 || s3 || s4
+isCollideScrollMap :: forall a. Object a => Int -> a -> Boolean
+isCollideScrollMap d o =
+  let
+    s1 =
+      (mapCond.s1 d)
+        && (isCollF stage1 0)
+
+    s2 =
+      (mapCond.s2 d)
+        && (isCollF stage2 2048)
+
+    s3 =
+      (mapCond.s3 d)
+        && (isCollF stage3 4096)
+
+    s4 =
+      (mapCond.s4 d)
+        && (isCollF stage4 6144)
+  in
+    s1 || s2 || s3 || s4
   where
-  whenF true m = m
-
-  whenF false _ = pure false
-
   isCollF a bias =
     isCollideMap
       a

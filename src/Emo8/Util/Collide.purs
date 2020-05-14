@@ -29,6 +29,9 @@ isCollideCanvas r size x y
   | y + size > r.height = true
   | otherwise = false
 
+-- | Check if the object collides the map with the specified accessor, map size, walls, object size, x and y.
+-- |
+-- | The walls are emojis collidable in a certain map.
 isCollideMap :: EmojiMap -> Size -> Walls -> Size -> X -> Y -> Boolean
 isCollideMap m ms walls size x y = f
   where

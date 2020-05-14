@@ -14,7 +14,6 @@ import Control.Monad.Reader as Reader
 import Data.FoldableWithIndex (traverseWithIndex_)
 import Data.Int (toNumber)
 import Data.List as L
-import Data.Newtype (class Newtype, unwrap)
 import Data.String (joinWith)
 import Effect (Effect)
 import Effect.Class (liftEffect)
@@ -28,17 +27,16 @@ import Graphics.Canvas (Context2D, fillRect, fillText, restore, rotate, save, sc
 import Math (pi)
 
 -- | Emo8 draw monad which does some draw operations.
-type Draw' dt
-  = Draw (DrawContext dt)
+type Draw'
+  = Draw DrawContext
 
-type DrawContext dt
+type DrawContext
   = { ctx :: Context2D
-    , resource :: dt
     , canvasSize :: Rect
     }
 
 -- | Fill the entire canvas with the specified color.
-cls :: forall dt. Color -> Draw' dt Unit
+cls :: Color -> Draw' Unit
 cls c = do
   r <- Reader.ask
   localDraw r.ctx \ctx -> do
@@ -53,7 +51,7 @@ cls c = do
 -- | Draw the emoji with the specified emoji, size, x and y.
 -- |
 -- | The origin of x and y is the bottom left.
-emo :: forall dt. Emoji -> Size -> X -> Y -> Draw' dt Unit
+emo :: Emoji -> Size -> X -> Y -> Draw' Unit
 emo e size x y = do
   r <- Reader.ask
   let
@@ -67,7 +65,7 @@ emo e size x y = do
   x' = toNumber x
 
 -- | The mirror version of `emo`.
-emo' :: forall dt. Emoji -> Size -> X -> Y -> Draw' dt Unit
+emo' :: Emoji -> Size -> X -> Y -> Draw' Unit
 emo' e size x y = do
   r <- Reader.ask
   let
@@ -85,7 +83,7 @@ emo' e size x y = do
   x' = toNumber x
 
 -- | The rotation version of `emo`.
-emor :: forall dt. Angle -> Emoji -> Size -> X -> Y -> Draw' dt Unit
+emor :: Angle -> Emoji -> Size -> X -> Y -> Draw' Unit
 emor deg e size x y = do
   r <- Reader.ask
   let
@@ -105,7 +103,7 @@ emor deg e size x y = do
   rad = 2.0 * pi * toNumber deg / 360.0
 
 -- | The mirror version of `emor`.
-emor' :: forall dt. Angle -> Emoji -> Size -> X -> Y -> Draw' dt Unit
+emor' :: Angle -> Emoji -> Size -> X -> Y -> Draw' Unit
 emor' deg e size x y = do
   r <- Reader.ask
   let
@@ -128,18 +126,15 @@ emor' deg e size x y = do
 -- | Draw the emoji map with the specified accessor, size, x and y.
 -- |
 -- | The size is one of the emojis'.
-emap ::
-  forall dt dr.
-  Newtype dt { | dr } =>
-  ({ | dr } -> EmojiMap) -> Size -> X -> Y -> Draw' dt Unit
-emap f size x y = do
+emap :: EmojiMap -> Size -> X -> Y -> Draw' Unit
+emap em size x y = do
   r <- Reader.ask
   let
     y' = toNumber $ r.canvasSize.height - y
 
     posY i = y' - toNumber i * size'
 
-    ess = L.reverse <<< f <<< unwrap $ r.resource
+    ess = L.reverse em
   localDraw r.ctx \c -> do
     setFont c (sizeToFont size')
     traverseWithIndex_
@@ -159,7 +154,7 @@ emap f size x y = do
 
   posX i = x' + toNumber i * size'
 
-localDraw :: forall dt. Context2D -> (Context2D -> Effect Unit) -> Draw dt Unit
+localDraw :: Context2D -> (Context2D -> Effect Unit) -> Draw' Unit
 localDraw ctx op =
   liftEffect do
     save ctx

@@ -8,12 +8,11 @@ import Emo8.Data.Emoji as E
 import Emo8.Game (class Game)
 import Emo8.Game.Draw (cls, emo)
 import Emo8.Util.Config (defaultConfig)
-import Emo8.Util.Resource (EmptyMap, EmptyScore, emptyMap, emptyScore)
 
 data State
   = Void
 
-instance gameState :: Game State EmptyMap EmptyScore where
+instance gameState :: Game State where
   update _ = pure
   draw _ = do
     cls C.maroon
@@ -21,4 +20,4 @@ instance gameState :: Game State EmptyMap EmptyScore where
   sound _ = pure unit
 
 main :: Effect Unit
-main = emo8 Void emptyMap emptyScore defaultConfig
+main = emo8 Void defaultConfig

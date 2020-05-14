@@ -3,15 +3,12 @@ module Emo8.GameBoot
   , finished
   , BootState
   , initialBootState
-  , BootSoundRes
-  , bootSound
   ) where
 
 import Prelude
 import Data.Array ((..))
 import Data.Foldable (for_)
 import Data.Int (floor, toNumber)
-import Data.Newtype (class Newtype)
 import Data.Symbol (SProxy(..))
 import Emo8.Data.Color as C
 import Emo8.Data.Emoji as E
@@ -24,11 +21,10 @@ import Emo8.Parser (parse)
 import Emo8.Parser.Type (Score)
 import Emo8.Type (Rect)
 import Emo8.Util.Input (anyInput, catchInput, noInput)
-import Emo8.Util.Resource (EmptyMap)
 import Math (cos, pi, sin)
 
 class
-  Game s dt st <= GameBoot s dt st | s -> dt st where
+  Game s <= GameBoot s where
   finished :: s -> Boolean
 
 data BootState
@@ -46,11 +42,6 @@ data BootState
     , frame :: Int
     }
 
-newtype BootSoundRes
-  = BootSoundRes { beep :: Score }
-
-derive instance newtypeBootSoundRes :: Newtype BootSoundRes _
-
 type Position
   = { x :: Int, y :: Int }
 
@@ -59,7 +50,7 @@ type Polar
     , theta :: Number
     }
 
-instance gameBootState :: Game BootState EmptyMap BootSoundRes where
+instance gameBootState :: Game BootState where
   update i st@(BootState s)
     | finished st = pure st
     | anyInput (catchInput s.prevInput i) =
@@ -108,9 +99,9 @@ instance gameBootState :: Game BootState EmptyMap BootSoundRes where
     moves = map polToPos <<< map { radius: toNumber s.infSize, theta: _ } $ rotations
   sound (BootState s) = do
     when (s.timeToFinish == initialTime)
-      $ play' _.beep Sawtooth 20
+      $ play' beepScore Sawtooth 20
 
-instance gameBootBootState :: GameBoot BootState EmptyMap BootSoundRes where
+instance gameBootBootState :: GameBoot BootState where
   finished (BootState s) = s.timeToFinish <= 0
 
 initialBootState :: Rect -> BootState
@@ -152,9 +143,6 @@ polToPos pol =
 
 initialTime :: Int
 initialTime = 120
-
-bootSound :: BootSoundRes
-bootSound = BootSoundRes { beep: beepScore }
 
 beepScore :: Score
 beepScore = parse (SProxy :: SProxy Beep)

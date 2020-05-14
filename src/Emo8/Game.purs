@@ -18,13 +18,13 @@ import Emo8.Game.Update (Update')
 -- | - `s` is a game state type
 -- | - `dt` is a draw resouce type
 -- | - `st` is a sound resouce type
-class Game s dt st | s -> dt st where
+class Game s where
   -- | It takes input and current state and should return next state.
   -- | You can read and write (optional) draw and sound resources in Update monad.
-  update :: Input -> s -> Update' dt st s
+  update :: Input -> s -> Update' s
   -- | It takes next state and does some draw operations.
   -- | You can read draw resources in Draw monad.
-  draw :: s -> Draw' dt Unit
+  draw :: s -> Draw' Unit
   -- | It takes next state and does some sound operations.
   -- | You can read sound resources in Sound monad.
-  sound :: s -> Sound' st Unit
+  sound :: s -> Sound' Unit

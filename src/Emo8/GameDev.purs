@@ -22,10 +22,10 @@ import Foreign.Generic (class Decode, class Encode, decodeJSON, encodeJSON)
 -- |
 -- | You can save the state to localstrage and visualize it by defining `Encode` and `Decode` instance of the state type.
 class
-  ( Game s dt st
+  ( Game s
   , Encode s
   , Decode s
-  ) <= GameDev s dt st | s -> dt st where
+  ) <= GameDev s where
   saveLocal :: s -> Array LocalKey
 
 data LoadError
@@ -36,7 +36,7 @@ instance showLoadError :: Show LoadError where
   show (DecodeError es) = show es
   show (KeyNotFoundError s) = show s
 
-loadStateWithDefault :: forall s dt st. GameDev s dt st => s -> LocalKey -> Effect s
+loadStateWithDefault :: forall s. GameDev s => s -> LocalKey -> Effect s
 loadStateWithDefault s key = do
   es <- loadState key
   case es of
@@ -49,14 +49,14 @@ loadStateWithDefault s key = do
         KeyNotFoundError e -> log e
       pure s
 
-saveState :: forall s dt st. GameDev s dt st => s -> Effect Unit
+saveState :: forall s. GameDev s => s -> Effect Unit
 saveState s = for_ keys \k -> setItem k json
   where
   keys = saveLocal s
 
   json = encodeJSON s
 
-loadState :: forall s dt st. GameDev s dt st => LocalKey -> Effect (Either LoadError s)
+loadState :: forall s. GameDev s => LocalKey -> Effect (Either LoadError s)
 loadState key = do
   mJson <- getItem key
   pure

@@ -19,7 +19,6 @@ import Data.Int (toNumber)
 import Data.List as L
 import Data.Map as Map
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Newtype (class Newtype, unwrap)
 import Data.Traversable (traverse)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (error)
@@ -32,13 +31,12 @@ import Emo8.Type (Tempo)
 import Emo8.Util.List (zipWithMaybeA)
 
 -- | Emo8 sound monad which does some sound operations.
-type Sound' st
-  = Sound (SoundContext st)
+type Sound'
+  = Sound SoundContext
 
 -- REVIEW: State instead of Ref?
-type SoundContext st
+type SoundContext
   = { ctx :: AudioContext
-    , resource :: st
     , ref :: Ref.Ref (Map.Map Score (L.List OscillatorNode))
     }
 
@@ -46,14 +44,9 @@ type SoundContext st
 -- | Play the score with the specified accessor, tone and tempo.
 -- | 
 -- | The operation is ignored until the score being stopped.
-play ::
-  forall st sr.
-  Newtype st { | sr } =>
-  ({ | sr } -> Score) -> Tone -> Tempo -> Sound' st Unit
-play f tone tempo = do
+play :: Score -> Tone -> Tempo -> Sound' Unit
+play score tone tempo = do
   r <- Reader.ask
-  let
-    score = f $ unwrap r.resource
   liftEffect do
     m <- Ref.read r.ref
     case Map.lookup score m of
@@ -101,23 +94,15 @@ play f tone tempo = do
   maxNotes = fromMaybe L.Nil <<< maximum
 
 -- | `play` the score after `stop`.
-play' ::
-  forall st sr.
-  Newtype st { | sr } =>
-  ({ | sr } -> Score) -> Tone -> Tempo -> Sound' st Unit
-play' f tone tempo = do
-  stop f
-  play f tone tempo
+play' :: Score -> Tone -> Tempo -> Sound' Unit
+play' score tone tempo = do
+  stop score
+  play score tone tempo
 
 -- | Stop playing with the specified score accessor.
-stop ::
-  forall st sr.
-  Newtype st { | sr } =>
-  ({ | sr } -> Score) -> Sound' st Unit
-stop f = do
+stop :: Score -> Sound' Unit
+stop score = do
   r <- Reader.ask
-  let
-    score = f $ unwrap r.resource
   liftEffect do
     m <- Ref.read r.ref
     case Map.lookup score m of
