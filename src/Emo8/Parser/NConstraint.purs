@@ -5,7 +5,7 @@ module Emo8.Parser.NConstraint
   , class ExtractNR
   , class UpToThreeNote
   , class ExtractNVR
-  , class UpToElevenLength
+  , class UpTo13Length
   , kind SpecChar
   , Space
   , Return
@@ -34,7 +34,7 @@ instance nConstraint ::
   , ExtractNR nl ll
   , UpToThreeNote ll
   , ExtractNVR nl ll'
-  , UpToElevenLength ll'
+  , UpTo13Length ll'
   ) =>
   NConstraint s
 
@@ -142,60 +142,68 @@ instance extractNVRConsSpace :: ExtractNVR nl ll => ExtractNVR (NCons (Rest Spac
 
 instance extractNVRConsReturn :: ExtractNVR nl ll => ExtractNVR (NCons (Rest Return) nl) (LCons N ll)
 
-class UpToElevenLength (ll :: LList)
+class UpTo13Length (ll :: LList)
 
-instance upToElevenLengthNil :: UpToElevenLength LNil
+instance upTo13LengthNil :: UpTo13Length LNil
 
-instance upToElevenLengthConsN ::
-  UpToElevenLength ll =>
-  UpToElevenLength (N : ll)
+instance upTo13LengthConsN ::
+  UpTo13Length ll =>
+  UpTo13Length (N : ll)
 
-instance upToElevenLengthCons1 ::
-  UpToElevenLength ll =>
-  UpToElevenLength (S : N : ll)
+instance upTo13LengthCons1 ::
+  UpTo13Length ll =>
+  UpTo13Length (S : N : ll)
 
-instance upToElevenLengthCons2 ::
-  UpToElevenLength ll =>
-  UpToElevenLength (S : S : N : ll)
+instance upTo13LengthCons2 ::
+  UpTo13Length ll =>
+  UpTo13Length (S : S : N : ll)
 
-instance upToElevenLengthCons3 ::
-  UpToElevenLength ll =>
-  UpToElevenLength (S : S : S : N : ll)
+instance upTo13LengthCons3 ::
+  UpTo13Length ll =>
+  UpTo13Length (S : S : S : N : ll)
 
-instance upToElevenLengthCons4 ::
-  UpToElevenLength ll =>
-  UpToElevenLength (S : S : S : S : N : ll)
+instance upTo13LengthCons4 ::
+  UpTo13Length ll =>
+  UpTo13Length (S : S : S : S : N : ll)
 
-instance upToElevenLengthCons5 ::
-  UpToElevenLength ll =>
-  UpToElevenLength (S : S : S : S : S : N : ll)
+instance upTo13LengthCons5 ::
+  UpTo13Length ll =>
+  UpTo13Length (S : S : S : S : S : N : ll)
 
-instance upToElevenLengthCons6 ::
-  UpToElevenLength ll =>
-  UpToElevenLength (S : S : S : S : S : S : N : ll)
+instance upTo13LengthCons6 ::
+  UpTo13Length ll =>
+  UpTo13Length (S : S : S : S : S : S : N : ll)
 
-instance upToElevenLengthCons7 ::
-  UpToElevenLength ll =>
-  UpToElevenLength (S : S : S : S : S : S : S : N : ll)
+instance upTo13LengthCons7 ::
+  UpTo13Length ll =>
+  UpTo13Length (S : S : S : S : S : S : S : N : ll)
 
-instance upToElevenLengthCons8 ::
-  UpToElevenLength ll =>
-  UpToElevenLength (S : S : S : S : S : S : S : S : N : ll)
+instance upTo13LengthCons8 ::
+  UpTo13Length ll =>
+  UpTo13Length (S : S : S : S : S : S : S : S : N : ll)
 
-instance upToElevenLengthCons9 ::
-  UpToElevenLength ll =>
-  UpToElevenLength (S : S : S : S : S : S : S : S : S : N : ll)
+instance upTo13LengthCons9 ::
+  UpTo13Length ll =>
+  UpTo13Length (S : S : S : S : S : S : S : S : S : N : ll)
 
-instance upToElevenLengthCons10 ::
-  UpToElevenLength ll =>
-  UpToElevenLength (S : S : S : S : S : S : S : S : S : S : N : ll)
+instance upTo13LengthCons10 ::
+  UpTo13Length ll =>
+  UpTo13Length (S : S : S : S : S : S : S : S : S : S : N : ll)
 
-instance upToElevenLengthCons11 ::
-  UpToElevenLength ll =>
-  UpToElevenLength (S : S : S : S : S : S : S : S : S : S : S : N : ll)
+instance upTo13LengthCons11 ::
+  UpTo13Length ll =>
+  UpTo13Length (S : S : S : S : S : S : S : S : S : S : S : N : ll)
 
-instance upToElevenLengthConsMore ::
-  ( UpToElevenLength ll
-  , TE.Fail (TE.Text "The maximum score length is 11 per line.")
+instance upTo13LengthCons12 ::
+  UpTo13Length ll =>
+  UpTo13Length (S : S : S : S : S : S : S : S : S : S : S : S : N : ll)
+
+instance upTo13LengthCons13 ::
+  UpTo13Length ll =>
+  UpTo13Length (S : S : S : S : S : S : S : S : S : S : S : S : S : N : ll)
+
+instance upTo13LengthConsMore ::
+  ( UpTo13Length ll
+  , TE.Fail (TE.Text "The maximum score length is 13 per line.")
   ) =>
-  UpToElevenLength (S : S : S : S : S : S : S : S : S : S : S : S : ll)
+  UpTo13Length (S : S : S : S : S : S : S : S : S : S : S : S : S : S : ll)
