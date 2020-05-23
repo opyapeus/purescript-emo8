@@ -4,32 +4,22 @@ import Prelude
 import Asset (stage1, stage2, stage3, stage4, walls)
 import Class.Object (class Object, position, size)
 import Constants (canvasSize, mapSize)
+import Data.Maybe (Maybe(..))
 import Data.Player (Player(..))
 import Emo8.Game.Draw (Draw, emap)
-import Emo8.Game.Update (Update, isCollideCanvas)
-import Emo8.Util.Collide (isCollideMap)
+import Emo8.Game.Update (Update, getCanvasSize)
+import Emo8.Util.Collide (isCollideMap, sinkCanvas)
 
-beInMonitor :: forall a. Object a => a -> Player -> Update Player
-beInMonitor p np@(Player ns) = do
-  isCollX <- isCollideCanvas size' npos.x pos.y
-  isCollY <- isCollideCanvas size' pos.x npos.y
-  let
-    npx = case isCollX, (npos.x < pos.x) of
-      true, true -> 0
-      true, false -> canvasSize.width - size'
-      _, _ -> npos.x
-  let
-    npy = case isCollY, (npos.y < pos.y) of
-      true, true -> 0
-      true, false -> canvasSize.height - size'
-      _, _ -> npos.y
-  pure <<< Player $ ns { pos = { x: npx, y: npy } }
+beInMonitor :: Player -> Update Player
+beInMonitor player@(Player p) = do
+  r <- getCanvasSize
+  pure case sinkCanvas r psize ppos.x ppos.y of
+    Just sink -> Player $ p { pos { x = ppos.x - sink.x, y = ppos.y - sink.y } }
+    Nothing -> player
   where
-  size' = size np
+  ppos = position player
 
-  pos = position p
-
-  npos = position np
+  psize = size player
 
 -- TODO: readable
 drawScrollMap :: Int -> Draw Unit

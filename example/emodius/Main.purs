@@ -1,10 +1,10 @@
 module Main where
 
 import Prelude
-import Class.Object (draw, position)
+import Class.Object (class Object, draw, position)
 import Collision (isCollideObjects, isOutOfWorld)
 import Constants (canvasSize, speed)
-import Data.Array (any, filterA, partition)
+import Data.Array (any, filter, filterA, partition)
 import Data.Bullet (Bullet, updateBullet)
 import Data.Enemy (Enemy(..), addEnemyBullet, emergeTable, updateEnemy)
 import Data.EnemyBullet (EnemyBullet, updateEnemyBullet)
@@ -18,6 +18,7 @@ import Emo8.Data.Emoji as E
 import Emo8.Data.Input (Input)
 import Emo8.Game (class Game)
 import Emo8.Game.Draw (cls, emo, emor, emor')
+import Emo8.Game.Update (Update)
 import Emo8.Util.Input (anyInput, catchInput, everyInput)
 import Helper (beInMonitor, drawScrollMap, isCollideScrollMap)
 
@@ -35,81 +36,123 @@ data State
     , enemies :: Array Enemy
     , particles :: Array Particle
     , enemyBullets :: Array EnemyBullet
+    , trans :: Trans
     }
 
+data Trans
+  = Continue
+  | GameClear
+  | GameOver
+
 instance gameState :: Game State where
-  update input (TitleState s)
-    | anyInput (catchInput s.prevInput input) = pure initialPlayState
-    | otherwise = pure $ TitleState { prevInput: input }
-  update input (OverState s)
-    | anyInput (catchInput s.prevInput input) = pure initialState
-    | otherwise = pure $ OverState { prevInput: input }
-  update input (ClearState s)
-    | anyInput (catchInput s.prevInput input) = pure initialState
-    | otherwise = pure $ ClearState { prevInput: input }
-  update input (PlayState s) = do
-    -- update pos
-    let
-      np = updatePlayer input s.player
+  update input = case _ of
+    TitleState s
+      | catchAny s -> pure initialPlayState
+      | otherwise -> pure $ TitleState { prevInput: input }
+    OverState s
+      | catchAny s -> pure initialState
+      | otherwise -> pure $ OverState { prevInput: input }
+    ClearState s
+      | catchAny s -> pure initialState
+      | otherwise -> pure $ ClearState { prevInput: input }
+    PlayState s -> do
+      ns <- system s
+      pure case ns.trans of
+        GameClear -> ClearState { prevInput: input }
+        GameOver -> OverState { prevInput: input }
+        Continue -> PlayState ns
+      where
+      system =
+        deleteOutObjects
+          <=< playerInCanvas
+          <<< addDistance
+          <<< shootEnemy
+          <<< gameClear
+          <<< gameOver
+          <<< movement
+          <<< newPlayerBullet
+          <<< newEnemyBullet
+          <<< newEnemies
 
-      nbullets = map updateBullet s.bullets
+      newEnemies d = d { enemies = d.enemies <> emergeTable d.distance }
 
-      nenemies = map (updateEnemy s.player) s.enemies
+      newEnemyBullet d = d { enemyBullets = d.enemyBullets <> (addEnemyBullet s.player =<< d.enemies) }
 
-      nparticles = map updateParticle s.particles
+      newPlayerBullet d = d { bullets = d.bullets <> addBullet input s.player }
 
-      nenemyBullets = map updateEnemyBullet s.enemyBullets
-    -- player collision
-    let
-      isMapColl = isCollideScrollMap s.distance np
+      movement d =
+        d
+          { player = updatePlayer input d.player
+          , bullets = updateBullet <$> d.bullets
+          , enemies = updateEnemy s.player <$> d.enemies
+          , particles = updateParticle <$> d.particles
+          , enemyBullets = updateEnemyBullet <$> d.enemyBullets
+          }
 
-      isEnemyColl = any (isCollideObjects np) nenemies
+      gameOver d = check
+        where
+        check
+          | isMapColl || isEnemyColl || isEnemyBulletColl = d { trans = GameOver }
+          | otherwise = d
 
-      isEnemyBulletColl = any (isCollideObjects np) nenemyBullets
-    -- separate objects
-    let
-      { yes: collidedEnemies, no: notCollidedEnemies } = partition (\e -> any (isCollideObjects e) nbullets) nenemies
+        isMapColl = isCollideScrollMap s.distance d.player
 
-      { yes: collidedBullets, no: notCollidedBullets } = partition (\b -> any (isCollideObjects b) nenemies) nbullets
-    -- add new objects
-    let
-      newBullets = addBullet input s.player
+        isEnemyColl = anyColl d.player d.enemies
 
-      newParticles = map (\e -> initParticle (position e)) collidedEnemies
+        isEnemyBulletColl = anyColl d.player d.enemyBullets
 
-      newEnemies = emergeTable s.distance
+      gameClear d = check
+        where
+        check
+          | any isCatchBoss collidedEnemies = d { trans = GameClear }
+          | otherwise = d
 
-      newEnemyBullets = notCollidedEnemies >>= addEnemyBullet s.player
-    -- fix player position
-    nnp <- beInMonitor s.player np
-    -- delete objects (out of monitor)
-    nnbullets <- filterA (pure <<< not <=< isOutOfWorld) notCollidedBullets
-    nnenemies <- filterA (pure <<< not <=< isOutOfWorld) notCollidedEnemies
-    nnparticles <- filterA (pure <<< not <=< isOutOfWorld) nparticles
-    nnenemyBullets <- filterA (pure <<< not <=< isOutOfWorld) nenemyBullets
-    -- game condition
-    let
-      isGameOver = isMapColl || isEnemyColl || isEnemyBulletColl
+        collidedEnemies = filter (anyCollFlip d.bullets) d.enemies
 
-      isCatchOct (Oct _) = true
+        isCatchBoss (Oct _) = true
 
-      isCatchOct _ = false
+        isCatchBoss _ = false
 
-      isGameClear = any isCatchOct collidedEnemies
-    pure
-      $ case isGameClear, isGameOver of
-          true, _ -> ClearState { prevInput: input }
-          false, true -> OverState { prevInput: input }
-          false, false ->
-            PlayState
-              $ s
-                  { distance = s.distance + speed
-                  , player = nnp
-                  , bullets = nnbullets <> newBullets
-                  , enemies = nnenemies <> newEnemies
-                  , particles = nnparticles <> newParticles
-                  , enemyBullets = nnenemyBullets <> newEnemyBullets
-                  }
+      shootEnemy d =
+        d
+          { enemies = notCollidedEnemies
+          , particles = d.particles <> map (initParticle <<< position) collidedEnemies
+          , bullets = notCollidedBullets
+          }
+        where
+        { yes: collidedEnemies, no: notCollidedEnemies } = partition (anyCollFlip d.bullets) d.enemies
+
+        { yes: _, no: notCollidedBullets } = partition (anyCollFlip d.enemies) d.bullets
+
+      addDistance d = d { distance = d.distance + speed }
+
+      playerInCanvas d = do
+        player' <- beInMonitor d.player
+        pure d { player = player' }
+
+      deleteOutObjects d = do
+        enemies' <- f d.enemies
+        particles' <- f d.particles
+        bullets' <- f d.bullets
+        enemyBullets' <- f d.enemyBullets
+        pure
+          d
+            { enemies = enemies'
+            , particles = particles'
+            , bullets = bullets'
+            , enemyBullets = enemyBullets'
+            }
+        where
+        f :: forall a. Object a => Array a -> Update (Array a)
+        f = filterA (pure <<< not <=< isOutOfWorld)
+
+      anyColl :: forall a b. Object a => Object b => a -> Array b -> Boolean
+      anyColl = any <<< isCollideObjects
+
+      anyCollFlip :: forall a b. Object a => Object b => Array b -> a -> Boolean
+      anyCollFlip = flip anyColl
+    where
+    catchAny s = anyInput $ catchInput s.prevInput input
   draw (TitleState _) = do
     cls C.aqua
     emor' 30 E.helicopter 192 50 50
@@ -148,6 +191,7 @@ initialPlayState =
     , enemies: []
     , particles: []
     , enemyBullets: []
+    , trans: Continue
     }
 
 initialState :: State
