@@ -44,7 +44,7 @@ updatePlayer i (Player s) =
   where
   newPos = updatePos i s.pos
 
-  newEnergy = case (canEmit s.energy), (i.isW || i.isS || i.isD) of
+  newEnergy = case canEmit s.energy, i.isW || i.isS || i.isD of
     true, true -> 0
     true, false -> s.energy
     false, _ -> s.energy + 1
@@ -71,9 +71,7 @@ addBullet :: Input -> Player -> Array Bullet
 addBullet i (Player p) = case canEmit p.energy of
   true
     | i.isW -> [ Upper { pos: p.pos } ]
-  true
     | i.isS -> [ Downer { pos: p.pos } ]
-  true
     | i.isD -> [ Normal { pos: p.pos } ]
   _ -> []
 

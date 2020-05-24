@@ -32,43 +32,41 @@ instance objectDrawEnemy :: ObjectDraw Enemy where
   draw o@(Oct _) = emo E.octopus (size o) (position o).x (position o).y
 
 updateEnemy :: Player -> Enemy -> Enemy
-updateEnemy p@(Player _) e@(Invader s) = Invader $ s { pos { x = s.pos.x - 3, y = s.pos.y + dy } }
+updateEnemy p@(Player _) e@(Invader s) = switch
   where
+  switch
+    | v.y > 0 = Invader $ s { pos { x = s.pos.x - 3, y = s.pos.y - 1 } }
+    | v.y < 0 = Invader $ s { pos { x = s.pos.x - 3, y = s.pos.y + 1 } }
+    | otherwise = Invader $ s { pos { x = s.pos.x - 3 } }
+
   v = diffVec e p
 
-  dy
-    | v.y > 0 = -1
-    | v.y < 0 = 1
-    | otherwise = 0
-
-updateEnemy _ (Moi s) =
-  Moi
-    $ if mod s.cnt 32 < 16 then
-        s { pos { x = s.pos.x - 2, y = s.pos.y - 2 }, cnt = s.cnt + 1 }
-      else
-        s { pos { x = s.pos.x - 4, y = s.pos.y + 2 }, cnt = s.cnt + 1 }
+updateEnemy _ (Moi s)
+  | mod s.cnt 32 < 16 = Moi $ s { pos { x = s.pos.x - 2, y = s.pos.y - 2 }, cnt = s.cnt + 1 }
+  | otherwise = Moi $ s { pos { x = s.pos.x - 4, y = s.pos.y + 2 }, cnt = s.cnt + 1 }
 
 updateEnemy _ (Bee s) = Bee $ s { pos { x = s.pos.x - 6 } }
 
-updateEnemy (Player p) (Rex s) =
-  Rex
-    $ if mod s.cnt 32 < 16 then
-        s { pos { x = s.pos.x - speed, y = s.pos.y + 4 }, cnt = s.cnt + 1 }
-      else
-        s { pos { x = s.pos.x - speed, y = s.pos.y - 4 }, cnt = s.cnt + 1 }
+updateEnemy (Player p) (Rex s)
+  | mod s.cnt 32 < 16 = Rex $ s { pos { x = s.pos.x - speed, y = s.pos.y + 4 }, cnt = s.cnt + 1 }
+  | otherwise = Rex $ s { pos { x = s.pos.x - speed, y = s.pos.y - 4 }, cnt = s.cnt + 1 }
 
-updateEnemy _ (Oct s) = Oct $ s { pos { x = s.pos.x + dx } }
-  where
-  dx = if s.pos.x > canvasSize.width / 2 then -speed else 0
+updateEnemy _ o@(Oct s)
+  | s.pos.x > canvasSize.width / 2 = Oct $ s { pos { x = s.pos.x - speed } }
+  | otherwise = o
 
 addEnemyBullet :: Player -> Enemy -> Array EnemyBullet
-addEnemyBullet _ (Moi s) = if mod s.cnt 16 == 0 then [ NormalBull { pos: s.pos } ] else []
+addEnemyBullet _ (Moi s)
+  | mod s.cnt 16 == 0 = [ NormalBull { pos: s.pos } ]
+  | otherwise = []
 
-addEnemyBullet p e@(Rex s) = if mod s.cnt 32 == 16 then [ ParseBull { pos: s.pos, vec: v', t: 0 } ] else []
-  where
-  v = diffVec p e
+addEnemyBullet p e@(Rex s)
+  | mod s.cnt 32 == 16 = [ ParseBull { pos: s.pos, vec: v', t: 0 } ]
+    where
+    v = diffVec p e
 
-  v' = { x: v.x / 128, y: v.y / 128 }
+    v' = { x: v.x / 128, y: v.y / 128 }
+  | otherwise = []
 
 addEnemyBullet _ _ = []
 
