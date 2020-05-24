@@ -3,6 +3,7 @@ module Emo8.Util.Collide
   , isCollideCanvas
   , isCollideMap
   , isCollide
+  , Sink
   , sinkCanvas
   , sinkMapXY
   ) where
@@ -70,6 +71,7 @@ type Sink
     , y :: Int
     }
 
+-- | Calculate how deep the object is sunk outside the canvas.
 sinkCanvas :: Rect -> Size -> X -> Y -> Maybe Sink
 sinkCanvas r size x y = case xF, yF of
   Just sx, Just sy -> Just { x: sx, y: sy }
@@ -88,6 +90,9 @@ sinkCanvas r size x y = case xF, yF of
     | otherwise = Nothing
 
 -- NOTE: judge separately x -> y or y -> x, using previous x, y.
+-- | Calculate how deep the object is sunk in the walls.
+-- | It takes emoji map, map size, walls, previous x, previous y, emoji size, x and y.
+-- | ※ This function only checks 4-edges of the object and treats 1-map-cell for each the edges.
 sinkMapXY :: EmojiMap -> Size -> Walls -> X -> Y -> Size -> X -> Y -> Maybe Sink
 sinkMapXY em ms walls px py size x y =
   if abs (x - px) > abs (y - py) then case sinkMapXF x py of
