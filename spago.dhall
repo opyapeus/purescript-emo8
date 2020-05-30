@@ -5,7 +5,6 @@
   , "effect"
   , "foreign-generic"
   , "lists"
-  , "psci-support"
   , "record"
   , "record-extra"
   , "refs"

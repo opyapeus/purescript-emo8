@@ -19,7 +19,6 @@
     "purescript-effect": "^v2.0.1",
     "purescript-foreign-generic": "^v10.0.0",
     "purescript-lists": "^v5.4.1",
-    "purescript-psci-support": "^v4.0.0",
     "purescript-record": "^v2.0.2",
     "purescript-record-extra": "^v3.0.1",
     "purescript-refs": "^v4.1.0",
