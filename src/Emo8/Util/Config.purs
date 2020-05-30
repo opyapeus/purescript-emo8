@@ -10,4 +10,5 @@ defaultConfig =
       { width: 512
       , height: 512
       }
+  , retina: true
   }

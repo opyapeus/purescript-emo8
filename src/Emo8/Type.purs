@@ -28,6 +28,7 @@ type Size
 
 type Config
   = { canvasSize :: Rect
+    , retina :: Boolean
     }
 
 type Rect

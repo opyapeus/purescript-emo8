@@ -201,4 +201,7 @@ main :: Effect Unit
 main = do
   emo8 initialState conf
   where
-  conf = { canvasSize: canvasSize }
+  conf =
+    { canvasSize: canvasSize
+    , retina: true
+    }

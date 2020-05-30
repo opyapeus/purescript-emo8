@@ -18,6 +18,7 @@ import Emo8.Data.Draw (runDrawR)
 import Emo8.Data.Input (Input)
 import Emo8.Data.Sound (runSoundR)
 import Emo8.Data.Update (runUpdateR)
+import Emo8.FFI.Emo8Retina (emo8Retina)
 import Emo8.Game (class Game, draw, sound, update)
 import Emo8.GameBoot as B
 import Emo8.GameDev (class GameDev, saveState)
@@ -26,7 +27,7 @@ import Emo8.Input (poll)
 import Emo8.Input.Merged (mkInput)
 import Emo8.Parser.Type (Score)
 import Emo8.Type (Config, Rect)
-import Graphics.Canvas (CanvasElement, Context2D, getCanvasElementById, getContext2D, setCanvasHeight, setCanvasWidth)
+import Graphics.Canvas (CanvasElement, Context2D, getCanvasElementById, getContext2D, scale, setCanvasHeight, setCanvasWidth)
 import Signal (foldp, runSignal, sampleOn)
 import Signal.DOM (animationFrame)
 
@@ -54,11 +55,16 @@ emo8F f s conf = do
   case mc of
     Nothing -> error "no canvas"
     Just c -> do
-      setCanvasWidth c (toNumber conf.canvasSize.width)
-      setCanvasHeight c (toNumber conf.canvasSize.height)
+      when conf.retina $ emo8Retina c conf.canvasSize
+      setCanvasWidth c (scl * toNumber conf.canvasSize.width)
+      setCanvasHeight c (scl * toNumber conf.canvasSize.height)
       f c s conf
   where
   canvasId = "emo8"
+
+  scl
+    | conf.retina = 2.0
+    | otherwise = 1.0
 
 run ::
   forall s.
@@ -66,6 +72,7 @@ run ::
   CanvasElement -> s -> Config -> Effect Unit
 run c state conf = do
   dctx <- getContext2D c
+  when conf.retina $ scale dctx { scaleX: 2.0, scaleY: 2.0 }
   sctx <- newAudioContext
   ref <- Ref.new Map.empty
   frame <- animationFrame
@@ -107,6 +114,7 @@ runDev ::
   CanvasElement -> s -> Config -> Effect Unit
 runDev c state conf = do
   dctx <- getContext2D c
+  when conf.retina $ scale dctx { scaleX: 2.0, scaleY: 2.0 }
   sctx <- newAudioContext
   ref <- Ref.new Map.empty
   frame <- animationFrame
